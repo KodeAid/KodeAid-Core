@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>KodeAid.Logging</AssemblyName>
+    <RootNamespace>KodeAid.Logging</RootNamespace>
+    <Authors>Kris Penner</Authors>
+    <Company></Company>
+    <Product>Kode-Aid</Product>
+    <Description>Kode-Aid shared logging library.</Description>
+    <Copyright>Copyright © Kris Penner</Copyright>
+    <LangVersion>latest</LangVersion>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BitSquared.Common" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>

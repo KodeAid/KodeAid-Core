@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Kris Penner</Authors>
+    <Product>Kode-Aid</Product>
+    <Description>Kode-Aid shared common library.</Description>
+    <Copyright>Copyright © Kris Penner</Copyright>
+    <RootNamespace>KodeAid</RootNamespace>
+	<PackageId>KodeAid.Common</PackageId>
+	<Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>KodeAid.Common</AssemblyName>
+  </PropertyGroup>
+
+</Project>

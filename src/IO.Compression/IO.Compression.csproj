@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>KodeAid.IO.Compression</AssemblyName>
+    <RootNamespace>KodeAid.IO.Compression</RootNamespace>
+    <Authors>Kris Penner</Authors>
+    <Company></Company>
+    <Product>Kode-Aid</Product>
+    <Description>Kode-Aid shared IO compression (zip files) library.</Description>
+    <Copyright>Copyright © Kris Penner</Copyright>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
