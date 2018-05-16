@@ -19,7 +19,7 @@ namespace KodeAid
         {
         }
 
-        public static IDisposable NoOp { get; } = new Disposable();
+        public static IDisposable Noop { get; } = new Disposable();
 
         public void Dispose()
         {

@@ -52,7 +52,7 @@ namespace HtmlAgilityPack
                         lineBreakNode.ParentNode.ReplaceChild(HtmlNode.CreateNode(_newLineToken + (lineBreakNode.InnerText ?? "") + _newLineToken), lineBreakNode);
                 node = n;
             }
-            var text = HtmlEntity.DeEntitize(node.InnerText).Replace("\r", "").Replace("\n", " ").Replace(_newLineToken, newLine ?? Environment.NewLine).TrimAndCollapse(multiline, newLine);
+            var text = HtmlEntity.DeEntitize(node.InnerText).Replace("\r", "").Replace("\n", " ").Replace(_newLineToken, newLine ?? Environment.NewLine).CollapseAndTrim(multiline, newLine);
             return text;
         }
     }

@@ -3,6 +3,7 @@
 
 
 using System;
+using KodeAid;
 using Microsoft.Extensions.Logging;
 
 namespace KodeAid.Logging
@@ -21,7 +22,7 @@ namespace KodeAid.Logging
             {
             }
 
-            IDisposable ILogger.BeginScope<TState>(TState state) => Disposable.Empty;
+            IDisposable ILogger.BeginScope<TState>(TState state) => Disposable.Noop;
 
             bool ILogger.IsEnabled(LogLevel logLevel) => false;
 

@@ -1,17 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>Kris Penner</Authors>
-    <Company></Company>
-    <Product>Kode-Aid</Product>
-    <Description>Kode-Aid shared repositories library.</Description>
-    <Copyright>Copyright © Kris Penner</Copyright>
-	<AssemblyName>KodeAid.Repositories</AssemblyName>
-	<PackageId>KodeAid.Repositories</PackageId>
-	<Version>1.0.0</Version>
-	<RootNamespace>KodeAid.Repositories</RootNamespace>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Authors>Kris Penner</Authors>
+        <Product>Kode-Aid</Product>
+        <Description>Kode-Aid shared repositories library.</Description>
+        <Copyright>Copyright © Kris Penner</Copyright>
+        <RootNamespace>KodeAid.Repositories</RootNamespace>
+    	<PackageId>KodeAid.Repositories</PackageId>
+    	<Version>0.5.0</Version>
+        <AssemblyName>KodeAid.Repositories</AssemblyName>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
+        <PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109?s=200&amp;v=4</PackageIconUrl>
+        <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>helpers extensions utilities</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
 </Project>

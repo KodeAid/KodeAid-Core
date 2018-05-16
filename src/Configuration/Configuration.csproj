@@ -1,23 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>KodeAid.Configuration</RootNamespace>
-    <AssemblyName>KodeAid.Configuration</AssemblyName>
-    <Authors>Kris Penner</Authors>
-    <Company></Company>
-    <Product>Kode-Aid</Product>
-    <Description>Kode-Aid shared configuration library.</Description>
-    <Copyright>Copyright © Kris Penner</Copyright>
-    <PackageId>KodeAid.Configuration</PackageId>
-    <Version>1.0.0</Version>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Authors>Kris Penner</Authors>
+        <Product>Kode-Aid</Product>
+        <Description>Kode-Aid shared configuration library.</Description>
+        <Copyright>Copyright © Kris Penner</Copyright>
+        <RootNamespace>KodeAid.Configuration</RootNamespace>
+    	<PackageId>KodeAid.Configuration</PackageId>
+    	<Version>0.5.0</Version>
+        <AssemblyName>KodeAid.Configuration</AssemblyName>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
+        <PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109?s=200&amp;v=4</PackageIconUrl>
+        <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>helpers extensions utilities configuration</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    </ItemGroup>
 
 </Project>
