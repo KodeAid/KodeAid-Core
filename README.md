@@ -1,1 +1,1 @@
-# KodeAid.Common
+# KodeAid-Core
