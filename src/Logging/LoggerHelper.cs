@@ -22,7 +22,7 @@ namespace KodeAid.Logging
             {
             }
 
-            IDisposable ILogger.BeginScope<TState>(TState state) => Disposable.Noop;
+            IDisposable ILogger.BeginScope<TState>(TState state) => Disposable.NoOp;
 
             bool ILogger.IsEnabled(LogLevel logLevel) => false;
 
