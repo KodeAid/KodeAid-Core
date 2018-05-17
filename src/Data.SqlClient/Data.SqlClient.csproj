@@ -8,7 +8,7 @@
         <Copyright>Copyright © Kris Penner</Copyright>
         <RootNamespace>KodeAid.Data.SqlClient</RootNamespace>
     	<PackageId>KodeAid.Data.SqlClient</PackageId>
-    	<Version>0.5.0</Version>
+    	<Version>0.6.0</Version>
         <AssemblyName>KodeAid.Data.SqlClient</AssemblyName>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
@@ -22,7 +22,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="KodeAid.Common" Version="0.5.2" />
+        <PackageReference Include="KodeAid.Common" Version="0.6.0" />
         <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
     </ItemGroup>
 

@@ -8,7 +8,7 @@
         <Copyright>Copyright © Kris Penner</Copyright>
         <RootNamespace>KodeAid.IO.Compression</RootNamespace>
     	<PackageId>KodeAid.IO.Compression</PackageId>
-    	<Version>0.5.0</Version>
+    	<Version>0.6.0</Version>
         <AssemblyName>KodeAid.IO.Compression</AssemblyName>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>

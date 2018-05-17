@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using KodeAid.Text.Base64;
+using KodeAid;
 
 namespace System
 {
