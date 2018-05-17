@@ -1,0 +1,21 @@
+﻿// Copyright (c) Kris Penner. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+
+namespace KodeAid.Data.Repositories
+{
+    public interface ICrudTrackingRepositoryAsync<TEntity> : ICrudRepositoryAsync<TEntity>
+        where TEntity : class
+    {
+        Task<TEntity> GetAsync(object id, bool trackChanges);
+        Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges);
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, bool trackChanges);
+        Task TrackChangesAsync(TEntity entity);
+        Task TrackChangesOnRangeAsync(IEnumerable<TEntity> entities);
+    }
+}

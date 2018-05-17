@@ -16,7 +16,7 @@
         <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
         <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>helpers extensions utilities</PackageTags>
+        <PackageTags>helpers extensions utilities protobuf serialization</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>

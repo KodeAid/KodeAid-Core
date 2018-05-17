@@ -16,13 +16,13 @@
         <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
         <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>helpers extensions utilities</PackageTags>
+        <PackageTags>helpers extensions utilities logging</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="KodeAid.Common" Version="0.5.0" />
+        <PackageReference Include="KodeAid.Common" Version="0.5.2" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
     </ItemGroup>
 
