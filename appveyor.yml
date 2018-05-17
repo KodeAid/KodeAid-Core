@@ -1,0 +1,8 @@
+version: 0.6.{build}
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: /l+O39xKbteTtcuyht5JhE8yyLrzeoysLH9r+9r/ZnpY38ULs23tGHT/ukPUaFIJ
+  skip_symbols: false
+  artifact: /.*\.nupkg/
