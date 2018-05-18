@@ -4,12 +4,16 @@
 
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 namespace KodeAid
 {
     public static class ParseHelper
     {
+        private static readonly string[] _trueStringsForBooleanParsing = new[] { "true", "t", "1", "y", "yes", "on" };
+        private static readonly string[] _falseStringsForBooleanParsing = new[] { "false", "f", "0", "n", "no", "off" };
+
         public static T Parse<T>(string str)
         {
             return (T)Parse(str, typeof(T));
@@ -85,18 +89,12 @@ namespace KodeAid
             if (targetType == typeof(bool))
             {
                 str = str.Trim();
-                if (string.Equals(str, bool.TrueString, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(str, "1") ||
-                    string.Equals(str, "Yes", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(str, "On", StringComparison.OrdinalIgnoreCase))
+                if (_trueStringsForBooleanParsing.Contains(str.ToLowerInvariant()))
                 {
                     value = true;
                     return true;
                 }
-                if (string.Equals(str, bool.FalseString, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(str, "0") ||
-                    string.Equals(str, "No", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(str, "Off", StringComparison.OrdinalIgnoreCase))
+                if (_falseStringsForBooleanParsing.Contains(str.ToLowerInvariant()))
                 {
                     value = false;
                     return true;

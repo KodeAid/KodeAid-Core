@@ -9,6 +9,16 @@ namespace System.Linq
 {
     public static class EnumerableExtensions
     {
+        public static IEnumerable<TSource> EmptyIfNull<TSource>(this IEnumerable<TSource> source)
+        {
+            return source ?? Enumerable.Empty<TSource>();
+        }
+
+        public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource> source)
+        {
+            return source.Where(f => f != null);
+        }
+
         public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> source, int size)
         {
             ArgCheck.NotNull(nameof(source), source);
