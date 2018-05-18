@@ -5,8 +5,6 @@ platform: Any CPU
 skip_tags: true
 pull_requests:
   do_not_increment_build_number: true
-before_build:
-- nuget restore
 build:
   publish_nuget: true
   publish_nuget_symbols: true
