@@ -9,7 +9,7 @@
     <Description>Kode-Aid shared HTML utility library.</Description>
     <Copyright>Copyright © Kris Penner</Copyright>
     <LangVersion>latest</LangVersion>
-    <Version>0.6.0</Version>
+    <Version>0.8.0</Version>
     <RootNamespace>KodeAid.Html</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -23,7 +23,10 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.7.0" />
-    <PackageReference Include="KodeAid.Common" Version="0.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>

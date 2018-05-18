@@ -8,7 +8,7 @@
         <Copyright>Copyright © Kris Penner</Copyright>
         <RootNamespace>KodeAid.Security.Cryptography</RootNamespace>
     	<PackageId>KodeAid.Security.Cryptography</PackageId>
-    	<Version>0.6.0</Version>
+    	<Version>0.8.0</Version>
         <AssemblyName>KodeAid.Security.Cryptography</AssemblyName>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
@@ -22,7 +22,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="KodeAid.Common" Version="0.6.0" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.4.0" />
     </ItemGroup>
 
