@@ -8,10 +8,8 @@
     <Product>Kode-Aid</Product>
     <Description>Kode-Aid shared HTML utility library.</Description>
     <Copyright>Copyright © Kris Penner</Copyright>
-    <LangVersion>latest</LangVersion>
-    <Version>0.8.0</Version>
+    <Version>0.8.2</Version>
     <RootNamespace>KodeAid.Html</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
@@ -19,10 +17,12 @@
     <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>helpers extensions utilities html</PackageTags>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.7.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62909-01" />
   </ItemGroup>
 
   <ItemGroup>

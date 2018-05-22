@@ -8,7 +8,7 @@
         <Copyright>Copyright © Kris Penner</Copyright>
         <RootNamespace>KodeAid.Configuration</RootNamespace>
     	<PackageId>KodeAid.Configuration</PackageId>
-    	<Version>0.8.0</Version>
+    	<Version>0.8.2</Version>
         <AssemblyName>KodeAid.Configuration</AssemblyName>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
@@ -17,7 +17,6 @@
         <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>helpers extensions utilities configuration</PackageTags>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
@@ -25,6 +24,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62909-01" />
     </ItemGroup>
 
 </Project>
