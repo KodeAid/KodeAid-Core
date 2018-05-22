@@ -52,10 +52,10 @@ namespace KodeAid.Serialization.Binary
                 SerializeToStream(stream, graph);
         }
 
-        public Task SerializeToFileAsync(string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
+        public async Task SerializeToFileAsync(string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
         {
             using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
-                return SerializeToStreamAsync(stream, graph, cancellationToken);
+                await SerializeToStreamAsync(stream, graph, cancellationToken).ConfigureAwait(false);
         }
 
         public T DeserializeFromFile<T>(string path)
@@ -64,10 +64,10 @@ namespace KodeAid.Serialization.Binary
                 return DeserializeFromStream<T>(stream);
         }
 
-        public Task<T> DeserializeFromFileAsync<T>(string path, CancellationToken cancellationToken = default)
+        public async Task<T> DeserializeFromFileAsync<T>(string path, CancellationToken cancellationToken = default)
         {
             using (var stream = File.OpenRead(path))
-                return DeserializeFromStreamAsync<T>(stream, cancellationToken);
+                return await DeserializeFromStreamAsync<T>(stream, cancellationToken).ConfigureAwait(false);
         }
 
         object ISerializer.Serialize(object value)

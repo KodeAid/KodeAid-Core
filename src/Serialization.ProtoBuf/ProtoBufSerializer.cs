@@ -3,37 +3,81 @@
 
 
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using ProtoBuf;
 
 namespace KodeAid.Serialization.ProtoBuf
 {
-    public static class ProtoBufSerializer
+    public class ProtoBufSerializer : ISerializer<byte[]>
     {
-        public static byte[] Serialize(object value)
+        public byte[] Serialize(object graph)
         {
             using (var stream = new MemoryStream())
             {
-                Serializer.Serialize(stream, value);
+                SerializeToStream(stream, graph);
                 return stream.ToArray();
             }
         }
 
-        public static T Deserialize<T>(byte[] data)
+        public T Deserialize<T>(byte[] data)
         {
             using (var stream = new MemoryStream(data))
-                return Serializer.Deserialize<T>(stream);
+                return DeserializeFromStream<T>(stream);
         }
 
-        public static void SerializeToFile(string fileName, object value)
+        public void SerializeToStream(Stream stream, object graph)
         {
-            using (var stream = File.Open(fileName, FileMode.Create))
-                Serializer.Serialize(stream, value);
+            Serializer.Serialize(stream, graph);
         }
 
-        public static T DeserializeFromFile<T>(string fileName)
+        public Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
-            using (var stream = File.Open(fileName, FileMode.Open))
-                return Serializer.Deserialize<T>(stream);
+            return Task.Run(() => Serializer.Serialize(stream, graph), cancellationToken);
+        }
+
+        public T DeserializeFromStream<T>(Stream stream)
+        {
+            return Serializer.Deserialize<T>(stream);
+        }
+
+        public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => Serializer.Deserialize<T>(stream), cancellationToken);
+        }
+
+        public void SerializeToFile(string path, object graph, bool overwrite = false)
+        {
+            using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
+                SerializeToStream(stream, graph);
+        }
+
+        public async Task SerializeToFileAsync(string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
+        {
+            using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
+                await SerializeToStreamAsync(stream, graph, cancellationToken).ConfigureAwait(false);
+        }
+
+        public T DeserializeFromFile<T>(string path)
+        {
+            using (var stream = File.OpenRead(path))
+                return DeserializeFromStream<T>(stream);
+        }
+
+        public async Task<T> DeserializeFromFileAsync<T>(string path, CancellationToken cancellationToken = default)
+        {
+            using (var stream = File.OpenRead(path))
+                return await DeserializeFromStreamAsync<T>(stream, cancellationToken).ConfigureAwait(false);
+        }
+
+        object ISerializer.Serialize(object value)
+        {
+            return Serialize(value);
+        }
+
+        T ISerializer.Deserialize<T>(object data)
+        {
+            return Deserialize<T>((byte[])data);
         }
     }
 }

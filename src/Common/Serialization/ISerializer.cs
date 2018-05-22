@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace KodeAid.Serialization.Binary
+namespace KodeAid.Serialization
 {
     public interface ISerializer<TSerialized> : ISerializer
     {
