@@ -103,7 +103,6 @@ namespace KodeAid.Serialization.Json
         {
             using (var jw = new JsonTextWriter(writer))
             {
-                r
                 new NJsonSerializer().Serialize(jw, graph);
                 jw.Flush();
             }
