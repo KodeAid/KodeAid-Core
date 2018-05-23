@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KodeAid
 {
-    public interface IAsyncService
+    public interface IComponentService
     {
         bool IsStarted { get; }
         Task StartAsync(CancellationToken cancellationToken);
