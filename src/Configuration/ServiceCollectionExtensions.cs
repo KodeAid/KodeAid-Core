@@ -9,11 +9,21 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection, string environment = null, string basePath = null, string jsonFileName = "appsettings.json")
+        public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
+            string environment = null, string basePath = null,
+            bool isJsonFileRequired = false, string jsonFileName = "appsettings.json")
+        {
+            return AddConfiguration(serviceCollection, out var configuration, environment, basePath, isJsonFileRequired, jsonFileName);
+        }
+
+        public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
+            out IConfiguration configuration,
+            string environment = null, string basePath = null,
+            bool isJsonFileRequired = false, string jsonFileName = "appsettings.json")
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(basePath ?? Directory.GetCurrentDirectory())
-                .AddJsonFile(jsonFileName, optional: false, reloadOnChange: true)
+                .AddJsonFile(jsonFileName, optional: !isJsonFileRequired, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             if (!string.IsNullOrEmpty(environment))
@@ -23,7 +33,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.AddJsonFile($"{fileName}.{environment}{extension}", optional: true, reloadOnChange: true);
             }
 
-            return serviceCollection.AddSingleton<IConfiguration>(builder.Build());
+            configuration = builder.Build();
+            return serviceCollection.AddSingleton(configuration);
         }
     }
 }
