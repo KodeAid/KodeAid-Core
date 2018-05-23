@@ -6,6 +6,6 @@ namespace KodeAid
 {
     public interface IIdentifiable<T>
     {
-        T Id { get; }
+        T Id { get; set; }
     }
 }
