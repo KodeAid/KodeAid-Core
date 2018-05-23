@@ -28,12 +28,12 @@ namespace KodeAid
             throw new ArgumentException($"Parameter {nameof(str)} cannot be parsed as type {targetType.FullName}.", "strValue");
         }
 
-        public static T ParseOrDefault<T>(string str, T defaultValue = default, bool ignoreCase = false)
+        public static T ParseOrDefault<T>(string str, bool ignoreCase = false, T defaultValue = default)
         {
             return (T)ParseOrDefault(str, typeof(T), defaultValue, ignoreCase: ignoreCase);
         }
 
-        public static object ParseOrDefault(string str, Type targetType, object defaultValue = null, bool ignoreCase = false)
+        public static object ParseOrDefault(string str, Type targetType, bool ignoreCase = false, object defaultValue = null)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
             if (defaultValue != null && !targetType.IsAssignableFrom(defaultValue.GetType()))
