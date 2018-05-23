@@ -12,7 +12,7 @@
         <AssemblyName>KodeAid.Serialization.Json</AssemblyName>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
-        <PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109?s=200&amp;v=4</PackageIconUrl>
+        <PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109</PackageIconUrl>
         <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
         <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
