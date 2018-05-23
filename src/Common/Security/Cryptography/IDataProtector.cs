@@ -2,11 +2,13 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Threading.Tasks;
+
 namespace KodeAid.Security.Cryptography
 {
     public interface IDataProtector
     {
-        byte[] EncryptData(byte[] dataToEncrypt, byte[] key);
-        byte[] DecryptData(byte[] dataToDecrypt, byte[] key);
+        byte[] ProtectData(byte[] unprotectedData);
+        byte[] UnprotectData(byte[] protectedData);
     }
 }
