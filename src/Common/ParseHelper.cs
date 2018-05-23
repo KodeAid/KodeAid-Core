@@ -30,7 +30,7 @@ namespace KodeAid
 
         public static T ParseOrDefault<T>(string str, bool ignoreCase = false, T defaultValue = default)
         {
-            return (T)ParseOrDefault(str, typeof(T), defaultValue, ignoreCase: ignoreCase);
+            return (T)ParseOrDefault(str, typeof(T), ignoreCase, defaultValue);
         }
 
         public static object ParseOrDefault(string str, Type targetType, bool ignoreCase = false, object defaultValue = null)

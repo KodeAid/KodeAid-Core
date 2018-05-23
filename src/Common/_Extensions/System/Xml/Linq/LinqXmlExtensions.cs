@@ -107,7 +107,7 @@ namespace System.Xml.Linq
 
         private static object ParseValue(string value, Type type, object defaultValue = null)
         {
-            return ParseHelper.ParseOrDefault(value, type, defaultValue);
+            return ParseHelper.ParseOrDefault(value, type, false, defaultValue);
         }
     }
 }
