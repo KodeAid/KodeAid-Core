@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace KodeAid.Repositories
@@ -12,10 +13,10 @@ namespace KodeAid.Repositories
     public interface ICrudTrackingRepositoryAsync<TEntity> : ICrudRepositoryAsync<TEntity>
         where TEntity : class
     {
-        Task<TEntity> GetAsync(object id, bool trackChanges);
-        Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges);
-        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, bool trackChanges);
-        Task TrackChangesAsync(TEntity entity);
-        Task TrackChangesOnRangeAsync(IEnumerable<TEntity> entities);
+        Task<TEntity> GetAsync(object id, bool trackChanges, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, bool trackChanges, CancellationToken cancellationToken = default);
+        Task TrackChangesAsync(TEntity entity, bool trackChanges = true, CancellationToken cancellationToken = default);
+        Task TrackChangesForRangeAsync(IEnumerable<TEntity> entities, bool trackChanges = true, CancellationToken cancellationToken = default);
     }
 }

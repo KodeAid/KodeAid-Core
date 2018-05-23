@@ -14,7 +14,7 @@ namespace KodeAid.Repositories
         TEntity Get(object id, bool trackChanges);
         IEnumerable<TEntity> GetAll(bool trackChanges);
         IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate, bool trackChanges);
-        void TrackChanges(TEntity entity);
-        void TrackChangesOnRange(IEnumerable<TEntity> entities);
+        void TrackChanges(TEntity entity, bool trackChanges = true);
+        void TrackChangesForRange(IEnumerable<TEntity> entities, bool trackChanges = true);
     }
 }
