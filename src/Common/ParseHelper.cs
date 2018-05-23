@@ -4,8 +4,10 @@
 
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace KodeAid
 {
@@ -14,36 +16,36 @@ namespace KodeAid
         private static readonly string[] _trueStringsForBooleanParsing = new[] { "true", "t", "1", "y", "yes", "on" };
         private static readonly string[] _falseStringsForBooleanParsing = new[] { "false", "f", "0", "n", "no", "off" };
 
-        public static T Parse<T>(string str)
+        public static T Parse<T>(string str, bool ignoreCase = false)
         {
-            return (T)Parse(str, typeof(T));
+            return (T)Parse(str, typeof(T), ignoreCase: ignoreCase);
         }
 
-        public static object Parse(string str, Type targetType)
+        public static object Parse(string str, Type targetType, bool ignoreCase = false)
         {
-            if (TryParse(str, targetType, out var value))
+            if (TryParse(str, targetType, out var value, ignoreCase: ignoreCase))
                 return value;
             throw new ArgumentException($"Parameter {nameof(str)} cannot be parsed as type {targetType.FullName}.", "strValue");
         }
 
-        public static T ParseOrDefault<T>(string str, T defaultValue = default)
+        public static T ParseOrDefault<T>(string str, T defaultValue = default, bool ignoreCase = false)
         {
-            return (T)ParseOrDefault(str, typeof(T), defaultValue);
+            return (T)ParseOrDefault(str, typeof(T), defaultValue, ignoreCase: ignoreCase);
         }
 
-        public static object ParseOrDefault(string str, Type targetType, object defaultValue = null)
+        public static object ParseOrDefault(string str, Type targetType, object defaultValue = null, bool ignoreCase = false)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
             if (defaultValue != null && !targetType.IsAssignableFrom(defaultValue.GetType()))
                 throw new ArgumentException($"Parameter '{nameof(defaultValue)}' must be assignable to '{nameof(targetType)}'.", nameof(defaultValue));
-            if (TryParse(str, targetType, out var value))
+            if (TryParse(str, targetType, out var value, ignoreCase: ignoreCase))
                 return value;
             return defaultValue;
         }
 
-        public static bool TryParse<T>(string str, out T value)
+        public static bool TryParse<T>(string str, out T value, bool ignoreCase = false)
         {
-            if (TryParse(str, typeof(T), out var objValue))
+            if (TryParse(str, typeof(T), out var objValue, ignoreCase: ignoreCase))
             {
                 value = (T)objValue;
                 return true;
@@ -52,7 +54,7 @@ namespace KodeAid
             return false;
         }
 
-        public static bool TryParse(string str, Type targetType, out object value)
+        public static bool TryParse(string str, Type targetType, out object value, bool ignoreCase = false)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
 
@@ -88,13 +90,13 @@ namespace KodeAid
             // for booleans, allow case-insensitive values
             if (targetType == typeof(bool))
             {
-                str = str.Trim();
-                if (_trueStringsForBooleanParsing.Contains(str.ToLowerInvariant()))
+                str = str.Trim().Normalize().ToLowerInvariant();
+                if (_trueStringsForBooleanParsing.Contains(str))
                 {
                     value = true;
                     return true;
                 }
-                if (_falseStringsForBooleanParsing.Contains(str.ToLowerInvariant()))
+                if (_falseStringsForBooleanParsing.Contains(str))
                 {
                     value = false;
                     return true;
@@ -105,17 +107,21 @@ namespace KodeAid
                 return false;
             }
 
-            if (targetType.GetTypeInfo().IsEnum)
+            if (targetType == typeof(DateTime))
             {
-                try
+                if (DateTime.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var d))
                 {
-                    value = Enum.Parse(targetType, str);
+                    value = d;
                     return true;
                 }
-                catch
+            }
+
+            if (targetType == typeof(DateTimeOffset))
+            {
+                if (DateTimeOffset.TryParse(str, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var d))
                 {
-                    value = null;
-                    return false;
+                    value = d;
+                    return true;
                 }
             }
 
@@ -138,6 +144,39 @@ namespace KodeAid
                 }
                 value = null;
                 return false;
+            }
+
+            if (targetType.GetTypeInfo().IsEnum)
+            {
+                str = str.Trim().Normalize();
+
+                // EnumMemberAttribute
+                value = targetType.GetFields(BindingFlags.Public | BindingFlags.Static)
+                    .SingleOrDefault(f =>
+                    {
+                        if (!f.IsLiteral)
+                            return false;
+                        var a = f.GetCustomAttribute<EnumMemberAttribute>(true);
+                        if (a == null || !a.IsValueSetExplicitly)
+                            return false;
+                        if (!string.Equals(str, a.Value, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                            return false;
+                        return true;
+                    })?.GetRawConstantValue();
+                if (value != null)
+                    return true;
+
+                try
+                {
+                    // enum name or underlying integral value
+                    value = Enum.Parse(targetType, str, ignoreCase);
+                    return true;
+                }
+                catch
+                {
+                    value = null;
+                    return false;
+                }
             }
 
             try
