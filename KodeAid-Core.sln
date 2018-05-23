@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serialization.ProtoBuf", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore", "src\EntityFrameworkCore\EntityFrameworkCore.csproj", "{DF1112AB-53BA-4A12-BBC6-A3482850F057}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore", "src\AspNetCore\AspNetCore.csproj", "{35740F36-87A3-46B1-A8A2-3A374BC79CED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{DF1112AB-53BA-4A12-BBC6-A3482850F057}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF1112AB-53BA-4A12-BBC6-A3482850F057}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF1112AB-53BA-4A12-BBC6-A3482850F057}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35740F36-87A3-46B1-A8A2-3A374BC79CED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35740F36-87A3-46B1-A8A2-3A374BC79CED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35740F36-87A3-46B1-A8A2-3A374BC79CED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35740F36-87A3-46B1-A8A2-3A374BC79CED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
