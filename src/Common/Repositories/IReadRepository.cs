@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace KodeAid.Data.Repositories
+namespace KodeAid.Repositories
 {
     public interface IReadRepository<TEntity>
         where TEntity : class

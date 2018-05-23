@@ -8,7 +8,7 @@
         <Copyright>Copyright © Kris Penner</Copyright>
         <RootNamespace>KodeAid</RootNamespace>
     	<PackageId>KodeAid.Common</PackageId>
-    	<Version>0.8.3</Version>
+    	<Version>0.8.4</Version>
         <AssemblyName>KodeAid.Common</AssemblyName>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>

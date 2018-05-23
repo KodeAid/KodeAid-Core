@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace KodeAid.Data.Repositories
+namespace KodeAid.Repositories
 {
     public interface IReadRepositoryAsync<TEntity>
         where TEntity : class

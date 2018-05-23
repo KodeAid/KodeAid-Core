@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace KodeAid.Data.Repositories
+namespace KodeAid.Repositories
 {
     public interface ICrudRepository<TEntity> : IReadRepository<TEntity>
         where TEntity : class

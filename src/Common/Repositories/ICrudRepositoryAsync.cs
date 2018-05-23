@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace KodeAid.Data.Repositories
+namespace KodeAid.Repositories
 {
     public interface ICrudRepositoryAsync<TEntity> : IReadRepositoryAsync<TEntity>
         where TEntity : class
