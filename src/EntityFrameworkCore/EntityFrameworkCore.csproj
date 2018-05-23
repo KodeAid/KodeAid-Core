@@ -8,7 +8,7 @@
     <Product>Kode-Aid</Product>
     <Description>Kode-Aid shared Entity Framework Core library.</Description>
     <Copyright>Copyright © Kris Penner</Copyright>
-    <Version>0.8.0</Version>
+    <Version>0.8.1</Version>
     <RootNamespace>KodeAid.EntityFrameworkCore</RootNamespace>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>

@@ -20,6 +20,10 @@ namespace KodeAid.EntityFrameworkCore
             : base(context, autoSave)
         {
         }
+
+        protected EFRepository()
+        {
+        }
     }
 
     public class EFRepository<TEntity, TContext> : ICrudTrackingRepository<TEntity>, ICrudTrackingRepositoryAsync<TEntity>
@@ -33,6 +37,10 @@ namespace KodeAid.EntityFrameworkCore
             ArgCheck.NotNull(nameof(context), context);
             Context = context;
             _autoSave = autoSave;
+        }
+
+        protected EFRepository()
+        {
         }
 
         protected internal TContext Context { get; set; }
