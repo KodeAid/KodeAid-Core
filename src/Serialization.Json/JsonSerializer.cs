@@ -42,18 +42,15 @@ namespace KodeAid.Serialization.Json
             }
         }
 
-        public Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
+        public async Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
-            return Task.Run(async () =>
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
+                SerializeToWriter(writer, graph);
                 cancellationToken.ThrowIfCancellationRequested();
-                using (var writer = new StreamWriter(stream, Encoding.UTF8))
-                {
-                    SerializeToWriter(writer, graph);
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await writer.FlushAsync().ConfigureAwait(false);
-                }
-            });
+                await writer.FlushAsync().ConfigureAwait(false);
+            }
         }
 
         public T DeserializeFromStream<T>(Stream stream)
@@ -66,13 +63,11 @@ namespace KodeAid.Serialization.Json
 
         public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() =>
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    return DeserializeFromReader<T>(reader);
-                }
-            });
+                return Task.FromResult(DeserializeFromReader<T>(reader));
+            }
         }
 
         public void SerializeToFile(string path, object graph, bool overwrite = false)

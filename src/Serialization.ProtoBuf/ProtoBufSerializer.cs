@@ -33,7 +33,9 @@ namespace KodeAid.Serialization.ProtoBuf
 
         public Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => Serializer.Serialize(stream, graph), cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            Serializer.Serialize(stream, graph);
+            return Task.CompletedTask;
         }
 
         public T DeserializeFromStream<T>(Stream stream)
@@ -43,7 +45,8 @@ namespace KodeAid.Serialization.ProtoBuf
 
         public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => Serializer.Deserialize<T>(stream), cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult(Serializer.Deserialize<T>(stream));
         }
 
         public void SerializeToFile(string path, object graph, bool overwrite = false)

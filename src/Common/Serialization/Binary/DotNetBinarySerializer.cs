@@ -33,7 +33,9 @@ namespace KodeAid.Serialization.Binary
 
         public Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => new BinaryFormatter().Serialize(stream, graph), cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            new BinaryFormatter().Serialize(stream, graph);
+            return Task.CompletedTask;
         }
 
         public T DeserializeFromStream<T>(Stream stream)
@@ -43,7 +45,8 @@ namespace KodeAid.Serialization.Binary
 
         public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => (T)new BinaryFormatter().Deserialize(stream), cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            return Task.FromResult((T)new BinaryFormatter().Deserialize(stream));
         }
 
         public void SerializeToFile(string path, object graph, bool overwrite = false)
