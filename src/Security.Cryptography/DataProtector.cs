@@ -2,8 +2,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -13,7 +15,14 @@ namespace KodeAid.Security.Cryptography
 {
     public static class DataProtector
     {
+        public static readonly SecureString CodeKey;
+
         private static readonly Encoding _defaultEncoding = Encoding.UTF8;
+
+        public static byte[] EncryptStringWithCodeKey(string value)
+        {
+            return EncryptStringWithCodeKey(_defaultEncoding, value);
+        }
 
         public static byte[] EncryptStringWithPassword(string password, string value)
         {
@@ -33,6 +42,11 @@ namespace KodeAid.Security.Cryptography
         public static byte[] EncryptStringWithCertificate(X509Certificate2 certificate, string value)
         {
             return EncryptStringWithCertificate(certificate, _defaultEncoding, value);
+        }
+
+        public static byte[] EncryptStringsWithCodeKey(params string[] values)
+        {
+            return EncryptStringsWithCodeKey(_defaultEncoding, values);
         }
 
         public static byte[] EncryptStringsWithPassword(string password, params string[] values)
@@ -55,6 +69,11 @@ namespace KodeAid.Security.Cryptography
             return EncryptStringsWithCertificate(certificate, _defaultEncoding, values);
         }
 
+        public static byte[] EncryptStringWithCodeKey(Encoding encoding, string value)
+        {
+            return EncryptStringsWithCodeKey(encoding, new[] { value });
+        }
+
         public static byte[] EncryptStringWithPassword(string password, Encoding encoding, string value)
         {
             return EncryptStringsWithPassword(password, encoding, new[] { value });
@@ -75,6 +94,11 @@ namespace KodeAid.Security.Cryptography
             return EncryptStringsWithCertificate(certificate, encoding, new[] { value });
         }
 
+        public static byte[] EncryptStringsWithCodeKey(Encoding encoding, params string[] values)
+        {
+            return EncryptBytesWithCodeKey(GetBytesFromStrings(encoding, values));
+        }
+
         public static byte[] EncryptStringsWithPassword(string password, Encoding encoding, params string[] values)
         {
             return EncryptBytesWithPassword(password, GetBytesFromStrings(encoding, values));
@@ -93,6 +117,13 @@ namespace KodeAid.Security.Cryptography
         public static byte[] EncryptStringsWithCertificate(X509Certificate2 certificate, Encoding encoding, params string[] values)
         {
             return EncryptBytesWithCertificate(certificate, GetBytesFromStrings(encoding, values));
+        }
+
+        public static byte[] EncryptBytesWithCodeKey(byte[] data)
+        {
+            if (CodeKey == null)
+                throw new InvalidOperationException($"{nameof(CodeKey)} is not set.");
+            return EncryptBytesWithPassword(CodeKey.Unsecure(), data);
         }
 
         public static byte[] EncryptBytesWithPassword(string password, byte[] data)
@@ -120,6 +151,11 @@ namespace KodeAid.Security.Cryptography
             return certificate.GetRSAPrivateKey().Encrypt(data, RSAEncryptionPadding.OaepSHA1);
         }
 
+        public static string DecryptStringWithCodeKey(byte[] encryptedData)
+        {
+            return DecryptStringWithCodeKey(_defaultEncoding, encryptedData);
+        }
+
         public static string DecryptStringWithPassword(string password, byte[] encryptedData)
         {
             return DecryptStringWithPassword(password, _defaultEncoding, encryptedData);
@@ -138,6 +174,11 @@ namespace KodeAid.Security.Cryptography
         public static string DecryptStringWithCertificate(X509Certificate2 certificate, byte[] encryptedData)
         {
             return DecryptStringWithCertificate(certificate, _defaultEncoding, encryptedData);
+        }
+
+        public static string[] DecryptStringsWithCodeKey(byte[] encryptedData)
+        {
+            return DecryptStringsWithCodeKey(_defaultEncoding, encryptedData);
         }
 
         public static string[] DecryptStringsWithPassword(string password, byte[] encryptedData)
@@ -160,6 +201,11 @@ namespace KodeAid.Security.Cryptography
             return DecryptStringsWithCertificate(certificate, _defaultEncoding, encryptedData);
         }
 
+        public static string DecryptStringWithCodeKey(Encoding encoding, byte[] encryptedData)
+        {
+            return DecryptStringsWithCodeKey(encoding, encryptedData)[0];
+        }
+
         public static string DecryptStringWithPassword(string password, Encoding encoding, byte[] encryptedData)
         {
             return DecryptStringsWithPassword(password, encoding, encryptedData)[0];
@@ -180,6 +226,11 @@ namespace KodeAid.Security.Cryptography
             return DecryptStringsWithCertificate(certificate, encoding, encryptedData)[0];
         }
 
+        public static string[] DecryptStringsWithCodeKey(Encoding encoding, byte[] encryptedData)
+        {
+            return GetStringsFromBytes(encoding, DecryptBytesWithCodeKey(encryptedData));
+        }
+
         public static string[] DecryptStringsWithPassword(string password, Encoding encoding, byte[] encryptedData)
         {
             return GetStringsFromBytes(encoding, DecryptBytesWithPassword(password, encryptedData));
@@ -198,6 +249,13 @@ namespace KodeAid.Security.Cryptography
         public static string[] DecryptStringsWithCertificate(X509Certificate2 certificate, Encoding encoding, byte[] encryptedData)
         {
             return GetStringsFromBytes(encoding, DecryptBytesWithCertificate(certificate, encryptedData));
+        }
+
+        public static byte[] DecryptBytesWithCodeKey(byte[] encryptedData)
+        {
+            if (CodeKey == null)
+                throw new InvalidOperationException($"{nameof(CodeKey)} is not set.");
+            return DecryptBytesWithPassword(CodeKey.Unsecure(), encryptedData);
         }
 
         public static byte[] DecryptBytesWithPassword(string password, byte[] encryptedData)
