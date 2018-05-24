@@ -14,7 +14,7 @@ namespace KodeAid.Security.Cryptography
         private readonly RSAEncryptionPadding _padding;
 
         public RsaCertificateProtector(X509Certificate2 certificate)
-            : this(certificate, RSAEncryptionPadding.OaepSHA1)
+            : this(certificate, null)
         {
         }
 
@@ -22,6 +22,7 @@ namespace KodeAid.Security.Cryptography
         {
             ArgCheck.NotNull(nameof(certificate), certificate);
             _certificate = certificate;
+            _padding = padding ?? RSAEncryptionPadding.OaepSHA1;
         }
 
         public byte[] ProtectData(byte[] unprotectedData)
