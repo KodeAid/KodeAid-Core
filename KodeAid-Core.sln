@@ -27,6 +27,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore", "src\AspNetCore\AspNetCore.csproj", "{35740F36-87A3-46B1-A8A2-3A374BC79CED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8DE82B69-A512-4953-B0B5-1013AF3C8FBF}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
