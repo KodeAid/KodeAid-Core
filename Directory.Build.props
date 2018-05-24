@@ -4,7 +4,7 @@
         <Authors>Kris Penner</Authors>
         <Company></Company>
         <Product>Kode-Aid</Product>
-        <Copyright>Copyright © Kris Penner</Copyright>
+        <Copyright>Copyright © Kris Penner. All rights reserved.</Copyright>
         <DefaultLanguage>en-US</DefaultLanguage>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
