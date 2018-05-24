@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Version>0.8.3</Version>
+		<Version>0.9.0</Version>
 		<AssemblyName>KodeAid.Html</AssemblyName>
 		<RootNamespace>KodeAid.Html</RootNamespace>
 		<Description>Kode-Aid shared HTML utility library.</Description>
