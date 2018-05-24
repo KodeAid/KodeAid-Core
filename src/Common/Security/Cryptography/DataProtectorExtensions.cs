@@ -12,7 +12,7 @@ namespace KodeAid.Security.Cryptography
 {
     public static class DataProtectorExtensions
     {
-        internal static readonly Encoding _defaultEncoding = Encoding.UTF8;
+        private static readonly Encoding _defaultEncoding = Encoding.UTF8;
 
         public static byte[] ProtectString(this IDataProtector dataProtector, string unprotectedString, Encoding encoding = null)
         {
