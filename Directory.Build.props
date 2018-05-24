@@ -1,0 +1,21 @@
+<Project>
+
+	<PropertyGroup>
+		<Authors>Kris Penner</Authors>
+		<Company></Company>
+		<Product>Kode-Aid</Product>
+		<Copyright>Copyright © Kris Penner</Copyright>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
+		<PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109</PackageIconUrl>
+		<RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.1" PrivateAssets="All" />
+	</ItemGroup>
+
+</Project>

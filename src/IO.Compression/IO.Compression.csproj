@@ -2,26 +2,14 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Authors>Kris Penner</Authors>
-        <Product>Kode-Aid</Product>
-        <Description>Kode-Aid shared IO compression (zip files) library.</Description>
-        <Copyright>Copyright © Kris Penner</Copyright>
-        <RootNamespace>KodeAid.IO.Compression</RootNamespace>
-    	<PackageId>KodeAid.IO.Compression</PackageId>
-    	<Version>0.8.2</Version>
+    	<Version>0.8.3</Version>
         <AssemblyName>KodeAid.IO.Compression</AssemblyName>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
-        <PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109</PackageIconUrl>
-        <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
+        <RootNamespace>KodeAid.IO.Compression</RootNamespace>
+        <Description>Kode-Aid shared IO compression (zip files) library.</Description>
         <PackageTags>helpers extensions utilities zip archive compression io</PackageTags>
-        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-62909-01" />
         <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     </ItemGroup>
 
