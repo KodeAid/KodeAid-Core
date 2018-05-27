@@ -2,10 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-    	<Version>0.9.0</Version>
-        <AssemblyName>KodeAid.Serialization.Json</AssemblyName>
-        <RootNamespace>KodeAid.Serialization.Json</RootNamespace>
-        <Description>Kode-Aid shared JSON serialization library.</Description>
+    	<Version>0.9.1</Version>
+        <AssemblyName>KodeAid.Json</AssemblyName>
+        <RootNamespace>KodeAid.Json</RootNamespace>
+        <Description>Kode-Aid shared JSON library.</Description>
         <PackageTags>helpers extensions utilities json serialization</PackageTags>
     </PropertyGroup>
 

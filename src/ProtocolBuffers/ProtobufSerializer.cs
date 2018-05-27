@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using ProtoBuf;
 
-namespace KodeAid.Serialization.ProtoBuf
+namespace KodeAid.Serialization.ProtocolBuffers
 {
-    public class ProtoBufSerializer : ISerializer<byte[]>
+    public class ProtobufSerializer : ISerializer<byte[]>
     {
         public byte[] Serialize(object graph)
         {

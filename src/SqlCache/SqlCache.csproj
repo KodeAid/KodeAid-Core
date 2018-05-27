@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    	<Version>0.9.0</Version>
+        <AssemblyName>KodeAid.SqlCache</AssemblyName>
+        <RootNamespace>KodeAid.Caching.SqlDb</RootNamespace>
+        <Description>Kode-Aid shared SQL cache library.</Description>
+        <PackageTags>helpers extensions utilities caching sql sqldb sqlclient</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Caching\Caching.csproj" />
+	  <ProjectReference Include="..\Common\Common.csproj" />
+	  <ProjectReference Include="..\Data.SqlClient\Data.SqlClient.csproj" />
+	  <ProjectReference Include="..\Logging\Logging.csproj" />
+	</ItemGroup>
+
+</Project>
