@@ -95,7 +95,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             {
                 var options = SetPartitionKey(partitionKey);
                 var document = await _client.ReadDocumentAsync(GetDocumentUri(id), options).ConfigureAwait(false);
-                return (TDocument)(dynamic)document.Resource;
+                return (TDocument)(object)document.Resource;
             }
             catch (DocumentClientException e)
             {
@@ -135,7 +135,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             while (query.HasMoreResults)
             {
                 var documents = await query.ExecuteNextAsync<Document>().ConfigureAwait(false);
-                results.AddRange(documents.Select(d => (TDocument)(dynamic)d));
+                results.AddRange(documents.Select(d => (TDocument)(object)d));
             }
             return results;
         }
@@ -337,9 +337,13 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
         private FeedOptions SetPartitionKeyForFeed(object partitionKey, FeedOptions options = null)
         {
             if (partitionKey == null)
+            {
                 return options;
+            }
             if (options == null)
+            {
                 options = new FeedOptions();
+            }
             options.PartitionKey = new PartitionKey(partitionKey);
             return options;
         }
@@ -347,9 +351,13 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
         private RequestOptions SetPartitionKey(object partitionKey, RequestOptions options = null)
         {
             if (partitionKey == null)
+            {
                 return options;
+            }
             if (options == null)
+            {
                 options = new RequestOptions();
+            }
             options.PartitionKey = new PartitionKey(partitionKey);
             return options;
         }
@@ -357,9 +365,13 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
         private RequestOptions SetETag(string eTag, RequestOptions options = null)
         {
             if (eTag == null)
+            {
                 return options;
+            }
             if (options == null)
+            {
                 options = new RequestOptions();
+            }
             options.AccessCondition = new AccessCondition() { Type = AccessConditionType.IfMatch, Condition = eTag };
             return options;
         }
@@ -367,9 +379,13 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
         private RequestOptions SetTimeToLive(TimeSpan? ttl, RequestOptions options = null)
         {
             if (!ttl.HasValue)
+            {
                 return options;
+            }
             if (options == null)
+            {
                 options = new RequestOptions();
+            }
             options.ResourceTokenExpirySeconds = (int)ttl.Value.TotalSeconds;
             return options;
         }
