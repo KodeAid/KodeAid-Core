@@ -79,7 +79,7 @@ namespace KodeAid.ComponentModel
         /// <summary>
         /// Changes the specified property's backing field if they are considered unequal and raises any notifications as required.
         /// If both values are considered to be equal, then no assignement or notifications occurs.
-        /// This is an overload to accomodate the most common use-case utilizing the <seealso cref="CallerMemberNameAttribute"/> for <see cref="propertyName"/>.
+        /// This is an overload to accomodate the most common use-case utilizing the <seealso cref="CallerMemberNameAttribute"/> for <paramref name="propertyName"/>.
         /// </summary>
         /// <typeparam name="T">The type of the property.</typeparam>
         /// <param name="propertyField">The backing field of the property passed in by reference and currently assigned the old value.</param>

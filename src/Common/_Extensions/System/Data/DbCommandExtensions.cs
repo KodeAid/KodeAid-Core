@@ -249,6 +249,7 @@ namespace System.Data
         /// <param name="command"></param>
         /// <param name="commandText"></param>
         /// <param name="parameters"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>True if the connection should be closed within the extension method; otherwise false.</returns>
         private static async Task<bool> PrepareCommandAndEnsureConnectionIsOpenAsync(DbCommand command, string commandText, IEnumerable<IDataParameter> parameters, CancellationToken cancellationToken)
         {

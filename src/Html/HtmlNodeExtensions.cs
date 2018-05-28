@@ -16,6 +16,7 @@ namespace HtmlAgilityPack
         /// <summary>
         /// Selects a list of nodes matching the HtmlAgilityPack.HtmlNode.XPath expression - will not return null.
         /// </summary>
+        /// <param name="node">The node.</param>
         /// <param name="xpath">The XPath expression.</param>
         /// <returns>An HtmlAgilityPack.HtmlNodeCollection containing a collection of nodes matching the HtmlAgilityPack.HtmlNode.XPath query, or an empty collection if no node matched the XPath expression.</returns>
         public static HtmlNodeCollection SelectSafeNodes(this HtmlNode node, string xpath)
@@ -26,6 +27,7 @@ namespace HtmlAgilityPack
         /// <summary>
         /// Selects a list of nodes matching the HtmlAgilityPack.HtmlNode.XPath expression - will not return null.
         /// </summary>
+        /// <param name="node">The node.</param>
         /// <param name="xpath">The XPath expression.</param>
         /// <returns>An HtmlAgilityPack.HtmlNodeCollection containing a collection of nodes matching the HtmlAgilityPack.HtmlNode.XPath query, or an empty collection if no node matched the XPath expression.</returns>
         public static HtmlNodeCollection SelectSafeNodes(this HtmlNode node, XPathExpression xpath)
@@ -36,6 +38,7 @@ namespace HtmlAgilityPack
         /// <summary>
         /// Gets the unescaped inner text of a node, optionally with new lines inserted for line-breaking elements such as "br" and "p".
         /// </summary>
+        /// <param name="node">The node.</param>
         /// <param name="multiline">True to replace line-breaking elements with new lines; otherwise false to collapse to a single line.</param>
         /// <param name="newLine">The new line string to use, defaults to <see cref="System.Environment.NewLine"/>, only applicable if <paramref name="multiline"/> is true.</param>
         /// <param name="lineBreakTags">The element tag names that cause a new line to be inserted, defaults to "br" and "p" if none are specified, only applicable if <paramref name="multiline"/> is true.</param>
