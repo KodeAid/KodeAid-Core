@@ -43,6 +43,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlCache", "src\SqlCache\Sq
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cache", "Cache", "{D0351A3E-B686-44A8-A26F-03B996F30862}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CosmosDB", "src\CosmosDB\CosmosDB.csproj", "{770A5F71-CB19-49A3-AE9A-4AAB81ECD52E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,10 @@ Global
 		{F64BB1DE-AD46-48AA-8D74-3AF55FAD767C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F64BB1DE-AD46-48AA-8D74-3AF55FAD767C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F64BB1DE-AD46-48AA-8D74-3AF55FAD767C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{770A5F71-CB19-49A3-AE9A-4AAB81ECD52E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{770A5F71-CB19-49A3-AE9A-4AAB81ECD52E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{770A5F71-CB19-49A3-AE9A-4AAB81ECD52E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{770A5F71-CB19-49A3-AE9A-4AAB81ECD52E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
