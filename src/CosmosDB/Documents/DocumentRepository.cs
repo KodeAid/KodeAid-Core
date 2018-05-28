@@ -109,9 +109,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
 
         public Task<IEnumerable<TDocument>> GetAllAsync(object partitionKey = null, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return FindAsync(null, partitionKey);
+            return FindAsync(null, partitionKey, cancellationToken);
         }
 
         public async Task<IEnumerable<TDocument>> FindAsync(Expression<Func<TDocument, bool>> predicate, object partitionKey = null, CancellationToken cancellationToken = default)
@@ -159,7 +157,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
 
-            return (await Task.WhenAll(documents.Select(document => AddAsync(document, partitionKey, ttl)).ToList()).ConfigureAwait(false)).ToList();
+            return (await Task.WhenAll(documents.Select(document => AddAsync(document, partitionKey, ttl, cancellationToken)).ToList()).ConfigureAwait(false)).ToList();
         }
 
         public Task UpdateAsync(TDocument document, object partitionKey = null, string eTag = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
@@ -182,7 +180,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
 
-            return Task.WhenAll(documents.Select(document => UpdateAsync(document, partitionKey, null, ttl)).ToList());
+            return Task.WhenAll(documents.Select(document => UpdateAsync(document, partitionKey, null, ttl, cancellationToken)).ToList());
         }
 
         public async Task<string> SaveAsync(TDocument document, string documentType = null, object partitionKey = null, string eTag = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
@@ -205,7 +203,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
 
-            return (await Task.WhenAll(documents.Select(document => SaveAsync(document, documentType, partitionKey, null, ttl)).ToList()).ConfigureAwait(false)).ToList();
+            return (await Task.WhenAll(documents.Select(document => SaveAsync(document, documentType, partitionKey, null, ttl, cancellationToken)).ToList()).ConfigureAwait(false)).ToList();
         }
 
         public Task RemoveAsync(TDocument document, object partitionKey = null, CancellationToken cancellationToken = default)
@@ -222,7 +220,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
 
-            return Task.WhenAll(documents.Select(document => RemoveAsync(document, partitionKey)).ToList());
+            return Task.WhenAll(documents.Select(document => RemoveAsync(document, partitionKey, cancellationToken)).ToList());
         }
 
         public Task RemoveAsync(string id, object partitionKey = null, CancellationToken cancellationToken = default)
@@ -239,15 +237,15 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             ArgCheck.NotNull(nameof(ids), ids);
             cancellationToken.ThrowIfCancellationRequested();
 
-            return Task.WhenAll(ids.Select(id => RemoveAsync(id, partitionKey)).ToList());
+            return Task.WhenAll(ids.Select(id => RemoveAsync(id, partitionKey, cancellationToken)).ToList());
         }
 
         public async Task ClearAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var documents = await GetAllAsync().ConfigureAwait(false);
-            await RemoveRangeAsync(documents).ConfigureAwait(false);
+            var documents = await GetAllAsync(cancellationToken).ConfigureAwait(false);
+            await RemoveRangeAsync(documents, cancellationToken).ConfigureAwait(false);
         }
 
         public Task ClearAsync(object partitionKey, CancellationToken cancellationToken = default)
@@ -264,8 +262,8 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
 
             foreach (var partitionKey in partitionKeys)
             {
-                var documents = await GetAllAsync(partitionKey).ConfigureAwait(false);
-                await RemoveRangeAsync(documents, partitionKey).ConfigureAwait(false);
+                var documents = await GetAllAsync(partitionKey, cancellationToken).ConfigureAwait(false);
+                await RemoveRangeAsync(documents, partitionKey, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -281,47 +279,47 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
 
         Task<TDocument> IReadRepositoryAsync<TDocument>.GetAsync(object id, CancellationToken cancellationToken)
         {
-            return GetAsync(id?.ToString(), null);
+            return GetAsync(id?.ToString(), null, cancellationToken);
         }
 
         Task<IEnumerable<TDocument>> IReadRepositoryAsync<TDocument>.GetAllAsync(CancellationToken cancellationToken)
         {
-            return GetAllAsync(null);
+            return GetAllAsync(null, cancellationToken);
         }
 
         Task<IEnumerable<TDocument>> IReadRepositoryAsync<TDocument>.FindAsync(Expression<Func<TDocument, bool>> predicate, CancellationToken cancellationToken)
         {
-            return FindAsync(predicate, null);
+            return FindAsync(predicate, null, cancellationToken);
         }
 
         Task ICrudRepositoryAsync<TDocument>.AddAsync(TDocument document, CancellationToken cancellationToken)
         {
-            return AddAsync(document, null);
+            return AddAsync(document, null, cancellationToken: cancellationToken);
         }
 
         Task ICrudRepositoryAsync<TDocument>.AddRangeAsync(IEnumerable<TDocument> documents, CancellationToken cancellationToken)
         {
-            return AddRangeAsync(documents, null);
+            return AddRangeAsync(documents, null, cancellationToken: cancellationToken);
         }
 
         Task ICrudRepositoryAsync<TDocument>.RemoveAsync(TDocument document, CancellationToken cancellationToken)
         {
-            return RemoveAsync(document, null);
+            return RemoveAsync(document, null, cancellationToken);
         }
 
         Task ICrudRepositoryAsync<TDocument>.RemoveRangeAsync(IEnumerable<TDocument> documents, CancellationToken cancellationToken)
         {
-            return RemoveRangeAsync(documents, null);
+            return RemoveRangeAsync(documents, null, cancellationToken);
         }
 
         Task ICrudRepositoryAsync<TDocument>.UpdateAsync(TDocument document, CancellationToken cancellationToken)
         {
-            return UpdateAsync(document, null);
+            return UpdateAsync(document, null, cancellationToken: cancellationToken);
         }
 
         Task ICrudRepositoryAsync<TDocument>.UpdateRangeAsync(IEnumerable<TDocument> documents, CancellationToken cancellationToken)
         {
-            return UpdateRangeAsync(documents, null);
+            return UpdateRangeAsync(documents, null, cancellationToken: cancellationToken);
         }
 
         private Uri GetDocumentUri(string id)
