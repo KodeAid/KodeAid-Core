@@ -135,9 +135,24 @@ namespace System
         }
 
         /// <summary>
+        /// Returns a value indicating whether a specified token occurs within a string.
+        /// The characters '}' and ':' are not supported in the token name.
+        /// </summary>
+        /// <param name="str">Input string that may contain one or more tokens.</param>
+        /// <param name="token">Name of the token to seek, eg: use "MyToken" to find "{MyToken:F2}".</param>
+        /// <returns>True if the <paramref name="token"/> parameter occurs within <paramref name="str"/>; otherwise, false.</returns>
+        public static bool ContainsToken(this string str, string token)
+        {
+            ArgCheck.NotNull(nameof(str), str);
+            ArgCheck.NotNullOrEmpty(nameof(token), token);
+            var match = Regex.Match(str, $@"{{{token}(?::([^}}]*))?}}", RegexOptions.Compiled);
+            return match.Success && match.Groups[0].Success;
+        }
+
+        /// <summary>
         /// Replaces the first matching token in a string, eg: "Insert{MyToken}Here".
         /// The token may contain a format, eg: "{MyToken:F2}" or "{MyToken:yyyy-MM-dd}".
-        /// The character '}' is not currently supported in the token name or format.
+        /// The characters '}' and ':' are not supported in the token name.
         /// You can compare the resulting string to the original string to determine if a replacement took place.
         /// </summary>
         /// <param name="str">Input string that may contain one or more tokens.</param>
@@ -159,7 +174,7 @@ namespace System
         /// <summary>
         /// Replaces the first matching token in a string, eg: "Insert{MyToken}Here".
         /// The token may contain a format, eg: "{MyToken:F2}" or "{MyToken:yyyy-MM-dd}".
-        /// The character '}' is not currently supported in the token name or format.
+        /// The characters '}' and ':' are not supported in the token name.
         /// You can compare the resulting string to the original string to determine if a replacement took place.
         /// </summary>
         /// <param name="str">Input string that may contain one or more tokens.</param>
@@ -182,7 +197,7 @@ namespace System
         /// <summary>
         /// Replaces the first matching token in a string, eg: "Insert{MyToken}Here".
         /// The token may contain a format, eg: "{MyToken:F2}" or "{MyToken:yyyy-MM-dd}".
-        /// The character '}' is not currently supported in the token name or format.
+        /// The characters '}' and ':' are not supported in the token name.
         /// You can compare the resulting string to the original string to determine if a replacement took place.
         /// </summary>
         /// <param name="str">Input string that may contain one or more tokens.</param>
