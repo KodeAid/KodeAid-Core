@@ -16,6 +16,11 @@ namespace System
             return str != null ? string.Intern(str) : null;
         }
 
+        /// <summary>
+        /// Trims a string of all leading and trailing whitespace, and returns null if the result would be an empty string.
+        /// </summary>
+        /// <param name="str">The string to be trimmed.</param>
+        /// <returns>A non whitespace-only string; or null if the result would be an empty string.</returns>
         public static string TrimToNull(this string str)
         {
             if (str == null)
@@ -26,6 +31,13 @@ namespace System
             return str;
         }
 
+        /// <summary>
+        /// Collapse all runs of multiple whitespace into a single space character.
+        /// </summary>
+        /// <param name="str">The string to collapse.</param>
+        /// <param name="multiline">If true, lines will be kept but runs of multiple blank lines will be collasped into a single <paramref name="newLine"/> string</param>
+        /// <param name="newLine">The new line string to use for new-lines, if null will default to <seealso cref="Environment.NewLine"/>.</param>
+        /// <returns>A string that has all white space collapsed.</returns>
         public static string Collapse(this string str, bool multiline = false, string newLine = null)
         {
             if (multiline)
@@ -33,16 +45,40 @@ namespace System
             return Regex.Replace(str, @"\s+", " ");
         }
 
+        /// <summary>
+        /// Performs a <see cref="Collapse(string, bool, string)"/> and <see cref="String.Trim"/>.
+        /// </summary>
+        /// <param name="str">The string to collapse and trim.</param>
+        /// <param name="multiline">If true, lines will be kept but runs of multiple blank lines will be collasped into a single <paramref name="newLine"/> string;
+        /// all leading and trailing new-lines however will be trimmed.</param>
+        /// <param name="newLine">The new line string to use for new-lines, if null will default to <seealso cref="Environment.NewLine"/>.</param>
+        /// <returns>A string that has all white space collapsed and all leading and trailing whitespace trimmed.</returns>
         public static string CollapseAndTrim(this string str, bool multiline = false, string newLine = null)
         {
             return Collapse(str, multiline, newLine).Trim();
         }
 
+        /// <summary>
+        /// Performs a <see cref="Collapse(string, bool, string)"/> and <see cref="TrimToNull(string)"/>.
+        /// </summary>
+        /// <param name="str">The string to collapse and trim to null.</param>
+        /// <param name="multiline">If true, lines will be kept but runs of multiple blank lines will be collasped into a single <paramref name="newLine"/> string;
+        /// all leading and trailing new-lines however will be trimmed.</param>
+        /// <param name="newLine">The new line string to use for new-lines, if null will default to <seealso cref="Environment.NewLine"/>.</param>
+        /// <returns>A non whitespace-only string that has all white space collapsed and all leading and trailing whitespace trimmed; or null if the result would be an empty string.</returns>
         public static string CollapseAndTrimToNull(this string str, bool multiline = false, string newLine = null)
         {
             return Collapse(str, multiline, newLine).TrimToNull();
         }
 
+        /// <summary>
+        /// Truncates a string to a specified maximum length.
+        /// </summary>
+        /// <param name="str">The string to truncate.</param>
+        /// <param name="maxLength">The maximum length of the new string.</param>
+        /// <returns>If the length of <paramref name="str"/> is equal to or less than <paramref name="maxLength"/> 
+        /// then the original <paramref name="str"/> is returned; otherwise the excess trailing characters are removed and
+        /// the result will be of length <paramref name="maxLength"/>.</returns>
         public static string Truncate(this string str, int maxLength)
         {
             return str.Length <= maxLength ? str : str.Substring(0, maxLength);
@@ -58,16 +94,35 @@ namespace System
             return Base64Encoder.DecodeBytes(base64String, urlEncoded);
         }
 
+        /// <summary>
+        /// Concatenates the members of a constructed <seealso cref="IEnumerable{T}"/> collection of type <seealso cref="String"/> 
+        /// using the specified <paramref name="separator"/> between each member and escaping any <paramref name="separator"/> characters found in the members.
+        /// </summary>
+        /// <param name="values">A collection that contains the strings to concatenate.</param>
+        /// <param name="separator">The character to use as a separator. It is included in the returned string only if values has more than one element.</param>
+        /// <param name="escape">The escape character to escape pre-exisiting <paramref name="separator"/> characters found within <paramref name="values"/>.</param>
+        /// <returns>A string that consists of the members of values delimited by the separator string. If values has no members, the method returns <seealso cref="String.Empty"/>.</returns>
         public static string JoinEscaped(this IEnumerable<string> values, char separator, char escape = '\\')
         {
+            if (separator == escape)
+                throw new ArgumentException($"Parameter {nameof(separator)} cannot equal the {nameof(escape)} character.", nameof(separator));
             var escapedDelimiter = $"{escape.ToString()}{separator.ToString()}";
             var escapedEscape = $"{escape.ToString()}{escape.ToString()}";
             values = values.Select(v => v.Replace(escape.ToString(), escapedEscape).Replace(separator.ToString(), escapedDelimiter));
             return string.Join(separator.ToString(), values);
         }
 
+        /// <summary>
+        /// Splits a string into a maximum number of substrings based on the strings in an array.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="separator">A char that delimits the substrings in this string.</param>
+        /// <param name="escape">The escape character to unescape pre-exisiting <paramref name="separator"/> characters that are not an actual separator.</param>
+        /// <returns>An array whose elements contain the substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
         public static string[] SplitEscaped(this string str, char separator, char escape = '\\')
         {
+            if (separator == escape)
+                throw new ArgumentException($"Parameter {nameof(separator)} cannot equal the {nameof(escape)} character.", nameof(separator));
             var escapedDelimiter = $"{escape.ToString()}{separator.ToString()}";
             var escapedEscape = $"{escape.ToString()}{escape.ToString()}";
             return Regex.Matches(str, $@"(?:[^{Regex.Escape(escape.ToString())}{Regex.Escape(separator.ToString())}]|{Regex.Escape(escapedDelimiter)}|{Regex.Escape(escapedEscape)})+", RegexOptions.Compiled)
@@ -77,6 +132,78 @@ namespace System
                 .Select(c => c.Value))
               .Select(v => v.Replace(escapedDelimiter, separator.ToString()).Replace(escapedEscape, escape.ToString()))
               .ToArray();
+        }
+
+        /// <summary>
+        /// Replaces the first matching token in a string, eg: "Insert{MyToken}Here".
+        /// The token may contain a format, eg: "{MyToken:F2}" or "{MyToken:yyyy-MM-dd}".
+        /// The character '}' is not currently supported in the token name or format.
+        /// You can compare the resulting string to the original string to determine if a replacement took place.
+        /// </summary>
+        /// <param name="str">Input string that may contain one or more tokens.</param>
+        /// <param name="token">Name of the token to replace, eg: use "MyToken" to replace "{MyToken}".</param>
+        /// <param name="value">Replacement string value.</param>
+        /// <returns>The result of <paramref name="str"/> with the matching token (if found) replaced with <paramref name="value"/>.</returns>
+        public static string ReplaceToken(this string str, string token, string value)
+        {
+            ArgCheck.NotNull(nameof(str), str);
+            ArgCheck.NotNullOrEmpty(nameof(token), token);
+            var match = Regex.Match(str, $@"{{{token}(?::([^}}]*))?}}", RegexOptions.Compiled);
+            if (match.Success && match.Groups[0].Success)
+            {
+                return str.Replace(match.Groups[0].Value, value);
+            }
+            return str;
+        }
+
+        /// <summary>
+        /// Replaces the first matching token in a string, eg: "Insert{MyToken}Here".
+        /// The token may contain a format, eg: "{MyToken:F2}" or "{MyToken:yyyy-MM-dd}".
+        /// The character '}' is not currently supported in the token name or format.
+        /// You can compare the resulting string to the original string to determine if a replacement took place.
+        /// </summary>
+        /// <param name="str">Input string that may contain one or more tokens.</param>
+        /// <param name="token">Name of the token to replace, eg: use "MyToken" to replace "{MyToken}".</param>
+        /// <param name="value">Replacement value, to be converted to a string unformatted.</param>
+        /// <returns>The result of <paramref name="str"/> with the matching token (if found) replaced with an
+        /// unformatted string representation of <paramref name="value"/>.</returns>
+        public static string ReplaceToken(this string str, string token, object value)
+        {
+            ArgCheck.NotNull(nameof(str), str);
+            ArgCheck.NotNullOrEmpty(nameof(token), token);
+            var match = Regex.Match(str, $@"{{{token}(?::([^}}]*))?}}", RegexOptions.Compiled);
+            if (match.Success && match.Groups[0].Success)
+            {
+                return str.Replace(match.Groups[0].Value, value?.ToString());
+            }
+            return str;
+        }
+
+        /// <summary>
+        /// Replaces the first matching token in a string, eg: "Insert{MyToken}Here".
+        /// The token may contain a format, eg: "{MyToken:F2}" or "{MyToken:yyyy-MM-dd}".
+        /// The character '}' is not currently supported in the token name or format.
+        /// You can compare the resulting string to the original string to determine if a replacement took place.
+        /// </summary>
+        /// <param name="str">Input string that may contain one or more tokens.</param>
+        /// <param name="token">Name of the token to replace, eg: use "MyToken" to replace "{MyToken}".</param>
+        /// <param name="value">Replacement value, to be converted to a string formatted with either the format specified by the token
+        /// otherwise by <paramref name="defaultFormat"/>.</param>
+        /// <param name="defaultFormat">Default format to use on the <paramref name="value"/> if no format is specified on the matched token.</param>
+        /// <param name="formatProvider">The provider to use to format the <paramref name="value"/>. -or- 
+        /// A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
+        /// <returns>The result of <paramref name="str"/> with the matching token (if found) replaced with a formatted <paramref name="value"/>.</returns>
+        public static string ReplaceToken(this string str, string token, IFormattable value, string defaultFormat = null, IFormatProvider formatProvider = null)
+        {
+            ArgCheck.NotNull(nameof(str), str);
+            ArgCheck.NotNullOrEmpty(nameof(token), token);
+            var match = Regex.Match(str, $@"{{{token}(?::([^}}]*))?}}", RegexOptions.Compiled);
+            if (match.Success && match.Groups[0].Success)
+            {
+                return str.Replace(match.Groups[0].Value,
+                    value?.ToString(match.Groups[1].Success ? match.Groups[1].Value : defaultFormat, formatProvider));
+            }
+            return str;
         }
 
         public static string Pluralize(this string str)
