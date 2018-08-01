@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using KodeAid.Serialization;
 using KodeAid.Serialization.Binary;
@@ -206,6 +205,13 @@ namespace KodeAid.Caching.AzureStorage
             if (_isBinarySerializer)
                 data = value.FromBase64();
             return _serializer.Deserialize<T>(data);
+        }
+
+        private sealed class AzureTableStorageCacheEntry : TableEntity
+        {
+            public DateTimeOffset LastUpdated { get; set; }
+            public DateTimeOffset? Expiration { get; set; }
+            public string Value { get; set; }
         }
     }
 }
