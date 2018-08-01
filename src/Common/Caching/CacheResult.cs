@@ -21,5 +21,10 @@ namespace KodeAid.Caching
         public bool IsHit { get; set; }
         public T Value { get; set; }
         public DateTimeOffset? LastUpdated { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Key} = {(IsHit ? "HIT" : "MISS")}";
+        }
     }
 }
