@@ -27,29 +27,14 @@ namespace KodeAid.Caching
             return cache.GetRangeAsync<T>(keys.OfType<object>().Select(key => key?.ToString()), partition);
         }
 
-        public static Task SetAsync<T>(this ICache cache, object key, T value, string partition = null)
-            where T : new()
-        {
-            ArgCheck.NotNull(nameof(cache), cache);
-            return cache.SetAsync(key?.ToString(), value, partition);
-        }
-
-        public static Task SetAsync<T>(this ICache cache, object key, T value, DateTimeOffset absoluteExpiration, string partition = null)
+        public static Task SetAsync<T>(this ICache cache, object key, T value, DateTimeOffset? absoluteExpiration = null, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(cache), cache);
             return cache.SetAsync(key?.ToString(), value, absoluteExpiration, partition);
         }
 
-        public static Task SetAsync<T>(this ICache cache, T value, Func<T, object> getKey, string partition = null)
-            where T : new()
-        {
-            ArgCheck.NotNull(nameof(cache), cache);
-            ArgCheck.NotNull(nameof(getKey), getKey);
-            return SetAsync(cache, getKey(value), value, partition);
-        }
-
-        public static Task SetAsync<T>(this ICache cache, Func<T, object> getKey, T value, DateTimeOffset absoluteExpiration, string partition = null)
+        public static Task SetAsync<T>(this ICache cache, Func<T, object> getKey, T value, DateTimeOffset? absoluteExpiration = null, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(cache), cache);
@@ -57,24 +42,14 @@ namespace KodeAid.Caching
             return SetAsync(cache, getKey(value), value, absoluteExpiration, partition);
         }
 
-        public static Task SetAsync<T>(this ICache cache, Func<T, object> getKey, IEnumerable<T> values, string partition = null)
+        public static Task SetRangeAsync<T>(this ICache cache, Func<T, object> getKey, IEnumerable<T> values, DateTimeOffset? absoluteExpiration = null, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(cache), cache);
             ArgCheck.NotNull(nameof(getKey), getKey);
             ArgCheck.NotNull(nameof(values), values);
             var pairs = values.Select(value => new KeyValuePair<string, T>(getKey(value).ToString(), value)).ToList();
-            return cache.SetRangeAsync(pairs, partition);
-        }
-
-        public static Task SetRangeAsync<T>(this ICache cache, Func<T, object> getKey, IEnumerable<T> values, DateTimeOffset absoluteExpiration, string partition = null)
-            where T : new()
-        {
-            ArgCheck.NotNull(nameof(cache), cache);
-            ArgCheck.NotNull(nameof(getKey), getKey);
-            ArgCheck.NotNull(nameof(values), values);
-            var pairs = values.Select(value => new KeyValuePair<string, T>(getKey(value).ToString(), value)).ToList();
-            return cache.SetAsync(pairs, absoluteExpiration, partition);
+            return cache.SetRangeAsync(pairs, absoluteExpiration, partition);
         }
     }
 }

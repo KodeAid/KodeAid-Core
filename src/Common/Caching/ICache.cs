@@ -12,10 +12,8 @@ namespace KodeAid.Caching
     {
         Task<ICacheResult<T>> GetAsync<T>(string key, string partition = null) where T : new();
         Task<IEnumerable<ICacheResult<T>>> GetRangeAsync<T>(IEnumerable<string> keys, string partition = null) where T : new();
-        Task SetAsync<T>(string key, T value, string partition = null) where T : new();
-        Task SetAsync<T>(string key, T value, DateTimeOffset absoluteExpiration, string partition = null) where T : new();
-        Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, string partition = null) where T : new();
-        Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset absoluteExpiration, string partition = null) where T : new();
+        Task SetAsync<T>(string key, T value, DateTimeOffset? absoluteExpiration = null, string partition = null) where T : new();
+        Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration = null, string partition = null) where T : new();
         Task RemoveAsync(string key, string partition = null);
         Task RemoveRangeAsync(IEnumerable<string> keys, string partition = null);
     }

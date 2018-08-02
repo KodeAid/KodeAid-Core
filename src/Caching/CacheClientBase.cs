@@ -46,36 +46,14 @@ namespace KodeAid.Caching
             return GetAsyncHelper<T>(keys, partition);
         }
 
-        public virtual Task SetAsync<T>(string key, T value, string partition = null)
-            where T : new()
-        {
-            ArgCheck.NotNull(nameof(key), key);
-            return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, null, partition);
-        }
-
-        public virtual Task SetAsync<T>(string key, T value, DateTimeOffset absoluteExpiration, string partition = null)
+        public virtual Task SetAsync<T>(string key, T value, DateTimeOffset? absoluteExpiration, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(key), key);
             return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, absoluteExpiration, partition);
         }
 
-        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, string partition = null)
-            where T : new()
-        {
-            ArgCheck.NotNull(nameof(keyValues), keyValues);
-            if (keyValues.Any(keyValue => keyValue.Key == null))
-            {
-                throw new ArgumentException("Parameter keyValues must contain non-null keys.", "keyValues");
-            }
-            if (keyValues.GroupBy(keyValue => keyValue.Key).Any(g => g.Count() > 1))
-            {
-                throw new ArgumentException("Parameter keyValues must contain only distinct keys.", "keyValues");
-            }
-            return SetAsyncHelper(keyValues, null, partition);
-        }
-
-        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset absoluteExpiration, string partition = null)
+        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(keyValues), keyValues);
