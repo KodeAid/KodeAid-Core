@@ -61,12 +61,12 @@ namespace KodeAid.Caching.AzureStorage
             _table = _tableClient.GetTableReference(_tableName);
         }
 
-        public Task CreateTableIfNotExistsAsync()
+        public Task CreateIfNotExistsAsync()
         {
             return _table.CreateIfNotExistsAsync();
         }
 
-        public async Task DeleteExpiredAsync()
+        public async Task RemoveExpiredAsync()
         {
             var utcNow = DateTimeOffset.UtcNow;
 
