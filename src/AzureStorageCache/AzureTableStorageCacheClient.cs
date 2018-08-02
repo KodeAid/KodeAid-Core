@@ -61,60 +61,9 @@ namespace KodeAid.Caching.AzureStorage
             _table = _tableClient.GetTableReference(_tableName);
         }
 
-        public Task CreateIfNotExistsAsync()
-        {
-            return _table.CreateIfNotExistsAsync();
-        }
-
-        public async Task RemoveExpiredAsync()
-        {
-            var utcNow = DateTimeOffset.UtcNow;
-
-            var filter = $"{nameof(AzureTableStorageCacheEntry.Expiration)} lt datetime'{utcNow.ToString(_dateTimeFormatString)}'";
-
-            TableQuerySegment<DynamicTableEntity> segment = null;
-            while (segment == null || segment.ContinuationToken != null)
-            {
-                var query = new TableQuery<DynamicTableEntity>()
-                    .Where(filter)
-                    .Take(100)
-                    .Select(new List<string>() {
-                        nameof(AzureTableStorageCacheEntry.PartitionKey),
-                        nameof(AzureTableStorageCacheEntry.RowKey) });
-
-                segment = await _table.ExecuteQuerySegmentedAsync(query, segment?.ContinuationToken, _options, new OperationContext()).ConfigureAwait(false);
-
-                var batches = new Dictionary<string, TableBatchOperation>();
-
-                foreach (var entity in segment.Results)
-                {
-                    if (!batches.TryGetValue(entity.PartitionKey, out TableBatchOperation batch))
-                    {
-                        batches[entity.PartitionKey] = batch = new TableBatchOperation();
-                    }
-
-                    batch.Add(TableOperation.Delete(entity));
-
-                    if (batch.Count == 100)
-                    {
-                        await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
-                        batches[entity.PartitionKey] = new TableBatchOperation();
-                    }
-                }
-
-                foreach (var batch in batches.Values)
-                {
-                    if (batch.Count > 0)
-                    {
-                        await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
-                    }
-                }
-            }
-        }
-
         protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> rowKeys, string partitionKey)
         {
-            partitionKey = partitionKey ?? _defaultDefaultPartitionKey;
+            partitionKey = partitionKey ?? _defaultPartitionKey;
             ArgCheck.NotNull(nameof(partitionKey), partitionKey);
 
             var utcNow = DateTimeOffset.UtcNow;
@@ -170,7 +119,7 @@ namespace KodeAid.Caching.AzureStorage
 
         protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partitionKey)
         {
-            partitionKey = partitionKey ?? _defaultDefaultPartitionKey;
+            partitionKey = partitionKey ?? _defaultPartitionKey;
             ArgCheck.NotNull(nameof(partitionKey), partitionKey);
 
             var utcNow = DateTimeOffset.UtcNow;
@@ -196,7 +145,7 @@ namespace KodeAid.Caching.AzureStorage
 
         protected override async Task RemoveKeysAsync(IEnumerable<string> rowKeys, string partitionKey = null)
         {
-            partitionKey = partitionKey ?? _defaultDefaultPartitionKey;
+            partitionKey = partitionKey ?? _defaultPartitionKey;
             ArgCheck.NotNull(nameof(partitionKey), partitionKey);
 
             var batch = new TableBatchOperation();
@@ -212,6 +161,57 @@ namespace KodeAid.Caching.AzureStorage
             if (batch.Count > 0)
             {
                 await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
+            }
+        }
+
+        public Task CreateIfNotExistsAsync()
+        {
+            return _table.CreateIfNotExistsAsync();
+        }
+
+        public async Task RemoveExpiredAsync()
+        {
+            var utcNow = DateTimeOffset.UtcNow;
+
+            var filter = $"{nameof(AzureTableStorageCacheEntry.Expiration)} lt datetime'{utcNow.ToString(_dateTimeFormatString)}'";
+
+            TableQuerySegment<DynamicTableEntity> segment = null;
+            while (segment == null || segment.ContinuationToken != null)
+            {
+                var query = new TableQuery<DynamicTableEntity>()
+                    .Where(filter)
+                    .Take(100)
+                    .Select(new List<string>() {
+                        nameof(AzureTableStorageCacheEntry.PartitionKey),
+                        nameof(AzureTableStorageCacheEntry.RowKey) });
+
+                segment = await _table.ExecuteQuerySegmentedAsync(query, segment?.ContinuationToken, _options, new OperationContext()).ConfigureAwait(false);
+
+                var batches = new Dictionary<string, TableBatchOperation>();
+
+                foreach (var entity in segment.Results)
+                {
+                    if (!batches.TryGetValue(entity.PartitionKey, out TableBatchOperation batch))
+                    {
+                        batches[entity.PartitionKey] = batch = new TableBatchOperation();
+                    }
+
+                    batch.Add(TableOperation.Delete(entity));
+
+                    if (batch.Count == 100)
+                    {
+                        await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
+                        batches[entity.PartitionKey] = new TableBatchOperation();
+                    }
+                }
+
+                foreach (var batch in batches.Values)
+                {
+                    if (batch.Count > 0)
+                    {
+                        await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
+                    }
+                }
             }
         }
 
