@@ -5,13 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MSMemoryCache = System.Runtime.Caching.MemoryCache;
 
 namespace KodeAid.Caching.MemoryCache
 {
-    public sealed class MemoryCacheClient : CacheClientBase
+    public class MemoryCacheClient : CacheClientBase
     {
         private static MSMemoryCache _client;
 
@@ -22,22 +23,22 @@ namespace KodeAid.Caching.MemoryCache
             _client = new MSMemoryCache(name);
         }
 
-        protected override Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string regionName)
+        protected override Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition)
         {
-            if (!string.IsNullOrEmpty(regionName))
-                keys = keys.Select(key => string.Format("${0}$|{1}", regionName, key)).ToList();
+            if (!string.IsNullOrEmpty(partition))
+                keys = keys.Select(key => $"${partition}$|{key}").ToList();
             return Task.FromResult(_client.GetValues(keys, null).Select(pair => (CacheItem<T>)pair.Value).ToList().AsEnumerable());
         }
 
-        protected override Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string regionName)
+        protected override Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition)
         {
             var utcNow = DateTimeOffset.UtcNow;
             foreach (var item in items)
             {
                 var key = item.Key;
-                if (!string.IsNullOrEmpty(regionName))
+                if (!string.IsNullOrEmpty(partition))
                 {
-                    key = string.Format("${0}$|{1}", regionName, key);
+                    key = $"${partition}$|{key}";
                 }
                 if (item.Expiration.HasValue)
                 {
@@ -47,6 +48,17 @@ namespace KodeAid.Caching.MemoryCache
                 {
                     _client.Set(key, item, null, null);
                 }
+            }
+            return Task.CompletedTask;
+        }
+
+        protected override Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
+        {
+            if (!string.IsNullOrEmpty(partition))
+                keys = keys.Select(key => $"${partition}$|{key}").ToList();
+            foreach (var key in keys)
+            {
+                _client.Remove(key, CacheEntryRemovedReason.Removed, null);
             }
             return Task.CompletedTask;
         }

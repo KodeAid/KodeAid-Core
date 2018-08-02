@@ -27,15 +27,15 @@ namespace KodeAid.Caching
         protected bool ThrowOnError { get; }
         protected ILogger Logger { get; }
 
-        public virtual async Task<ICacheResult<T>> GetAsync<T>(string key, string regionName = null)
+        public virtual async Task<ICacheResult<T>> GetAsync<T>(string key, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(key), key);
-            var results = await GetAsyncHelper<T>(new[] { key }, regionName).ConfigureAwait(false);
+            var results = await GetAsyncHelper<T>(new[] { key }, partition).ConfigureAwait(false);
             return results.Single();
         }
 
-        public virtual Task<IEnumerable<ICacheResult<T>>> GetRangeAsync<T>(IEnumerable<string> keys, string regionName = null)
+        public virtual Task<IEnumerable<ICacheResult<T>>> GetRangeAsync<T>(IEnumerable<string> keys, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(keys), keys);
@@ -43,24 +43,24 @@ namespace KodeAid.Caching
             {
                 throw new ArgumentException("Parameter keys must not contain null items.", "keys");
             }
-            return GetAsyncHelper<T>(keys, regionName);
+            return GetAsyncHelper<T>(keys, partition);
         }
 
-        public virtual Task SetAsync<T>(string key, T value, string regionName = null)
+        public virtual Task SetAsync<T>(string key, T value, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(key), key);
-            return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, null, regionName);
+            return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, null, partition);
         }
 
-        public virtual Task SetAsync<T>(string key, T value, DateTimeOffset absoluteExpiration, string regionName = null)
+        public virtual Task SetAsync<T>(string key, T value, DateTimeOffset absoluteExpiration, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(key), key);
-            return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, absoluteExpiration, regionName);
+            return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, absoluteExpiration, partition);
         }
 
-        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, string regionName = null)
+        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(keyValues), keyValues);
@@ -72,10 +72,10 @@ namespace KodeAid.Caching
             {
                 throw new ArgumentException("Parameter keyValues must contain only distinct keys.", "keyValues");
             }
-            return SetAsyncHelper(keyValues, null, regionName);
+            return SetAsyncHelper(keyValues, null, partition);
         }
 
-        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset absoluteExpiration, string regionName = null)
+        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset absoluteExpiration, string partition = null)
             where T : new()
         {
             ArgCheck.NotNull(nameof(keyValues), keyValues);
@@ -87,16 +87,16 @@ namespace KodeAid.Caching
             {
                 throw new ArgumentException("Parameter keyValues must contain only distinct keys.", "keyValues");
             }
-            return SetAsyncHelper(keyValues, absoluteExpiration, regionName);
+            return SetAsyncHelper(keyValues, absoluteExpiration, partition);
         }
 
-        public virtual Task RemoveAsync(string key, string regionName = null)
+        public virtual Task RemoveAsync(string key, string partition = null)
         {
             ArgCheck.NotNull(nameof(key), key);
-            return RemoveRangeAsync(EnumerableHelper.From(key), regionName);
+            return RemoveRangeAsync(EnumerableHelper.From(key), partition);
         }
 
-        public virtual async Task RemoveRangeAsync(IEnumerable<string> keys, string regionName = null)
+        public virtual async Task RemoveRangeAsync(IEnumerable<string> keys, string partition = null)
         {
             ArgCheck.NotNull(nameof(keys), keys);
             keys = keys.Where(key => key != null).ToList();
@@ -104,7 +104,7 @@ namespace KodeAid.Caching
                 return;
             var sw = new Stopwatch();
             sw.Start();
-            await RemoveKeysAsync(keys, regionName);
+            await RemoveKeysAsync(keys, partition);
             sw.Stop();
             if (keys.Count() == 1)
             {
@@ -116,16 +116,16 @@ namespace KodeAid.Caching
             }
         }
 
-        protected abstract Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string regionName) where T : new();
+        protected abstract Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition) where T : new();
 
-        protected abstract Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string regionName) where T : new();
+        protected abstract Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition) where T : new();
 
-        protected virtual Task RemoveKeysAsync(IEnumerable<string> keys, string regionName = null)
+        protected virtual Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
         {
             return Task.CompletedTask;
         }
 
-        private async Task<IEnumerable<ICacheResult<T>>> GetAsyncHelper<T>(IEnumerable<string> keys, string regionName)
+        private async Task<IEnumerable<ICacheResult<T>>> GetAsyncHelper<T>(IEnumerable<string> keys, string partition)
             where T : new()
         {
             try
@@ -135,7 +135,7 @@ namespace KodeAid.Caching
                     var distinctKeys = keys.Distinct().ToList();
                     var sw = new Stopwatch();
                     sw.Start();
-                    var items = await GetItemsAsync<T>(distinctKeys, regionName).ConfigureAwait(false);
+                    var items = await GetItemsAsync<T>(distinctKeys, partition).ConfigureAwait(false);
                     sw.Stop();
                     if (items != null)
                     {
@@ -202,7 +202,7 @@ namespace KodeAid.Caching
             return keys.Select(key => new CacheResult<T>(key)).ToList();
         }
 
-        private async Task SetAsyncHelper<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string regionName)
+        private async Task SetAsyncHelper<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string partition)
             where T : new()
         {
             var utcNow = DateTimeOffset.UtcNow;
@@ -228,7 +228,7 @@ namespace KodeAid.Caching
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                await SetItemsAsync(items, regionName).ConfigureAwait(false);
+                await SetItemsAsync(items, partition).ConfigureAwait(false);
                 sw.Stop();
 
                 // logging

@@ -15,8 +15,9 @@ using Microsoft.Extensions.Logging;
 
 namespace KodeAid.Caching.SqlDb
 {
-    public sealed class SqlCacheClient : CacheClientBase
+    public class SqlCacheClient : CacheClientBase
     {
+        private const string _defaultDefaultTableName = "Cache";
         private const string _defaultSchemaName = "dbo";
         private const string _sqlDateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
 
@@ -26,20 +27,20 @@ namespace KodeAid.Caching.SqlDb
         private readonly ISerializer _serializer;
         private readonly bool _isBinarySerializer;
 
-        public SqlCacheClient(string connectionString, ISerializer<string> serializer, ILogger<SqlCacheClient> logger, string defaultTableName = null, string schemaName = _defaultSchemaName, bool throwOnError = false)
+        public SqlCacheClient(string connectionString, ISerializer<string> serializer, ILogger<SqlCacheClient> logger, string defaultTableName = _defaultDefaultTableName, string schemaName = _defaultSchemaName, bool throwOnError = false)
             : this(connectionString, serializer, defaultTableName, schemaName, logger, throwOnError)
         {
             _isBinarySerializer = false;
         }
 
-        public SqlCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<SqlCacheClient> logger, string defaultTableName = null, string schemaName = _defaultSchemaName, bool throwOnError = false)
+        public SqlCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<SqlCacheClient> logger, string defaultTableName = _defaultDefaultTableName, string schemaName = _defaultSchemaName, bool throwOnError = false)
             : this(connectionString, serializer, defaultTableName, schemaName, logger, throwOnError)
         {
             _isBinarySerializer = true;
         }
 
-        public SqlCacheClient(string connectionString, ILogger<SqlCacheClient> logger, string defaultTableName = null, string schemaName = _defaultSchemaName, bool throwOnError = false)
-            : this(connectionString, null, defaultTableName, schemaName, logger, throwOnError)
+        public SqlCacheClient(string connectionString, ILogger<SqlCacheClient> logger, string defaultTableName = _defaultDefaultTableName, string schemaName = _defaultSchemaName, bool throwOnError = false)
+            : this(connectionString, new DotNetBinarySerializer(), defaultTableName, schemaName, logger, throwOnError)
         {
             _isBinarySerializer = true;
         }
@@ -47,11 +48,13 @@ namespace KodeAid.Caching.SqlDb
         private SqlCacheClient(string connectionString, ISerializer serializer, string defaultTableName, string schemaName, ILogger<SqlCacheClient> logger, bool throwOnError)
             : base(throwOnError, logger)
         {
-            ArgCheck.NotNull(nameof(connectionString), connectionString);
+            ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);
+            ArgCheck.NotNull(nameof(serializer), serializer);
+            ArgCheck.NotNullOrEmpty(nameof(schemaName), schemaName);
             _connectionString = connectionString;
             _defaultTableName = defaultTableName;
-            _schemaName = schemaName ?? _defaultSchemaName;
-            _serializer = serializer ?? new DotNetBinarySerializer();
+            _schemaName = schemaName;
+            _serializer = serializer;
         }
 
         public async Task DeleteExpired(string tableName)
@@ -62,13 +65,16 @@ namespace KodeAid.Caching.SqlDb
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = $@"IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{_schemaName}' AND TABLE_NAME = 'TCACHE_{(tableName ?? _defaultTableName)}') DELETE FROM [{_schemaName}].[{(tableName ?? _defaultTableName)}] WHERE ([Expiration] IS NOT NULL AND [Expiration] >= '{DateTimeOffset.UtcNow.ToString(_sqlDateTimeFormat)}');";
+                    command.CommandText = $@"IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{_schemaName}' AND TABLE_NAME = '{tableName}') DELETE FROM [{_schemaName}].[{tableName}] WHERE ([Expiration] IS NOT NULL AND [Expiration] >= '{DateTimeOffset.UtcNow.ToString(_sqlDateTimeFormat)}');";
                 }
             }
         }
 
         protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string tableName)
         {
+            tableName = tableName ?? _defaultTableName;
+            ArgCheck.NotNull(nameof(tableName), tableName);
+
             var items = new List<CacheItem<T>>();
             var utcNow = DateTime.UtcNow;
 
@@ -81,7 +87,7 @@ namespace KodeAid.Caching.SqlDb
                     {
                         command.CommandType = CommandType.Text;
                         command.CommandText = GetCheckTableScript(tableName) +
-                          $@"SELECT [Key], [Value], [Updated], [Expiry] FROM [{_schemaName}].[TCACHE_{(tableName ?? _defaultTableName)}] WHERE ([Key] IN ({string.Join(",", Enumerable.Range(0, keyParition.Count()).Select(i => "@key" + i))}) AND ([Expiry] IS NULL OR [Expiry] < @now));";
+                          $@"SELECT [Key], [Value], [Updated], [Expiry] FROM [{_schemaName}].[{tableName}] WHERE ([Key] IN ({string.Join(",", Enumerable.Range(0, keyParition.Count()).Select(i => "@key" + i))}) AND ([Expiry] IS NULL OR [Expiry] < @now));";
                         var p = -1;
                         foreach (var key in keyParition)
                             command.AddParameter("@key" + (++p), key, DbType.String);
@@ -110,6 +116,9 @@ namespace KodeAid.Caching.SqlDb
 
         protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string tableName)
         {
+            tableName = tableName ?? _defaultTableName;
+            ArgCheck.NotNull(nameof(tableName), tableName);
+
             // max < 2100 parameters allowed, each item has 4 parameters so (524 x 4 = 2096)
             foreach (var itemParition in items.Partition(524))
             {
@@ -122,10 +131,10 @@ namespace KodeAid.Caching.SqlDb
                         foreach (var item in itemParition)
                         {
                             ++p;
-                            sql.Append($@"IF NOT EXISTS (SELECT [Key] FROM [{_schemaName}].[TCACHE_{(tableName ?? _defaultTableName)}] WHERE ([Key] = @pk{p}))
-  INSERT INTO [{_schemaName}].[TCACHE_{(tableName ?? _defaultTableName)}] ([Key], [Value], [Updated], [Expiry]) VALUES (@pk{p}, @pv{p}, @pu{p}, @px{p});
+                            sql.Append($@"IF NOT EXISTS (SELECT [Key] FROM [{_schemaName}].[{tableName}] WHERE ([Key] = @pk{p}))
+  INSERT INTO [{_schemaName}].[{tableName}] ([Key], [Value], [Updated], [Expiry]) VALUES (@pk{p}, @pv{p}, @pu{p}, @px{p});
 ELSE
-  UPDATE [{_schemaName}].[TCACHE_{(tableName ?? _defaultTableName)}] SET [Value] = @pv{p}, [Updated] = @pu{p}, [Expiry] = @px{p} WHERE [Key] = @pk{p};
+  UPDATE [{_schemaName}].[{tableName}] SET [Value] = @pv{p}, [Updated] = @pu{p}, [Expiry] = @px{p} WHERE [Key] = @pk{p};
 ");
 
                             command.AddParameter("@pk" + p, item.Key, DbType.String);
@@ -144,18 +153,43 @@ ELSE
             }
         }
 
+        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string tableName = null)
+        {
+            tableName = tableName ?? _defaultTableName;
+            ArgCheck.NotNull(nameof(tableName), tableName);
+
+            foreach (var keyParition in keys.Partition(1000))
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync().ConfigureAwait(false);
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = GetCheckTableScript(tableName) +
+                          $@"DELETE FROM [{_schemaName}].[{tableName}] WHERE ([Key] IN ({string.Join(",", Enumerable.Range(0, keyParition.Count()).Select(i => "@key" + i))}));";
+                        var p = -1;
+                        foreach (var key in keyParition)
+                            command.AddParameter("@key" + (++p), key, DbType.String);
+                        await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    }
+                    connection.Close();
+                }
+            }
+        }
+
         private string GetCheckTableScript(string tableName)
         {
-            return $@"IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{_schemaName}' AND TABLE_NAME = 'TCACHE_{(tableName ?? _defaultTableName)}')
+            return $@"IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{_schemaName}' AND TABLE_NAME = '{tableName}')
 BEGIN
-  CREATE TABLE [{_schemaName}].[TCACHE_{(tableName ?? _defaultTableName)}] (
+  CREATE TABLE [{_schemaName}].[{tableName}] (
     [Key] NVARCHAR(1000) NOT NULL,
     [Value] {(_isBinarySerializer ? "VARBINARY(MAX)" : "NVARCHAR(MAX)")} NULL,
     [Updated] DATETIME2 NOT NULL,
     [Expiry] DATETIME2 NULL,
-    CONSTRAINT [PK_TCACHE_{(tableName ?? _defaultTableName)}] PRIMARY KEY ([Key]),
+    CONSTRAINT [PK_{tableName}] PRIMARY KEY ([Key]),
   );
-  CREATE INDEX [IX_TCACHE_{(tableName ?? _defaultTableName)}_Expiry] ON [{_schemaName}].[TCACHE_{(tableName ?? _defaultTableName)}] ([Expiry]);
+  CREATE INDEX [IX_{tableName}_Expiry] ON [{_schemaName}].[{tableName}] ([Expiry]);
 END";
         }
 

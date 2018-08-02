@@ -14,7 +14,7 @@ using StackExchange.Redis;
 
 namespace KodeAid.Caching.Redis
 {
-    public sealed class RedisCacheClient : CacheClientBase
+    public class RedisCacheClient : CacheClientBase
     {
         private static ConcurrentDictionary<string, ConnectionMultiplexer> _clientLookup = new ConcurrentDictionary<string, ConnectionMultiplexer>();
         private ConnectionMultiplexer _client;
@@ -31,22 +31,24 @@ namespace KodeAid.Caching.Redis
         }
 
         public RedisCacheClient(string connectionString, ILogger<RedisCacheClient> logger, bool throwOnError = false)
-            : this(connectionString, (ISerializer)null, logger, throwOnError)
+            : this(connectionString, new DotNetBinarySerializer(), logger, throwOnError)
         {
         }
 
         private RedisCacheClient(string connectionString, ISerializer serializer, ILogger<RedisCacheClient> logger, bool throwOnError = false)
             : base(throwOnError, logger)
         {
+            ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);
+            ArgCheck.NotNull(nameof(serializer), serializer);
             _client = _clientLookup.GetOrAdd(connectionString, key => ConnectionMultiplexer.Connect(connectionString));
-            _serializer = serializer ?? new DotNetBinarySerializer();
+            _serializer = serializer;
         }
 
-        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string regionName)
+        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition)
         {
-            if (!string.IsNullOrEmpty(regionName))
+            if (!string.IsNullOrEmpty(partition))
             {
-                keys = keys.Select(key => string.Format("${0}$|{1}", regionName, key)).ToList();
+                keys = keys.Select(key => $"${partition}$|{key}").ToList();
             }
             var hits = await _client.GetDatabase().StringGetAsync(keys.Cast<RedisKey>().ToArray()).ConfigureAwait(false);
             if (hits == null)
@@ -56,7 +58,7 @@ namespace KodeAid.Caching.Redis
             return hits.Where(hit => !hit.IsNull && hit.HasValue).Select(value => DeserializeItem<T>(value)).ToList();
         }
 
-        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string regionName)
+        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition)
         {
             var utcNow = DateTime.UtcNow;
             foreach (var groupOfExpiries in items.GroupBy(item => item.Expiration))
@@ -65,7 +67,7 @@ namespace KodeAid.Caching.Redis
                 if (!groupOfExpiries.Key.HasValue)
                 {
                     await database.StringSetAsync(groupOfExpiries.Select(item => new KeyValuePair<RedisKey, RedisValue>(
-                      !string.IsNullOrEmpty(regionName) ? string.Format("${0}$|{1}", regionName, item.Key) : item.Key,
+                      !string.IsNullOrEmpty(partition) ? $"${partition}$|{item.Key}" : item.Key,
                       SerializeItem(item))).ToArray()).ConfigureAwait(false);
                 }
                 else
@@ -76,9 +78,9 @@ namespace KodeAid.Caching.Redis
                         foreach (var item in groupOfExpiries)
                         {
                             var key = item.Key;
-                            if (!string.IsNullOrEmpty(regionName))
+                            if (!string.IsNullOrEmpty(partition))
                             {
-                                key = string.Format("${0}$|{1}", regionName, key);
+                                key = $"${partition}$|{key}";
                             }
                             await database.StringSetAsync(key, SerializeItem(item), ttl).ConfigureAwait(false);
                         }
@@ -87,10 +89,10 @@ namespace KodeAid.Caching.Redis
             }
         }
 
-        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string regionName = null)
+        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
         {
-            if (!string.IsNullOrEmpty(regionName))
-                keys = keys.Select(key => string.Format("${0}$|{1}", regionName, key));
+            if (!string.IsNullOrEmpty(partition))
+                keys = keys.Select(key => $"${partition}$|{key}");
             await _client.GetDatabase().KeyDeleteAsync(keys.Select(key => (RedisKey)key).ToArray()).ConfigureAwait(false);
         }
 

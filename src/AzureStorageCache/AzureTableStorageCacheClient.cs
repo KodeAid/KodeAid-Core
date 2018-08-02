@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using KodeAid.Serialization;
 using KodeAid.Serialization.Binary;
+using KodeAid.Serialization.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
@@ -14,13 +15,13 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace KodeAid.Caching.AzureStorage
 {
-    public sealed class AzureTableStorageCacheClient : CacheClientBase
+    public class AzureTableStorageCacheClient : CacheClientBase
     {
         private const string _dateTimeFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
         private const string _defaultTableName = "cache";
-        private const string _defaultPartitionKey = "";
+        private const string _defaultDefaultPartitionKey = "";
         private readonly string _tableName;
-        private readonly string _partitionKey;
+        private readonly string _defaultPartitionKey;
         private readonly ISerializer _serializer;
         private readonly bool _isBinarySerializer;
         private readonly CloudStorageAccount _storageAccount;
@@ -28,26 +29,33 @@ namespace KodeAid.Caching.AzureStorage
         private readonly CloudTable _table;
         private readonly TableRequestOptions _options = new TableRequestOptions() { RetryPolicy = new ExponentialRetry() }; //EncryptionPolicy = new TableEncryptionPolicy()
 
-        public AzureTableStorageCacheClient(string connectionString, ISerializer<string> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultPartitionKey, bool throwOnError = false)
+        public AzureTableStorageCacheClient(string connectionString, ISerializer<string> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
             : this(connectionString, serializer, tableName, defaultPartitionKey, logger, throwOnError)
         {
             _isBinarySerializer = false;
         }
 
-        public AzureTableStorageCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultPartitionKey, bool throwOnError = false)
+        public AzureTableStorageCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
             : this(connectionString, serializer, tableName, defaultPartitionKey, logger, throwOnError)
         {
             _isBinarySerializer = true;
         }
 
+        public AzureTableStorageCacheClient(string connectionString, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
+            : this(connectionString, new JsonSerializer(), tableName, defaultPartitionKey, logger, throwOnError)
+        {
+            _isBinarySerializer = false;
+        }
+
         private AzureTableStorageCacheClient(string connectionString, ISerializer serializer, string tableName, string defaultPartitionKey, ILogger logger, bool throwOnError)
             : base(throwOnError, logger)
         {
-            ArgCheck.NotNull(nameof(connectionString), connectionString);
-            ArgCheck.NotNull(nameof(tableName), tableName);
-            _tableName = tableName ?? _defaultTableName;
-            _partitionKey = defaultPartitionKey ?? _defaultPartitionKey;
-            _serializer = serializer ?? new DotNetBinarySerializer();
+            ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);
+            ArgCheck.NotNull(nameof(serializer), serializer);
+            ArgCheck.NotNullOrEmpty(nameof(tableName), tableName);
+            _tableName = tableName;
+            _defaultPartitionKey = defaultPartitionKey;
+            _serializer = serializer;
             _storageAccount = CloudStorageAccount.Parse(connectionString);
             _tableClient = _storageAccount.CreateCloudTableClient();
             _table = _tableClient.GetTableReference(_tableName);
@@ -106,7 +114,9 @@ namespace KodeAid.Caching.AzureStorage
 
         protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> rowKeys, string partitionKey)
         {
-            partitionKey = partitionKey ?? _defaultPartitionKey;
+            partitionKey = partitionKey ?? _defaultDefaultPartitionKey;
+            ArgCheck.NotNull(nameof(partitionKey), partitionKey);
+
             var utcNow = DateTimeOffset.UtcNow;
 
             // cache hits
@@ -160,7 +170,9 @@ namespace KodeAid.Caching.AzureStorage
 
         protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partitionKey)
         {
-            partitionKey = partitionKey ?? _defaultPartitionKey;
+            partitionKey = partitionKey ?? _defaultDefaultPartitionKey;
+            ArgCheck.NotNull(nameof(partitionKey), partitionKey);
+
             var utcNow = DateTimeOffset.UtcNow;
 
             foreach (var item in items)
@@ -179,6 +191,27 @@ namespace KodeAid.Caching.AzureStorage
                 {
                     throw new CacheAccessException($"Failed to write to Azure table storage cache for key '{entry.RowKey}' in partition '{partitionKey}', HTTP status code returned was {result.HttpStatusCode}.");
                 }
+            }
+        }
+
+        protected override async Task RemoveKeysAsync(IEnumerable<string> rowKeys, string partitionKey = null)
+        {
+            partitionKey = partitionKey ?? _defaultDefaultPartitionKey;
+            ArgCheck.NotNull(nameof(partitionKey), partitionKey);
+
+            var batch = new TableBatchOperation();
+            foreach (var rowKey in rowKeys)
+            {
+                batch.Add(TableOperation.Delete(new DynamicTableEntity(partitionKey, rowKey)));
+                if (batch.Count == 100)
+                {
+                    await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
+                    batch = new TableBatchOperation();
+                }
+            }
+            if (batch.Count > 0)
+            {
+                await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
             }
         }
 
