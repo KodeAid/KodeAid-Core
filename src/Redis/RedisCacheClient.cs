@@ -20,22 +20,12 @@ namespace KodeAid.Caching.Redis
         private ConnectionMultiplexer _client;
         private readonly ISerializer _serializer;
 
-        public RedisCacheClient(string connectionString, ISerializer<string> serializer, ILogger<RedisCacheClient> logger, bool throwOnError = false)
-            : this(connectionString, (ISerializer)serializer, logger, throwOnError)
-        {
-        }
-
-        public RedisCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<RedisCacheClient> logger, bool throwOnError = false)
-            : this(connectionString, (ISerializer)serializer, logger, throwOnError)
-        {
-        }
-
         public RedisCacheClient(string connectionString, ILogger<RedisCacheClient> logger, bool throwOnError = false)
             : this(connectionString, new DotNetBinarySerializer(), logger, throwOnError)
         {
         }
 
-        private RedisCacheClient(string connectionString, ISerializer serializer, ILogger<RedisCacheClient> logger, bool throwOnError = false)
+        public RedisCacheClient(string connectionString, ISerializer serializer, ILogger<RedisCacheClient> logger, bool throwOnError = false)
             : base(throwOnError, logger)
         {
             ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);

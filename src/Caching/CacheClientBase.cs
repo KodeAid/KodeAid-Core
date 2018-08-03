@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using KodeAid.Linq;
 using KodeAid.Logging;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using ProtoBuf;
 
 namespace KodeAid.Caching
 {
@@ -28,7 +26,6 @@ namespace KodeAid.Caching
         protected ILogger Logger { get; }
 
         public virtual async Task<ICacheResult<T>> GetAsync<T>(string key, string partition = null)
-            where T : new()
         {
             ArgCheck.NotNull(nameof(key), key);
             var results = await GetAsyncHelper<T>(new[] { key }, partition).ConfigureAwait(false);
@@ -36,7 +33,6 @@ namespace KodeAid.Caching
         }
 
         public virtual Task<IEnumerable<ICacheResult<T>>> GetRangeAsync<T>(IEnumerable<string> keys, string partition = null)
-            where T : new()
         {
             ArgCheck.NotNull(nameof(keys), keys);
             if (keys.Any(key => key == null))
@@ -47,14 +43,12 @@ namespace KodeAid.Caching
         }
 
         public virtual Task SetAsync<T>(string key, T value, DateTimeOffset? absoluteExpiration, string partition = null)
-            where T : new()
         {
             ArgCheck.NotNull(nameof(key), key);
             return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, absoluteExpiration, partition);
         }
 
         public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string partition = null)
-            where T : new()
         {
             ArgCheck.NotNull(nameof(keyValues), keyValues);
             if (keyValues.Any(keyValue => keyValue.Key == null))
@@ -94,9 +88,9 @@ namespace KodeAid.Caching
             }
         }
 
-        protected abstract Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition) where T : new();
+        protected abstract Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition);
 
-        protected abstract Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition) where T : new();
+        protected abstract Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition);
 
         protected virtual Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
         {
@@ -104,7 +98,6 @@ namespace KodeAid.Caching
         }
 
         private async Task<IEnumerable<ICacheResult<T>>> GetAsyncHelper<T>(IEnumerable<string> keys, string partition)
-            where T : new()
         {
             try
             {
@@ -181,7 +174,6 @@ namespace KodeAid.Caching
         }
 
         private async Task SetAsyncHelper<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string partition)
-            where T : new()
         {
             var utcNow = DateTimeOffset.UtcNow;
             if (absoluteExpiration.HasValue)
@@ -247,29 +239,19 @@ namespace KodeAid.Caching
 
         [Serializable]
         [DataContract]
-        [JsonObject]
-        [ProtoContract]
         public class CacheItem<T>
         {
-            [DataMember(IsRequired = true)]
-            [JsonProperty("key", Required = Required.Always)]
-            [ProtoMember(1, IsRequired = true)]
+            [DataMember(IsRequired = true, Order = 1, EmitDefaultValue = true)]
             public string Key { get; set; }
 
-            [DataMember(IsRequired = true)]
-            [JsonProperty("value", Required = Required.Always)]
-            [ProtoMember(2, IsRequired = true)]
+            [DataMember(IsRequired = true, Order = 2, EmitDefaultValue = true)]
             public T Value { get; set; }
 
-            [DataMember]
-            [JsonProperty("expiry", Required = Required.Default, NullValueHandling = NullValueHandling.Ignore)]
-            [ProtoMember(3)]
-            public DateTimeOffset? Expiration { get; set; }
-
-            [DataMember]
-            [JsonProperty("updated", Required = Required.Always)]
-            [ProtoMember(4)]
+            [DataMember(IsRequired = true, Order = 3, EmitDefaultValue = true)]
             public DateTimeOffset LastUpdated { get; set; }
+
+            [DataMember(IsRequired = false, Order = 4, EmitDefaultValue = false)]
+            public DateTimeOffset? Expiration { get; set; }
         }
     }
 }

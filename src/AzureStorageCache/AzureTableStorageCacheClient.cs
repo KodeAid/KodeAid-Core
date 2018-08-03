@@ -25,7 +25,7 @@ namespace KodeAid.Caching.AzureStorage
         private readonly ISerializer _serializer;
         private readonly bool _isBinarySerializer;
         private readonly CloudStorageAccount _storageAccount;
-        private readonly CloudTableClient _tableClient;
+        private readonly CloudTableClient _client;
         private readonly CloudTable _table;
         private readonly TableRequestOptions _options = new TableRequestOptions() { RetryPolicy = new ExponentialRetry() }; //EncryptionPolicy = new TableEncryptionPolicy()
 
@@ -57,8 +57,8 @@ namespace KodeAid.Caching.AzureStorage
             _defaultPartitionKey = defaultPartitionKey;
             _serializer = serializer;
             _storageAccount = CloudStorageAccount.Parse(connectionString);
-            _tableClient = _storageAccount.CreateCloudTableClient();
-            _table = _tableClient.GetTableReference(_tableName);
+            _client = _storageAccount.CreateCloudTableClient();
+            _table = _client.GetTableReference(_tableName);
         }
 
         protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> rowKeys, string partitionKey)
@@ -74,7 +74,7 @@ namespace KodeAid.Caching.AzureStorage
             foreach (var rowKey in rowKeys)
             {
                 var retrieve = TableOperation.Retrieve<AzureTableStorageCacheEntry>(partitionKey, rowKey);
-                var result = await ExecuteTableOperationAsync(_table, retrieve).ConfigureAwait(false);
+                var result = await ExecuteTableOperationAsync(retrieve).ConfigureAwait(false);
 
                 // failed?
                 if (result.HttpStatusCode / 100 != 2)
@@ -100,6 +100,11 @@ namespace KodeAid.Caching.AzureStorage
                 // expired?
                 if (entry.Expiration.HasValue && entry.Expiration.Value <= utcNow)
                 {
+                    // remove if expired
+                    var delete = TableOperation.Delete(new DynamicTableEntity(partitionKey, rowKey, result.Etag, null));
+                    await ExecuteTableOperationAsync(delete).ConfigureAwait(false);
+
+                    // this one is expired so move on to the next one
                     continue;
                 }
 
@@ -107,7 +112,7 @@ namespace KodeAid.Caching.AzureStorage
                 {
                     Key = entry.RowKey,
                     Value = DeserializeValue<T>(entry.Value),
-                    LastUpdated = entry.LastUpdated,
+                    LastUpdated = entry.Timestamp,
                     Expiration = entry.Expiration,
                 };
 
@@ -130,12 +135,12 @@ namespace KodeAid.Caching.AzureStorage
                 {
                     PartitionKey = partitionKey,
                     RowKey = item.Key,
-                    LastUpdated = utcNow,
+                    Timestamp = utcNow,
                     Expiration = item.Expiration,
                     Value = SerializeValue<T>(item.Value),
                 };
                 var insertOrReplace = TableOperation.InsertOrReplace(entry);
-                var result = await ExecuteTableOperationAsync(_table, insertOrReplace).ConfigureAwait(false);
+                var result = await ExecuteTableOperationAsync(insertOrReplace).ConfigureAwait(false);
                 if (result.HttpStatusCode / 100 != 2 && ThrowOnError)
                 {
                     throw new CacheAccessException($"Failed to write to Azure table storage cache for key '{entry.RowKey}' in partition '{partitionKey}', HTTP status code returned was {result.HttpStatusCode}.");
@@ -183,7 +188,8 @@ namespace KodeAid.Caching.AzureStorage
                     .Take(100)
                     .Select(new List<string>() {
                         nameof(AzureTableStorageCacheEntry.PartitionKey),
-                        nameof(AzureTableStorageCacheEntry.RowKey) });
+                        nameof(AzureTableStorageCacheEntry.RowKey),
+                        nameof(AzureTableStorageCacheEntry.ETag)});
 
                 segment = await _table.ExecuteQuerySegmentedAsync(query, segment?.ContinuationToken, _options, new OperationContext()).ConfigureAwait(false);
 
@@ -215,9 +221,9 @@ namespace KodeAid.Caching.AzureStorage
             }
         }
 
-        private Task<TableResult> ExecuteTableOperationAsync(CloudTable table, TableOperation tableOperation)
+        private Task<TableResult> ExecuteTableOperationAsync(TableOperation tableOperation)
         {
-            return table.ExecuteAsync(tableOperation, _options, new OperationContext());
+            return _table.ExecuteAsync(tableOperation, _options, new OperationContext());
         }
 
         private string SerializeValue<T>(T value)
@@ -242,7 +248,6 @@ namespace KodeAid.Caching.AzureStorage
 
         private sealed class AzureTableStorageCacheEntry : TableEntity
         {
-            public DateTimeOffset LastUpdated { get; set; }
             public DateTimeOffset? Expiration { get; set; }
             public string Value { get; set; }
         }
