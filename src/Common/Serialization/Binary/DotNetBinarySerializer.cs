@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KodeAid.Serialization.Binary
 {
-    public class DotNetBinarySerializer : ISerializer<byte[]>
+    public class DotNetBinarySerializer : IBinarySerializer
     {
         public byte[] Serialize(object graph)
         {
@@ -47,30 +47,6 @@ namespace KodeAid.Serialization.Binary
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult((T)new BinaryFormatter().Deserialize(stream));
-        }
-
-        public void SerializeToFile(string path, object graph, bool overwrite = false)
-        {
-            using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
-                SerializeToStream(stream, graph);
-        }
-
-        public async Task SerializeToFileAsync(string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
-        {
-            using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
-                await SerializeToStreamAsync(stream, graph, cancellationToken).ConfigureAwait(false);
-        }
-
-        public T DeserializeFromFile<T>(string path)
-        {
-            using (var stream = File.OpenRead(path))
-                return DeserializeFromStream<T>(stream);
-        }
-
-        public async Task<T> DeserializeFromFileAsync<T>(string path, CancellationToken cancellationToken = default)
-        {
-            using (var stream = File.OpenRead(path))
-                return await DeserializeFromStreamAsync<T>(stream, cancellationToken).ConfigureAwait(false);
         }
 
         object ISerializer.Serialize(object value)

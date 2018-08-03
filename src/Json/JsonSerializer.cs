@@ -11,7 +11,7 @@ using NJsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace KodeAid.Serialization.Json
 {
-    public class JsonSerializer : ISerializer<string>
+    public class JsonSerializer : IStringSerializer
     {
         public string Serialize(object graph)
         {
@@ -68,30 +68,6 @@ namespace KodeAid.Serialization.Json
             {
                 return Task.FromResult(DeserializeFromReader<T>(reader));
             }
-        }
-
-        public void SerializeToFile(string path, object graph, bool overwrite = false)
-        {
-            using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
-                SerializeToStream(stream, graph);
-        }
-
-        public async Task SerializeToFileAsync(string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
-        {
-            using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
-                await SerializeToStreamAsync(stream, graph, cancellationToken).ConfigureAwait(false);
-        }
-
-        public T DeserializeFromFile<T>(string path)
-        {
-            using (var stream = File.OpenRead(path))
-                return DeserializeFromStream<T>(stream);
-        }
-
-        public async Task<T> DeserializeFromFileAsync<T>(string path, CancellationToken cancellationToken = default)
-        {
-            using (var stream = File.OpenRead(path))
-                return await DeserializeFromStreamAsync<T>(stream, cancellationToken).ConfigureAwait(false);
         }
 
         public void SerializeToWriter(TextWriter writer, object graph)
