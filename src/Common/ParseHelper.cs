@@ -163,8 +163,12 @@ namespace KodeAid
                             return false;
                         return true;
                     })?.GetRawConstantValue();
+
                 if (value != null)
+                {
+                    value = Enum.ToObject(targetType, value);
                     return true;
+                }
 
                 try
                 {
