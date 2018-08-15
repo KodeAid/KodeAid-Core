@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <AssemblyName>KodeAid.Json.Tests</AssemblyName>
+        <RootNamespace>KodeAid.Json</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+		<ProjectReference Include="..\Tests\Tests.csproj" />
+		<ProjectReference Include="..\..\src\Json\Json.csproj" />
+    </ItemGroup>
+
+</Project>

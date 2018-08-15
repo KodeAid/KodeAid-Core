@@ -1,0 +1,53 @@
+﻿// Copyright © Kris Penner. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+
+using System.Collections;
+using System.Linq;
+using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
+namespace KodeAid.Serialization.Json.ContractResolvers
+{
+    public class EmptyArrayResolver : DefaultContractResolver
+    {
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            var property = base.CreateProperty(member, memberSerialization);
+
+            if (property != null &&
+                (member.MemberType == MemberTypes.Field || member.MemberType == MemberTypes.Property) &&
+                typeof(ICollection).IsAssignableFrom(property.PropertyType))
+            {
+                var emptyArrayAttribute = property.AttributeProvider.GetAttributes(typeof(JsonEmptyArrayAttribute), true).FirstOrDefault() as JsonEmptyArrayAttribute;
+                if (emptyArrayAttribute == null)
+                {
+                    emptyArrayAttribute = member.GetCustomAttribute<JsonEmptyArrayAttribute>(true);
+                    if (emptyArrayAttribute == null)
+                    {
+                        emptyArrayAttribute = member.DeclaringType.GetCustomAttribute<JsonEmptyArrayAttribute>(true);
+                    }
+                }
+                if (emptyArrayAttribute != null && emptyArrayAttribute.EmptyArrayHandling.HasFlag(EmptyArrayHandling.Ignore))
+                {
+                    var shouldSerialize = property.ShouldSerialize;
+                    property.ShouldSerialize = instance =>
+                    {
+                        if (shouldSerialize != null && !shouldSerialize(instance))
+                            return false;
+
+                        var collection =
+                            (member.MemberType == MemberTypes.Field ?
+                            ((FieldInfo)member).GetValue(instance) :
+                            ((PropertyInfo)member).GetValue(instance)) as ICollection;
+
+                        return collection == null || collection.Count > 0;
+                    };
+                }
+            }
+
+            return property;
+        }
+    }
+}
