@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.0</TargetFramework>
-        <AssemblyName>KodeAid.Tests</AssemblyName>
-        <RootNamespace>KodeAid.Tests</RootNamespace>
+        <AssemblyName>KodeAid.Testing</AssemblyName>
+        <RootNamespace>KodeAid.Testing</RootNamespace>
     </PropertyGroup>
 
 </Project>
