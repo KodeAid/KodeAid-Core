@@ -1,16 +1,33 @@
 ﻿<Project>
 
     <PropertyGroup>
-		<IsPackable>false</IsPackable>
-        <SourceLinkEnabled>false</SourceLinkEnabled>
-        <IsTestProject>true</IsTestProject>
+        <Authors>Kris Penner</Authors>
+        <Company></Company>
+        <Product>Kode-Aid</Product>
+        <Copyright>Copyright © Kris Penner. All rights reserved.</Copyright>
+        <DefaultLanguage>en-US</DefaultLanguage>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/KodeAid/KodeAid-Core/master/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/KodeAid</PackageProjectUrl>
+        <PackageIconUrl>https://avatars1.githubusercontent.com/u/39310109</PackageIconUrl>
+        <RepositoryUrl>https://github.com/KodeAid/KodeAid-Core</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <UseFullSemVerForNuGet>true</UseFullSemVerForNuGet>
+        <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
+        <DebugType>embedded</DebugType>
+        <IncludeSymbols>false</IncludeSymbols>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <LangVersion>latest</LangVersion>
+        <NoWarn>1701;1702;1705;1591</NoWarn>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-		<PackageReference Include="xunit" Version="2.3.1" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-		<DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+		<PackageReference Include="xunit" Version="2.4.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     </ItemGroup>
 
 </Project>
