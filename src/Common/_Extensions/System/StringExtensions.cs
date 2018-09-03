@@ -3,7 +3,9 @@
 
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using KodeAid;
 
@@ -308,6 +310,19 @@ namespace System
             // capitalize full text
             str = str.ToUpperInvariant();
             return str;
+        }
+
+        /// <summary>
+        /// Remove all diacritics (such as accents, cedilla and other glyphs) from each 
+        /// character in the string and normalize as Unicode form C.
+        /// </summary>
+        public static string RemoveDiacritics(this string str)
+        {
+            ArgCheck.NotNull(nameof(str), str);
+            return string.Concat(str
+                .Normalize(NormalizationForm.FormD)
+                .Where(ch => CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark))
+                .Normalize(NormalizationForm.FormC);
         }
     }
 }
