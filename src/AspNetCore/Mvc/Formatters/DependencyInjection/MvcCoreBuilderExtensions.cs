@@ -74,9 +74,10 @@ namespace Microsoft.Extensions.DependencyInjection
         // Internal for testing.
         internal static void AddXmlSerializerFormatterServices(IServiceCollection services, XmlSerializerFormatterOptions options)
         {
+            services.AddTransient(sp => new XmlSerializerMvcOptionsSetup(options, sp.GetRequiredService<ILoggerFactory>()));
+
             services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>>(
-                    sp => new XmlSerializerMvcOptionsSetup(options, sp.GetRequiredService<ILoggerFactory>())));
+                ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, XmlSerializerMvcOptionsSetup>());
         }
     }
 }
