@@ -8,7 +8,6 @@ using KodeAid.AspNetCore.Mvc.Formatters;
 using KodeAid.AspNetCore.Mvc.Formatters.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -74,8 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection
         // Internal for testing.
         internal static void AddXmlSerializerFormatterServices(IServiceCollection services, XmlSerializerFormatterOptions options)
         {
-            services.AddTransient(sp => new XmlSerializerMvcOptionsSetup(options, sp.GetRequiredService<ILoggerFactory>()));
-
+            services.AddSingleton(options);
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, XmlSerializerMvcOptionsSetup>());
         }

@@ -47,7 +47,7 @@ namespace KodeAid.AspNetCore.Mvc.Formatters.Internal
             }
 
             options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
-            options.InputFormatters.Add(new XmlSerializerInputFormatter((_options?.IgnoreNamespaces).GetValueOrDefault(), options.SuppressInputFormatterBuffering));
+            options.InputFormatters.Add(new XmlSerializerInputFormatter(_options, options));
         }
     }
 }
