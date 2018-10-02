@@ -7,7 +7,7 @@ using System.Linq;
 using KodeAid;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.Configuration
 {
     public static class ConfigurationExtensions
     {
