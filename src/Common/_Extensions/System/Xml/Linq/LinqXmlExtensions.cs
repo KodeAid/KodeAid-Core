@@ -8,6 +8,19 @@ namespace System.Xml.Linq
 {
     public static class LinqXmlExtensions
     {
+        public static void SetDefaultXmlNamespace(this XElement element, XNamespace xmlns)
+        {
+            if (element.Name.NamespaceName == string.Empty)
+            {
+                element.Name = xmlns + element.Name.LocalName;
+            }
+
+            foreach (var e in element.Elements())
+            {
+                e.SetDefaultXmlNamespace(xmlns);
+            }
+        }
+
         public static string GetChildElementValue(this XElement element, XName childElementName)
         {
             return GetChildElementValue<string>(element, childElementName);
