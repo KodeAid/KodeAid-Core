@@ -25,21 +25,21 @@ namespace KodeAid.Xml.Serialization
                 OmitXmlDeclaration = omitXmlDeclaration,
             };
 
-            var ns = new XmlSerializerNamespaces();
+            var namespaces = new XmlSerializerNamespaces();
             if (omitStandardNamespaces)
             {
-                ns.Add("", "");
+                namespaces.Add("", "");
             }
             if (defaultNamespace != null)
             {
-                ns.Add("", defaultNamespace);
+                namespaces.Add("", defaultNamespace);
             }
 
             var sb = new StringBuilder();
             using (var sw = new StringWriter(encoding, sb))
             using (var xw = XmlWriter.Create(sw, settings))
             {
-                new XmlSerializer(typeof(T), defaultNamespace).Serialize(xw, obj, ns);
+                new XmlSerializer(typeof(T), defaultNamespace).Serialize(xw, obj, namespaces);
                 xw.Flush();
                 sw.Flush();
             }

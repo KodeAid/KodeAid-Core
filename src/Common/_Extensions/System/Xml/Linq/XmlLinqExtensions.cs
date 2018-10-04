@@ -6,7 +6,7 @@ using KodeAid;
 
 namespace System.Xml.Linq
 {
-    public static class LinqXmlExtensions
+    public static class XmlLinqExtensions
     {
         public static void SetDefaultXmlNamespace(this XElement element, XNamespace xmlns)
         {
