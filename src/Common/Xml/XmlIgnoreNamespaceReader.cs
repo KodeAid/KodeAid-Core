@@ -9,11 +9,13 @@ namespace KodeAid.Xml
     public class XmlIgnoreNamespaceReader : XmlReader
     {
         private readonly XmlReader _reader;
+        private readonly bool _closeAndDisposeUnderlyingReader;
 
-        public XmlIgnoreNamespaceReader(XmlReader reader)
+        public XmlIgnoreNamespaceReader(XmlReader reader, bool closeAndDisposeUnderlyingReader)
         {
             ArgCheck.NotNull(nameof(reader), reader);
             _reader = reader;
+            _closeAndDisposeUnderlyingReader = closeAndDisposeUnderlyingReader;
         }
 
         public override int AttributeCount => _reader.AttributeCount;
@@ -39,6 +41,26 @@ namespace KodeAid.Xml
         public override ReadState ReadState => _reader.ReadState;
 
         public override string Value => _reader.Value;
+
+        public override void Close()
+        {
+            if (_closeAndDisposeUnderlyingReader)
+            {
+                _reader.Close();
+            }
+
+            base.Close();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_closeAndDisposeUnderlyingReader)
+            {
+                _reader.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
 
         public override string GetAttribute(int i)
         {

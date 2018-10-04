@@ -30,7 +30,7 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
             var reader = base.CreateXmlReader(readStream, encoding);
             if (_ignoreNamespaces)
             {
-                reader = new XmlIgnoreNamespaceReader(reader);
+                reader = new XmlIgnoreNamespaceReader(reader, true);
             }
             return reader;
         }
