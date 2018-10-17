@@ -12,5 +12,10 @@ namespace System
         {
             return Base64Encoder.EncodeBytes(data, urlEncoded);
         }
+
+        internal static string ToBase36(this byte[] data)
+        {
+            return Base36Encoder.EncodeBytes(data);
+        }
     }
 }
