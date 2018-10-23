@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -12,6 +13,11 @@ namespace KodeAid.Xml.Serialization
     public static class XmlSerializerHelper
     {
         public static string Serialize<T>(T obj, bool indent = false, bool omitStandardNamespaces = false, string defaultNamespace = null, bool omitXmlDeclaration = false, Encoding encoding = null)
+        {
+            return Serialize(typeof(T), obj, indent, omitStandardNamespaces, defaultNamespace, omitXmlDeclaration, encoding);
+        }
+
+        public static string Serialize(Type type, object obj, bool indent = false, bool omitStandardNamespaces = false, string defaultNamespace = null, bool omitXmlDeclaration = false, Encoding encoding = null)
         {
             if (encoding == null)
             {
@@ -39,11 +45,21 @@ namespace KodeAid.Xml.Serialization
             using (var sw = new StringWriter(encoding, sb))
             using (var xw = XmlWriter.Create(sw, settings))
             {
-                new XmlSerializer(typeof(T), defaultNamespace).Serialize(xw, obj, namespaces);
+                new XmlSerializer(type, defaultNamespace).Serialize(xw, obj, namespaces);
                 xw.Flush();
                 sw.Flush();
             }
             return sb.ToString();
+        }
+
+        public static T Deserialize<T>(string xml, string defaultNamespace = null, bool ignoreNamespaces = false)
+        {
+            return (T)Deserialize(typeof(T), xml, defaultNamespace, ignoreNamespaces);
+        }
+
+        public static object Deserialize(Type type, string xml, string defaultNamespace = null, bool ignoreNamespaces = false)
+        {
+            return new XmlSerializer(type, defaultNamespace).Deserialize(xml, ignoreNamespaces);
         }
     }
 }
