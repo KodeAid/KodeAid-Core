@@ -16,7 +16,7 @@ namespace KodeAid.Repositories
         Task<TEntity> GetAsync(object id, bool trackChanges, CancellationToken cancellationToken = default);
         Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges, CancellationToken cancellationToken = default);
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, bool trackChanges, CancellationToken cancellationToken = default);
-        Task TrackChangesAsync(TEntity entity, bool trackChanges = true, CancellationToken cancellationToken = default);
-        Task TrackChangesForRangeAsync(IEnumerable<TEntity> entities, bool trackChanges = true, CancellationToken cancellationToken = default);
+        Task TrackAsync(TEntity entity, bool trackChanges = true, CancellationToken cancellationToken = default);
+        Task TrackRangeAsync(IEnumerable<TEntity> entities, bool trackChanges = true, CancellationToken cancellationToken = default);
     }
 }

@@ -203,7 +203,7 @@ namespace KodeAid.EntityFrameworkCore
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
         }
 
-        public void TrackChanges(TEntity entity, bool trackChanges = true)
+        public void Track(TEntity entity, bool trackChanges = true)
         {
             if (trackChanges)
                 Context.Attach(entity);
@@ -211,13 +211,13 @@ namespace KodeAid.EntityFrameworkCore
                 Context.Entry(entity).State = EntityState.Detached;
         }
 
-        public Task TrackChangesAsync(TEntity entity, bool trackChanges = true, CancellationToken cancellationToken = default)
+        public Task TrackAsync(TEntity entity, bool trackChanges = true, CancellationToken cancellationToken = default)
         {
-            TrackChanges(entity, trackChanges);
+            Track(entity, trackChanges);
             return Task.CompletedTask;
         }
 
-        public void TrackChangesForRange(IEnumerable<TEntity> entities, bool trackChanges = true)
+        public void TrackRange(IEnumerable<TEntity> entities, bool trackChanges = true)
         {
             if (trackChanges)
                 Context.AttachRange(entities);
@@ -226,9 +226,9 @@ namespace KodeAid.EntityFrameworkCore
                     Context.Entry(entity).State = EntityState.Detached;
         }
 
-        public Task TrackChangesForRangeAsync(IEnumerable<TEntity> entities, bool trackChanges = true, CancellationToken cancellationToken = default)
+        public Task TrackRangeAsync(IEnumerable<TEntity> entities, bool trackChanges = true, CancellationToken cancellationToken = default)
         {
-            TrackChangesForRange(entities, trackChanges);
+            TrackRange(entities, trackChanges);
             return Task.CompletedTask;
         }
     }
