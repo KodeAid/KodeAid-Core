@@ -12,4 +12,13 @@
 		<ProjectReference Include="..\..\src\Xunit\Xunit.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+      <PackageReference Update="xunit" Version="2.4.1" />
+      <PackageReference Update="xunit.runner.visualstudio" Version="2.4.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
 </Project>
