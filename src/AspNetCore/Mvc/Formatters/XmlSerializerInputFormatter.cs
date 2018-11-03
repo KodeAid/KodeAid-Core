@@ -14,13 +14,8 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
     {
         private readonly bool _ignoreNamespaces;
 
-        public XmlSerializerInputFormatter()
-            : base()
-        {
-        }
-
         public XmlSerializerInputFormatter(XmlSerializerFormatterOptions options, MvcOptions mvcOptions)
-            : base((mvcOptions?.SuppressInputFormatterBuffering).GetValueOrDefault())
+            : base(mvcOptions)
         {
             _ignoreNamespaces = (options?.IgnoreNamespaces).GetValueOrDefault();
         }
