@@ -10,7 +10,7 @@ namespace KodeAid.Serialization.Json.ContractResolvers
     {
         private readonly ITestOutputHelper _output;
 
-        public EmptyArrayResolverTest(ITestOutputHelper output)
+        public EmptyArrayContractResolverTest(ITestOutputHelper output)
         {
             _output = output;
         }
