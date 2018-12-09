@@ -26,7 +26,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{8DE82B69-A512-4953-B0B5-1013AF3C8FBF}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		Directory.Build.props = Directory.Build.props
+		src\Directory.Build.props = src\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caching", "src\Caching\Caching.csproj", "{65ACBE82-8821-4D9F-BCA4-D7429AC6DB8D}"
