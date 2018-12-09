@@ -9,6 +9,7 @@ namespace KodeAid.Net
 {
     public static class MediaTypes
     {
+        public const string DefaultBinary = "application/octet-stream";
         public const string Bmp = "image/bmp";
         public const string Css = "text/css";
         public const string Csv = "text/csv";
@@ -42,7 +43,7 @@ namespace KodeAid.Net
             throw new NotSupportedException("File type is not supported.");
         }
 
-        public static string GetMediaTypeFromFileNameOrDefault(string fileName, string defaultMediaType = null)
+        public static string GetMediaTypeFromFileNameOrDefault(string fileName, string defaultMediaType = DefaultBinary)
         {
             if (TryGetMediaTypeFromFileName(fileName, out var mediaType))
             {
