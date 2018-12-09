@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<AssemblyName>KodeAid.Html</AssemblyName>
 		<RootNamespace>KodeAid.Html</RootNamespace>
 		<Description>Kode-Aid shared HTML utility library.</Description>
@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.8.9" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.8.11" />
 	</ItemGroup>
 
 	<ItemGroup>
