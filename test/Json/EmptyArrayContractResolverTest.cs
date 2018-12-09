@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace KodeAid.Serialization.Json.ContractResolvers
 {
-    public class EmptyArrayResolverTest
+    public class EmptyArrayContractResolverTest
     {
         private readonly ITestOutputHelper _output;
 
@@ -33,7 +33,7 @@ namespace KodeAid.Serialization.Json.ContractResolvers
         {
             var settings = new JsonSerializerSettings()
             {
-                ContractResolver = new EmptyArrayResolver()
+                ContractResolver = new EmptyArrayContractResolver()
             };
 
             var json = JsonConvert.SerializeObject(new D(), settings);

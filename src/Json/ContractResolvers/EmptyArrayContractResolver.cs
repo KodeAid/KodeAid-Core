@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace KodeAid.Serialization.Json.ContractResolvers
 {
-    public class EmptyArrayResolver : DefaultContractResolver
+    public class EmptyArrayContractResolver : DefaultContractResolver
     {
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
@@ -20,29 +20,19 @@ namespace KodeAid.Serialization.Json.ContractResolvers
                 (member.MemberType == MemberTypes.Field || member.MemberType == MemberTypes.Property) &&
                 typeof(ICollection).IsAssignableFrom(property.PropertyType))
             {
-                var emptyArrayAttribute = property.AttributeProvider.GetAttributes(typeof(JsonEmptyArrayAttribute), true).FirstOrDefault() as JsonEmptyArrayAttribute;
-                if (emptyArrayAttribute == null)
-                {
-                    emptyArrayAttribute = member.GetCustomAttribute<JsonEmptyArrayAttribute>(true);
-                    if (emptyArrayAttribute == null)
-                    {
-                        emptyArrayAttribute = member.DeclaringType.GetCustomAttribute<JsonEmptyArrayAttribute>(true);
-                    }
-                }
-                if (emptyArrayAttribute != null && emptyArrayAttribute.EmptyArrayHandling.HasFlag(EmptyArrayHandling.Ignore))
+                if (property.AttributeProvider.GetAttributes(true).OfType<JsonEmptyArrayAttribute>().FirstOrDefault() is JsonEmptyArrayAttribute emptyArrayAttribute &&
+                    emptyArrayAttribute.EmptyArrayHandling.HasFlag(EmptyArrayHandling.Ignore))
                 {
                     var shouldSerialize = property.ShouldSerialize;
                     property.ShouldSerialize = instance =>
                     {
                         if (shouldSerialize != null && !shouldSerialize(instance))
+                        {
                             return false;
+                        }
 
-                        var collection =
-                            (member.MemberType == MemberTypes.Field ?
-                            ((FieldInfo)member).GetValue(instance) :
-                            ((PropertyInfo)member).GetValue(instance)) as ICollection;
-
-                        return collection == null || collection.Count > 0;
+                        return !((member.MemberType == MemberTypes.Field ? ((FieldInfo)member).GetValue(instance) : ((PropertyInfo)member).GetValue(instance))
+                            is ICollection collection) || collection.Count > 0;
                     };
                 }
             }
