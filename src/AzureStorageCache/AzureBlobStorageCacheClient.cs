@@ -178,7 +178,10 @@ namespace KodeAid.Caching.AzureStorage
         private CloudBlockBlob GetBlobReference(string blobKey, string partitionDirectory)
         {
             if (!string.IsNullOrEmpty(partitionDirectory))
+            {
                 return _container.GetDirectoryReference(partitionDirectory).GetBlockBlobReference(blobKey);
+            }
+
             return _container.GetBlockBlobReference(blobKey);
         }
     }

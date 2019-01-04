@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using KodeAid.Serialization;
-using KodeAid.Serialization.Binary;
 using KodeAid.Serialization.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
@@ -156,7 +155,7 @@ namespace KodeAid.Caching.AzureStorage
             var batch = new TableBatchOperation();
             foreach (var rowKey in rowKeys)
             {
-                batch.Add(TableOperation.Delete(new DynamicTableEntity(partitionKey, rowKey)));
+                batch.Add(TableOperation.Delete(new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }));
                 if (batch.Count == 100)
                 {
                     await _table.ExecuteBatchAsync(batch).ConfigureAwait(false);
@@ -197,11 +196,12 @@ namespace KodeAid.Caching.AzureStorage
 
                 foreach (var entity in segment.Results)
                 {
-                    if (!batches.TryGetValue(entity.PartitionKey, out TableBatchOperation batch))
+                    if (!batches.TryGetValue(entity.PartitionKey, out var batch))
                     {
                         batches[entity.PartitionKey] = batch = new TableBatchOperation();
                     }
 
+                    entity.ETag = "*";
                     batch.Add(TableOperation.Delete(entity));
 
                     if (batch.Count == 100)
@@ -229,20 +229,32 @@ namespace KodeAid.Caching.AzureStorage
         private string SerializeValue<T>(T value)
         {
             if (value == null)
+            {
                 return null;
+            }
+
             var data = _serializer.Serialize(value);
             if (_isBinarySerializer)
+            {
                 return ((byte[])data).ToBase64();
+            }
+
             return (string)data;
         }
 
         private T DeserializeValue<T>(string value)
         {
             if (value == null)
+            {
                 return default;
+            }
+
             object data = value;
             if (_isBinarySerializer)
+            {
                 data = value.FromBase64();
+            }
+
             return _serializer.Deserialize<T>(data);
         }
 
