@@ -3,7 +3,7 @@
 
 
 using System.Collections.Generic;
-using KodeAid.Serialization.Json.ContractResolvers;
+using KodeAid.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

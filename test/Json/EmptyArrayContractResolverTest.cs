@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using KodeAid.Json.Serialization;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json
 {
     public class EmptyArrayContractResolverTest
     {

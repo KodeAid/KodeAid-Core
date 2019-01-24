@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using KodeAid.Json;
 using KodeAid.Serialization;
-using KodeAid.Serialization.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
