@@ -10,7 +10,7 @@ using KodeAid.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json.Serialization
 {
     public class VersionedModelContractResolver : DefaultContractResolver
     {

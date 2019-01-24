@@ -6,7 +6,7 @@ using System;
 using System.Reflection;
 using Newtonsoft.Json.Serialization;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json.Serialization
 {
     public interface IPredicateConfiguration
     {

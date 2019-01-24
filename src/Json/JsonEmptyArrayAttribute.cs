@@ -4,7 +4,7 @@
 
 using System;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class JsonEmptyArrayAttribute : Attribute

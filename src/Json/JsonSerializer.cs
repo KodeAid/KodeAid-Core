@@ -6,20 +6,22 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using KodeAid.Serialization;
 using Newtonsoft.Json;
-using NJsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace KodeAid.Serialization.Json
+namespace KodeAid.Json
 {
     public class JsonSerializer : IStringSerializer
     {
+        public JsonSerializerSettings Settings { get; set; }
+
         public string Serialize(object graph)
         {
             var sb = new StringBuilder();
             using (var sw = new StringWriter(sb))
             using (var jw = new JsonTextWriter(sw))
             {
-                new NJsonSerializer().Serialize(jw, graph);
+                CreateJsonSerializer().Serialize(jw, graph);
                 jw.Flush();
                 sw.Flush();
             }
@@ -30,7 +32,7 @@ namespace KodeAid.Serialization.Json
         {
             using (var sr = new StringReader(json))
             using (var jr = new JsonTextReader(sr))
-                return new NJsonSerializer().Deserialize<T>(jr);
+                return CreateJsonSerializer().Deserialize<T>(jr);
         }
 
         public void SerializeToStream(Stream stream, object graph)
@@ -74,7 +76,7 @@ namespace KodeAid.Serialization.Json
         {
             using (var jw = new JsonTextWriter(writer))
             {
-                new NJsonSerializer().Serialize(jw, graph);
+                CreateJsonSerializer().Serialize(jw, graph);
                 jw.Flush();
             }
         }
@@ -83,7 +85,7 @@ namespace KodeAid.Serialization.Json
         {
             using (var jr = new JsonTextReader(reader))
             {
-                return new NJsonSerializer().Deserialize<T>(jr);
+                return CreateJsonSerializer().Deserialize<T>(jr);
             }
         }
 
@@ -95,6 +97,11 @@ namespace KodeAid.Serialization.Json
         T ISerializer.Deserialize<T>(object data)
         {
             return Deserialize<T>((string)data);
+        }
+
+        private Newtonsoft.Json.JsonSerializer CreateJsonSerializer()
+        {
+            return Newtonsoft.Json.JsonSerializer.CreateDefault(Settings);
         }
     }
 }

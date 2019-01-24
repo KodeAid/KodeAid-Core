@@ -4,7 +4,7 @@
 
 using System;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json
 {
     //
     // Summary:

@@ -8,7 +8,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json.Serialization
 {
     public class PredicateContractResolver : DefaultContractResolver
     {

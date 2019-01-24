@@ -9,7 +9,7 @@ using System.Reflection;
 using KodeAid.ComponentModel.DataAnnotations;
 using Newtonsoft.Json.Serialization;
 
-namespace KodeAid.Serialization.Json.ContractResolvers
+namespace KodeAid.Json.Serialization
 {
     public class VersionedModelPredicate : IPredicateConfiguration
     {
