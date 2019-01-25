@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace KodeAid.FaultTolerance
 {
-    public class ExponentialBackoffRetryPolicy : RetryPolicy
+    public class ExponentialBackoffRetryPolicy : IRetryPolicy
     {
         public int MaxRetryCount { get; set; } = 3;
         public TimeSpan MaxRetryDelay { get; set; } = TimeSpan.FromSeconds(30);
         public int ExponentialPower { get; set; } = 3;
 
-        public override async Task<(bool Retry, RetryContext Context)> RetryDelayAsync(RetryContext context)
+        public async Task<(bool Retry, RetryContext Context)> RetryDelayAsync(RetryContext context)
         {
             ArgCheck.NotNull(nameof(context), context);
 

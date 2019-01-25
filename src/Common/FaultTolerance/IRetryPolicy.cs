@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace KodeAid.FaultTolerance
 {
-    public abstract class RetryPolicy
+    public interface IRetryPolicy
     {
-        public abstract Task<(bool Retry, RetryContext Context)> RetryDelayAsync(RetryContext context);
+        Task<(bool Retry, RetryContext Context)> RetryDelayAsync(RetryContext context);
     }
 }

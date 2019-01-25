@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace KodeAid.FaultTolerance
 {
-    public abstract class RetryManagerBase<T>
+    public abstract class RetryManagerBase<TState>
     {
-        public RetryManagerBase(RetryPolicy policy)
+        public RetryManagerBase(IRetryPolicy policy)
         {
             ArgCheck.NotNull(nameof(policy), policy);
 
             Policy = policy;
         }
 
-        public RetryPolicy Policy { get; }
+        public IRetryPolicy Policy { get; }
 
-        public async Task<(bool Retry, RetryContext Context)> CheckRetryAsync(RetryContext context, T state = default, Exception exception = null)
+        public async Task<(bool Retry, RetryContext Context)> CheckRetryAsync(RetryContext context, TState state = default, Exception exception = null)
         {
             if (!CanRetry(context, state, exception))
             {
@@ -28,6 +28,6 @@ namespace KodeAid.FaultTolerance
             return await Policy.RetryDelayAsync(context).ConfigureAwait(false);
         }
 
-        protected abstract bool CanRetry(RetryContext context, T state, Exception exception);
+        protected abstract bool CanRetry(RetryContext context, TState state, Exception exception);
     }
 }
