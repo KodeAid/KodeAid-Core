@@ -18,14 +18,15 @@ namespace KodeAid.FaultTolerance
 
         public IRetryPolicy Policy { get; }
 
-        public async Task<(bool Retry, RetryContext Context)> CheckRetryAsync(RetryContext context, TState state = default, Exception exception = null)
+        public async Task<RetryContext> CheckRetryAsync(RetryContext context, TState state = default, Exception exception = null)
         {
             if (!CanRetry(context, state, exception))
             {
-                return (false, context);
+                context.CanRetry = false;
+                return context;
             }
 
-            return await Policy.RetryDelayAsync(context).ConfigureAwait(false);
+            return await Policy.CheckRetryAsync(context).ConfigureAwait(false);
         }
 
         protected abstract bool CanRetry(RetryContext context, TState state, Exception exception);

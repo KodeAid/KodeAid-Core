@@ -7,25 +7,27 @@ using System.Threading.Tasks;
 
 namespace KodeAid.FaultTolerance
 {
-    public class ExponentialBackoffRetryPolicy : IRetryPolicy
+    public class ExponentialRetryPolicy : IRetryPolicy
     {
         public int MaxRetryCount { get; set; } = 3;
         public TimeSpan MaxRetryDelay { get; set; } = TimeSpan.FromSeconds(30);
         public int ExponentialPower { get; set; } = 3;
 
-        public async Task<(bool Retry, RetryContext Context)> RetryDelayAsync(RetryContext context)
+        public async Task<RetryContext> CheckRetryAsync(RetryContext context)
         {
             ArgCheck.NotNull(nameof(context), context);
 
             if (context.RetryCount >= MaxRetryCount)
             {
-                return (false, context);
+                context.CanRetry = false;
+                return context;
             }
 
             // delay (to the power of 3): 0s, 1s, 8s, 27s, 64s but if max is at 60s, then: ... 27s, 60s, 60s....
             await Task.Delay(TimeSpan.FromSeconds(Math.Min(Math.Pow(++context.RetryCount, ExponentialPower), MaxRetryDelay.TotalSeconds))).ConfigureAwait(false);
 
-            return (true, context);
+            context.CanRetry = true;
+            return context;
         }
     }
 }

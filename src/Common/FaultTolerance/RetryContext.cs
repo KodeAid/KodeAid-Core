@@ -6,6 +6,7 @@ namespace KodeAid.FaultTolerance
 {
     public class RetryContext
     {
+        public bool CanRetry { get; set; }
         public int RetryCount { get; set; }
     }
 }

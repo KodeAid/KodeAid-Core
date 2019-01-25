@@ -8,6 +8,6 @@ namespace KodeAid.FaultTolerance
 {
     public interface IRetryPolicy
     {
-        Task<(bool Retry, RetryContext Context)> RetryDelayAsync(RetryContext context);
+        Task<RetryContext> CheckRetryAsync(RetryContext context);
     }
 }
