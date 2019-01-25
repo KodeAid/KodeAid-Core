@@ -46,16 +46,40 @@ namespace KodeAid.Caching.AzureStorage
             _isBinarySerializer = false;
         }
 
+        public AzureTableStorageCacheClient(CloudStorageAccount account, ISerializer<string> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
+            : this(account, serializer, tableName, defaultPartitionKey, logger, throwOnError)
+        {
+            _isBinarySerializer = false;
+        }
+
+        public AzureTableStorageCacheClient(CloudStorageAccount account, ISerializer<byte[]> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
+            : this(account, serializer, tableName, defaultPartitionKey, logger, throwOnError)
+        {
+            _isBinarySerializer = true;
+        }
+
+        public AzureTableStorageCacheClient(CloudStorageAccount account, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
+            : this(account, new JsonSerializer(), tableName, defaultPartitionKey, logger, throwOnError)
+        {
+            _isBinarySerializer = false;
+        }
+
         private AzureTableStorageCacheClient(string connectionString, ISerializer serializer, string tableName, string defaultPartitionKey, ILogger logger, bool throwOnError)
+            : this(CloudStorageAccount.Parse(connectionString), new JsonSerializer(), tableName, defaultPartitionKey, logger, throwOnError)
+        {
+
+        }
+
+        private AzureTableStorageCacheClient(CloudStorageAccount account, ISerializer serializer, string tableName, string defaultPartitionKey, ILogger logger, bool throwOnError)
             : base(throwOnError, logger)
         {
-            ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);
+            ArgCheck.NotNull(nameof(account), account);
             ArgCheck.NotNull(nameof(serializer), serializer);
             ArgCheck.NotNullOrEmpty(nameof(tableName), tableName);
             _tableName = tableName;
             _defaultPartitionKey = defaultPartitionKey;
             _serializer = serializer;
-            _storageAccount = CloudStorageAccount.Parse(connectionString);
+            _storageAccount = account;
             _client = _storageAccount.CreateCloudTableClient();
             _table = _client.GetTableReference(_tableName);
         }
