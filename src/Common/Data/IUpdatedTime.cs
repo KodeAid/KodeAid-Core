@@ -2,12 +2,12 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System;
 
 namespace KodeAid.Data
 {
-    public interface IOptimisticConcurrency
+    public interface IUpdatedTime
     {
-        // ConcurrencyToken, Timestamp, Version, RowVersion, ETag
-        object ConcurrencyStamp { get; set; }
+        DateTimeOffset? UpdatedAt { get; set; }
     }
 }

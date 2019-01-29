@@ -2,12 +2,11 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
-using System;
 
-namespace KodeAid.Data
+namespace KodeAid.Storage
 {
-    public interface IAuditCreatedTime
+    public interface IBytesResult : IStoreResult
     {
-        DateTimeOffset? CreatedAt { get; set; }
+        byte[] Data { get; }
     }
 }

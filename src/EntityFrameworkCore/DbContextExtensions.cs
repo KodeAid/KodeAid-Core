@@ -82,20 +82,20 @@ namespace Microsoft.EntityFrameworkCore
             var timestamp = DateTimeOffset.UtcNow;
             if (existing != null)
             {
-                if (typeof(IAuditCreatedTime).IsAssignableFrom(entity.GetType()))
-                    ((IAuditCreatedTime)entity).CreatedAt = ((IAuditCreatedTime)existing).CreatedAt;
-                if (typeof(IAuditUpdatedTime).IsAssignableFrom(entity.GetType()))
-                    ((IAuditUpdatedTime)entity).UpdatedAt = timestamp;
+                if (typeof(ICreatedTime).IsAssignableFrom(entity.GetType()))
+                    ((ICreatedTime)entity).CreatedAt = ((ICreatedTime)existing).CreatedAt;
+                if (typeof(IUpdatedTime).IsAssignableFrom(entity.GetType()))
+                    ((IUpdatedTime)entity).UpdatedAt = timestamp;
                 if (typeof(IOptimisticConcurrency).IsAssignableFrom(entity.GetType()))
                     ((IOptimisticConcurrency)entity).ConcurrencyStamp = ((IOptimisticConcurrency)existing).ConcurrencyStamp;
                 context.Update(entity);
             }
             else
             {
-                if (typeof(IAuditCreatedTime).IsAssignableFrom(entity.GetType()))
-                    ((IAuditCreatedTime)entity).CreatedAt = timestamp;
-                if (typeof(IAuditUpdatedTime).IsAssignableFrom(entity.GetType()))
-                    ((IAuditUpdatedTime)entity).UpdatedAt = timestamp;
+                if (typeof(ICreatedTime).IsAssignableFrom(entity.GetType()))
+                    ((ICreatedTime)entity).CreatedAt = timestamp;
+                if (typeof(IUpdatedTime).IsAssignableFrom(entity.GetType()))
+                    ((IUpdatedTime)entity).UpdatedAt = timestamp;
                 context.Add(entity);
             }
         }

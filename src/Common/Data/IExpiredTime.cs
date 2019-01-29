@@ -6,8 +6,8 @@ using System;
 
 namespace KodeAid.Data
 {
-    public interface IAuditUpdatedTime
+    public interface IExpiredTime
     {
-        DateTimeOffset? UpdatedAt { get; set; }
+        DateTimeOffset? ExpiresAt { get; set; }
     }
 }
