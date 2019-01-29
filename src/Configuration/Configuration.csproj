@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-    	<Version>1.2.0</Version>
+    	<Version>1.2.1</Version>
         <AssemblyName>KodeAid.Configuration</AssemblyName>
         <RootNamespace>KodeAid.Configuration</RootNamespace>
         <Description>Kode-Aid shared configuration library.</Description>
@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+      <ProjectReference Include="..\Extensions\Extensions.csproj" />
     </ItemGroup>
 
 </Project>
