@@ -8,6 +8,11 @@ namespace KodeAid.Azure.KeyVault
     {
         internal static AzureKeyVaultSecretStoreOptions Verify(this AzureKeyVaultSecretStoreOptions options)
         {
+            if (options.KeyVaultBaseUrl == null && options.KeyVaultName != null)
+            {
+                options.KeyVaultBaseUrl = $"https://{options.KeyVaultName.ToLower()}.{(options.EndpointSuffix ?? "vault.azure.net")}";
+            }
+
             ArgCheck.NotNullOrEmpty(nameof(options.KeyVaultBaseUrl), options?.KeyVaultBaseUrl);
 
             return options;
