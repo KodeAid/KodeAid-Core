@@ -71,7 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureBlobStoragePublicKeyStore(this IServiceCollection services, string storeConfigurationKey = nameof(AzureBlobStorageKeyValueStore))
+        public static void AddAzureBlobStoragePublicKeyStore(this IServiceCollection services, string storeConfigurationKey = "AzureBlobStoragePublicKeyStore")
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);

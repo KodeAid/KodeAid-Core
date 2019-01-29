@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureKeyVaultPrivateKeyStore(this IServiceCollection services, string storeConfigurationKey = nameof(AzureKeyVaultSecretStore))
+        public static void AddAzureKeyVaultPrivateKeyStore(this IServiceCollection services, string storeConfigurationKey = "AzureKeyVaultPrivateKeyStore")
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);

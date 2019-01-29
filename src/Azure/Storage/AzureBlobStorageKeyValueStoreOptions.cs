@@ -3,6 +3,7 @@
 
 
 using System;
+using KodeAid.Security.Secrets;
 using Microsoft.WindowsAzure.Storage;
 
 namespace KodeAid.Azure.Storage
@@ -18,6 +19,12 @@ namespace KodeAid.Azure.Storage
         public string AccountName { get; set; }
 
         public string EndpointSuffix { get; set; }
+
+        public ISecretReadOnlyStore SecretStore { get; set; }
+
+        public string ConnectionStringSecretName { get; set; }
+
+        public string SharedAccessSignatureSecretName { get; set; }
 
         public string ContainerName { get; set; }
 

@@ -22,6 +22,10 @@ namespace KodeAid.Azure.Storage
                 {
                     options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.SharedAccessSignature), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
                 }
+                else if (options.SecretStore != null && (!string.IsNullOrEmpty(options?.ConnectionStringSecretName) || !string.IsNullOrEmpty(options?.SharedAccessSignatureSecretName)))
+                {
+                    //options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.SharedAccessSignature), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
+                }
                 else
                 {
                     ArgCheck.NotNull(nameof(options.StorageAccount), options?.StorageAccount);
