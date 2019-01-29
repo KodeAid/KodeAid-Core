@@ -510,11 +510,11 @@ namespace KodeAid.Azure.Storage
             return DeleteBlobStatus.OK;
         }
 
-        public async Task CreateIfNotExistsAsync(CancellationToken cancellationToken = default)
+        public async Task CreateIfNotExistsAsync(BlobContainerPublicAccessType publicAccessType, CancellationToken cancellationToken = default)
         {
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
 
-            await _container.CreateIfNotExistsAsync(cancellationToken).ConfigureAwait(false);
+            await _container.CreateIfNotExistsAsync(publicAccessType, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task RemoveExpiredAsync(CancellationToken cancellationToken = default)
@@ -536,7 +536,7 @@ namespace KodeAid.Azure.Storage
                         DateTimeOffset.TryParseExact(expirationString, _dateTimeFormatString, null, DateTimeStyles.None, out var expiration) &&
                         expiration <= utcNow)
                     {
-                        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, new AccessCondition() { IfMatchETag = blob.Properties.ETag }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, new AccessCondition() { IfMatchETag = blob.Properties.ETag }, _requestOptions, new OperationContext()).ConfigureAwait(false);
                     }
                 }
             }
