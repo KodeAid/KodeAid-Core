@@ -126,7 +126,6 @@ namespace KodeAid.Azure.Storage
         {
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
             directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
-            ArgCheck.NotNull(nameof(directoryRelativeAddress), directoryRelativeAddress);
 
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
 
@@ -308,7 +307,6 @@ namespace KodeAid.Azure.Storage
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
             ArgCheck.NotNull(nameof(contents), contents);
             directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
-            ArgCheck.NotNull(nameof(directoryRelativeAddress), directoryRelativeAddress);
 
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
 
@@ -432,7 +430,6 @@ namespace KodeAid.Azure.Storage
         {
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
             directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
-            ArgCheck.NotNull(nameof(directoryRelativeAddress), directoryRelativeAddress);
 
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
 
