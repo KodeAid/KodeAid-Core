@@ -6,6 +6,7 @@ using System;
 using KodeAid;
 using KodeAid.Azure.Storage;
 using KodeAid.Security.Cryptography.X509Certificates;
+using KodeAid.Security.Secrets;
 using KodeAid.Storage;
 using Microsoft.Extensions.Configuration;
 
@@ -24,6 +25,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     ?? throw new InvalidOperationException($"Azure blob store configuration section '{storeConfigurationKey}' not found.");
                 var options = new AzureBlobStorageKeyValueStoreOptions();
                 configuration.Bind(options);
+
+                if (options.SecretStore == null)
+                {
+                    options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
+                }
+
                 return new AzureBlobStorageKeyValueStore(options);
             });
 
@@ -33,6 +40,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     ?? throw new InvalidOperationException($"Azure blob store configuration section '{storeConfigurationKey}' not found.");
                 var options = new AzureBlobStorageKeyValueStoreOptions();
                 configuration.Bind(options);
+
+                if (options.SecretStore == null)
+                {
+                    options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
+                }
+
                 return new AzureBlobStorageKeyValueStore(options);
             });
         }
@@ -47,6 +60,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
                 setupAction(builder);
                 var options = builder.Build();
+
+                if (options.SecretStore == null)
+                {
+                    options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
+                }
+
                 return new AzureBlobStorageKeyValueStore(options);
             });
 
@@ -55,6 +74,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
                 setupAction(builder);
                 var options = builder.Build();
+
+                if (options.SecretStore == null)
+                {
+                    options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
+                }
+
                 return new AzureBlobStorageKeyValueStore(options);
             });
         }
@@ -70,6 +95,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     ?? throw new InvalidOperationException($"Azure blob store configuration section '{storeConfigurationKey}' not found.");
                 var options = new AzureBlobStorageKeyValueStoreOptions();
                 configuration.Bind(options);
+
+                if (options.SecretStore == null)
+                {
+                    options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
+                }
+
                 return new AzureBlobStorageKeyValueStore(options);
             });
         }
@@ -84,6 +115,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
                 setupAction(builder);
                 var options = builder.Build();
+
+                if (options.SecretStore == null)
+                {
+                    options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
+                }
+
                 return new AzureBlobStorageKeyValueStore(options);
             });
         }

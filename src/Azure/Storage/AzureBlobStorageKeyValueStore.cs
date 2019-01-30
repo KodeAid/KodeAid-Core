@@ -37,18 +37,8 @@ namespace KodeAid.Azure.Storage
         private readonly bool _deleteExpiredDuringRequests = false;
 
         public AzureBlobStorageKeyValueStore(AzureBlobStorageKeyValueStoreOptions options)
-            : this(options, null)
-        {
-        }
-
-        public AzureBlobStorageKeyValueStore(AzureBlobStorageKeyValueStoreOptions options, ISecretReadOnlyStore secretStore)
         {
             ArgCheck.NotNull(nameof(options), options);
-
-            if (options.SecretStore == null)
-            {
-                options.SecretStore = secretStore;
-            }
 
             options.Verify();
 
