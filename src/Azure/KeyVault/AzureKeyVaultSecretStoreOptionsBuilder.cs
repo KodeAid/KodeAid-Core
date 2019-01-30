@@ -6,6 +6,8 @@ namespace KodeAid.Azure.KeyVault
 {
     public sealed class AzureKeyVaultSecretStoreOptionsBuilder
     {
+        private string _keyVaultName;
+        private string _endpointSuffix;
         private string _keyVaultBaseUrl;
 
         public AzureKeyVaultSecretStoreOptions Build()
@@ -13,19 +15,27 @@ namespace KodeAid.Azure.KeyVault
             return new AzureKeyVaultSecretStoreOptions()
             {
                 KeyVaultBaseUrl = _keyVaultBaseUrl,
-            }
-            .Verify();
+                KeyVaultName = _keyVaultName,
+                EndpointSuffix = _endpointSuffix,
+            };
         }
 
         /// <summary>
-        /// Sets the base URL of the Azure key vault holding the secrets, eg. "https://mykeyvault.vault.azure.net"
+        /// Sets the name of the Azure key vault (eg. "MyKeyVault") and optionally the endpoint suffix which by default is ("vault.azure.net").
+        /// </summary>
+        public AzureKeyVaultSecretStoreOptionsBuilder WithKeyVault(string keyVaultName, string endpointSuffix = null)
+        {
+            _keyVaultName = keyVaultName;
+            _endpointSuffix = endpointSuffix;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the base URL of the Azure key vault, eg. "https://mykeyvault.vault.azure.net".
         /// </summary>
         public AzureKeyVaultSecretStoreOptionsBuilder WithKeyVaultBaseUrl(string keyVaultBaseUrl)
         {
-            ArgCheck.NotNullOrEmpty(nameof(keyVaultBaseUrl), keyVaultBaseUrl);
-
             _keyVaultBaseUrl = keyVaultBaseUrl;
-
             return this;
         }
     }

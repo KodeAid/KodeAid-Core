@@ -36,7 +36,7 @@ namespace KodeAid.Azure.Storage
 
             if (options.LeaseDuration.HasValue)
             {
-                // as per Azure storage lease duration requirements
+                // as per Azure storage lease duration constraints
                 ArgCheck.GreaterThanOrEqualTo(nameof(options.LeaseDuration), options.LeaseDuration, TimeSpan.FromSeconds(15));
                 ArgCheck.LessThanOrEqualTo(nameof(options.LeaseDuration), options.LeaseDuration, TimeSpan.FromSeconds(60));
             }

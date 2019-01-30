@@ -3,73 +3,88 @@
 
 
 using System;
+using KodeAid.Security.Secrets;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 
 namespace KodeAid.Azure.Storage
 {
     public sealed class AzureBlobStorageKeyValueStoreOptionsBuilder
     {
-        private CloudStorageAccount _storageAccount { get; set; }
-        private string _containerName { get; set; }
-        private string _defaultDirectoryRelativeAddress { get; set; }
-        private TimeSpan? _leaseDuration { get; set; }
+        private CloudStorageAccount _storageAccount;
+        private string _connectionString;
+        private string _sasToken;
+        private string _accountName;
+        private string _endpointSuffix;
+        private ISecretReadOnlyStore _secretStore;
+        private string _connectionStringSecretName;
+        private string _sasTokenSecretName;
+        private string _containerName;
+        private string _defaultDirectoryRelativeAddress;
+        private TimeSpan? _leaseDuration;
 
         public AzureBlobStorageKeyValueStoreOptions Build()
         {
             return new AzureBlobStorageKeyValueStoreOptions()
             {
-                StorageAccount = _storageAccount,
+                AccountName = _accountName,
+                ConnectionString = _connectionString,
+                ConnectionStringSecretName = _connectionStringSecretName,
                 ContainerName = _containerName,
                 DefaultDirectoryRelativeAddress = _defaultDirectoryRelativeAddress,
+                EndpointSuffix = _endpointSuffix,
                 LeaseDuration = _leaseDuration,
-            }
-            .Verify();
+                SecretStore = _secretStore,
+                SharedAccessSignature = _sasToken,
+                SharedAccessSignatureSecretName = _sasTokenSecretName,
+                StorageAccount = _storageAccount,
+            };
         }
 
         public AzureBlobStorageKeyValueStoreOptionsBuilder WithStorageAccount(CloudStorageAccount account)
         {
-            ArgCheck.NotNull(nameof(account), account);
-
             _storageAccount = account;
-
             return this;
         }
 
         public AzureBlobStorageKeyValueStoreOptionsBuilder WithConnectionString(string connectionString)
         {
-            ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);
-
-            _storageAccount = CloudStorageAccount.Parse(connectionString);
-
+            _connectionString = connectionString;
             return this;
         }
 
         public AzureBlobStorageKeyValueStoreOptionsBuilder WithSharedAccessSignature(string sasToken, string accountName, string endpointSuffix = null)
         {
-            ArgCheck.NotNullOrEmpty(nameof(sasToken), sasToken);
-            ArgCheck.NotNullOrEmpty(nameof(accountName), accountName);
+            _sasToken = sasToken;
+            _accountName = accountName;
+            _endpointSuffix = endpointSuffix;
+            return this;
+        }
 
-            _storageAccount = new CloudStorageAccount(new StorageCredentials(sasToken), accountName, endpointSuffix ?? "core.windows.net", true);
+        public AzureBlobStorageKeyValueStoreOptionsBuilder WithSecretConnectionString(string connectionStringSecretName, ISecretReadOnlyStore secretStore = null)
+        {
+            _connectionStringSecretName = connectionStringSecretName;
+            _secretStore = secretStore;
+            return this;
+        }
 
+        public AzureBlobStorageKeyValueStoreOptionsBuilder WithSecretSharedAccessSignature(string sasTokenSecretName, string accountName, ISecretReadOnlyStore secretStore = null, string endpointSuffix = null)
+        {
+            _sasTokenSecretName = sasTokenSecretName;
+            _accountName = accountName;
+            _secretStore = secretStore;
+            _endpointSuffix = endpointSuffix;
             return this;
         }
 
         public AzureBlobStorageKeyValueStoreOptionsBuilder WithLeasesEnabled(TimeSpan duration)
         {
-            // as per Azure storage lease duration requirements
-            ArgCheck.GreaterThanOrEqualTo(nameof(duration), duration, TimeSpan.FromSeconds(15));
-            ArgCheck.LessThanOrEqualTo(nameof(duration), duration, TimeSpan.FromSeconds(60));
-
             _leaseDuration = duration;
-
             return this;
         }
 
         public AzureBlobStorageKeyValueStoreOptionsBuilder WithLeasesDisabled()
         {
             _leaseDuration = null;
-
             return this;
         }
     }

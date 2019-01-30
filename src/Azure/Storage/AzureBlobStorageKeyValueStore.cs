@@ -45,7 +45,7 @@ namespace KodeAid.Azure.Storage
         {
             ArgCheck.NotNull(nameof(options), options);
 
-            if (secretStore != null)
+            if (options.SecretStore == null)
             {
                 options.SecretStore = secretStore;
             }

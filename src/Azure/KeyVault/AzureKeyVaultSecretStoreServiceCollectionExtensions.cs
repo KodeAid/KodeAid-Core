@@ -13,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class AzureKeyVaultSecretStoreServiceCollectionExtensions
     {
-        public static void AddAzureKeyVaultSecretReadOnlyStore(this IServiceCollection services, string storeConfigurationKey = nameof(AzureKeyVaultSecretStore))
+        public static void AddAzureKeyVaultSecretStore(this IServiceCollection services, string storeConfigurationKey = nameof(AzureKeyVaultSecretStore))
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);
@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureKeyVaultSecretReadOnlyStore(this IServiceCollection services, Action<AzureKeyVaultSecretStoreOptionsBuilder> setupAction)
+        public static void AddAzureKeyVaultSecretStore(this IServiceCollection services, Action<AzureKeyVaultSecretStoreOptionsBuilder> setupAction)
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setupAction), setupAction);
@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureKeyVaultPrivateKeyStore(this IServiceCollection services, string storeConfigurationKey = "AzureKeyVaultPrivateKeyStore")
+        public static void AddAzureKeyVaultPrivateCertificateStore(this IServiceCollection services, string storeConfigurationKey = "AzureKeyVaultPrivateCertificateStore")
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);
@@ -57,7 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureKeyVaultPrivateKeyStore(this IServiceCollection services, Action<AzureKeyVaultSecretStoreOptionsBuilder> setupAction)
+        public static void AddAzureKeyVaultPrivateCertificateStore(this IServiceCollection services, Action<AzureKeyVaultSecretStoreOptionsBuilder> setupAction)
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setupAction), setupAction);
