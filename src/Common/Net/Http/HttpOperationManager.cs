@@ -10,6 +10,11 @@ namespace KodeAid.Net.Http
 {
     public class HttpOperationManager : OperationManager
     {
+        public HttpOperationManager(IRetryPolicy retryPolicy = null)
+            : base(retryPolicy)
+        {
+        }
+
         public Task<OperationStatus> ProcessOperationAsync(OperationContext context, int statusCode, Exception exception, CancellationToken cancellationToken = default)
         {
             return ProcessOperationAsync(context, (object)statusCode, exception, cancellationToken);
