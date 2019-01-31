@@ -16,23 +16,25 @@ namespace KodeAid.AspNetCore.Http.RequestTracing
     public class RequestLoggingMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly LogLevel _logLevel;
         private readonly IEnumerable<string> _ignoredPathPrefixes;
 
-        public RequestLoggingMiddleware(RequestDelegate next, IEnumerable<string> ignoredPathPrefixes)
+        public RequestLoggingMiddleware(RequestDelegate next, LogLevel logLevel, IEnumerable<string> ignoredPathPrefixes)
         {
             _next = next;
+            _logLevel = logLevel;
             _ignoredPathPrefixes = ignoredPathPrefixes?.EmptyIfNull().WhereNotNull().ToList();
         }
 
         public async Task Invoke(HttpContext context, ILogger<RequestLoggingMiddleware> logger)
         {
-            if (_ignoredPathPrefixes.Any(p => context.Request.Path.StartsWithSegments(p, StringComparison.OrdinalIgnoreCase)))
+            if (!logger.IsEnabled(_logLevel) || _ignoredPathPrefixes.Any(p => context.Request.Path.StartsWithSegments(p, StringComparison.OrdinalIgnoreCase)))
             {
                 await _next(context);
                 return;
             }
 
-            logger.LogTrace(await FormatRequest(context.Request));
+            logger.Log(_logLevel, await FormatRequest(context.Request));
             await _next(context);
         }
 
