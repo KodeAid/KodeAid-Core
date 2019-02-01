@@ -76,6 +76,12 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
+        public AzureBlobStorageKeyValueStoreOptionsBuilder WithContainer(string containerName)
+        {
+            _containerName = containerName;
+            return this;
+        }
+
         public AzureBlobStorageKeyValueStoreOptionsBuilder WithDefaultDirectoryRelativeAddress(string directoryRelativeAddress)
         {
             _defaultDirectoryRelativeAddress = directoryRelativeAddress;

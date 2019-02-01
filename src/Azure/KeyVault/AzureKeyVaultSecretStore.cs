@@ -17,6 +17,7 @@ namespace KodeAid.Azure.KeyVault
     public class AzureKeyVaultSecretStore : ISecretReadOnlyStore, IPrivateCertificateStore
     {
         private readonly string _keyVaultBaseUrl;
+        private readonly X509KeyStorageFlags _keyStorageFlags = X509KeyStorageFlags.MachineKeySet;
 
         public AzureKeyVaultSecretStore(AzureKeyVaultSecretStoreOptions options)
         {
@@ -24,6 +25,7 @@ namespace KodeAid.Azure.KeyVault
             options.Verify();
 
             _keyVaultBaseUrl = options.KeyVaultBaseUrl?.TrimEnd(' ', '/');
+            _keyStorageFlags = options.KeyStorageFlags;
         }
 
         public async Task<SecureString> GetSecretAsync(string name, CancellationToken cancellationToken = default)
@@ -47,10 +49,10 @@ namespace KodeAid.Azure.KeyVault
             }
         }
 
-        async Task<X509Certificate2> IPrivateCertificateStore.GetPrivateCertificateAsync(string name, CancellationToken cancellationToken)
+        public async Task<X509Certificate2> GetPrivateCertificateAsync(string name, CancellationToken cancellationToken = default)
         {
             var securedBase64Key = await GetSecretAsync(name, cancellationToken).ConfigureAwait(false);
-            return new X509Certificate2(Convert.FromBase64String(securedBase64Key.Unsecure()));
+            return new X509Certificate2(Convert.FromBase64String(securedBase64Key.Unsecure()), (string)null, _keyStorageFlags);
         }
     }
 }

@@ -2,6 +2,8 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Security.Cryptography.X509Certificates;
+
 namespace KodeAid.Azure.KeyVault
 {
     public sealed class AzureKeyVaultSecretStoreOptionsBuilder
@@ -9,6 +11,7 @@ namespace KodeAid.Azure.KeyVault
         private string _keyVaultName;
         private string _endpointSuffix;
         private string _keyVaultBaseUrl;
+        private X509KeyStorageFlags _keyStorageFlags = X509KeyStorageFlags.MachineKeySet;
 
         public AzureKeyVaultSecretStoreOptions Build()
         {
@@ -17,6 +20,7 @@ namespace KodeAid.Azure.KeyVault
                 KeyVaultBaseUrl = _keyVaultBaseUrl,
                 KeyVaultName = _keyVaultName,
                 EndpointSuffix = _endpointSuffix,
+                KeyStorageFlags = _keyStorageFlags,
             };
         }
 
@@ -36,6 +40,15 @@ namespace KodeAid.Azure.KeyVault
         public AzureKeyVaultSecretStoreOptionsBuilder WithKeyVaultBaseUrl(string keyVaultBaseUrl)
         {
             _keyVaultBaseUrl = keyVaultBaseUrl;
+            return this;
+        }
+
+        /// <summary>
+        /// Indicates how to store private keys imported from Azure key vault secrets.
+        /// </summary>
+        public AzureKeyVaultSecretStoreOptionsBuilder WithKeyStorageFlags(X509KeyStorageFlags keyStorageFlags)
+        {
+            _keyStorageFlags = keyStorageFlags;
             return this;
         }
     }
