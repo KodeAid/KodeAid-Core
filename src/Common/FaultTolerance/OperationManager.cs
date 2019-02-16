@@ -22,7 +22,12 @@ namespace KodeAid.FaultTolerance
             return new OperationContext(state, RetryPolicy?.CreateRetryContext());
         }
 
-        public async virtual Task ExecuteOperationAsync(Func<Task> operation, object state = null, CancellationToken cancellationToken = default)
+        public Task ExecuteOperationAsync(Func<Task> operation, CancellationToken cancellationToken = default)
+        {
+            return ExecuteOperationAsync(operation, null, cancellationToken);
+        }
+
+        public async virtual Task ExecuteOperationAsync(Func<Task> operation, object state, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(operation), operation);
 
@@ -46,7 +51,12 @@ namespace KodeAid.FaultTolerance
             }
         }
 
-        public async virtual Task<TResult> ExecuteOperationAsync<TResult>(Func<Task<TResult>> operation, object state = null, CancellationToken cancellationToken = default)
+        public Task<TResult> ExecuteOperationAsync<TResult>(Func<Task<TResult>> operation, CancellationToken cancellationToken = default)
+        {
+            return ExecuteOperationAsync(operation, null, cancellationToken);
+        }
+
+        public async virtual Task<TResult> ExecuteOperationAsync<TResult>(Func<Task<TResult>> operation, object state, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(operation), operation);
 
