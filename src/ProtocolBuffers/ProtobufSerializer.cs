@@ -2,11 +2,12 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using KodeAid.Serialization;
+using ProtoBuf;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using KodeAid.Serialization;
-using ProtoBuf;
 
 namespace KodeAid.ProtocolBuffers
 {
@@ -21,33 +22,47 @@ namespace KodeAid.ProtocolBuffers
             }
         }
 
-        public T Deserialize<T>(byte[] data)
+        public object Deserialize(Type type, byte[] data)
         {
+            ArgCheck.NotNull(nameof(type), type);
+
             using (var stream = new MemoryStream(data))
-                return DeserializeFromStream<T>(stream);
+            {
+                return DeserializeFromStream(type, stream);
+            }
         }
 
         public void SerializeToStream(Stream stream, object graph)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             Serializer.Serialize(stream, graph);
         }
 
         public Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             cancellationToken.ThrowIfCancellationRequested();
             Serializer.Serialize(stream, graph);
             return Task.CompletedTask;
         }
 
-        public T DeserializeFromStream<T>(Stream stream)
+        public object DeserializeFromStream(Type type, Stream stream)
         {
-            return Serializer.Deserialize<T>(stream);
+            ArgCheck.NotNull(nameof(type), type);
+            ArgCheck.NotNull(nameof(stream), stream);
+
+            return Serializer.Deserialize(type, stream);
         }
 
-        public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public Task<object> DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
         {
+            ArgCheck.NotNull(nameof(type), type);
+            ArgCheck.NotNull(nameof(stream), stream);
+
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Serializer.Deserialize<T>(stream));
+            return Task.FromResult(Serializer.Deserialize(type, stream));
         }
 
         object ISerializer.Serialize(object value)
@@ -55,9 +70,11 @@ namespace KodeAid.ProtocolBuffers
             return Serialize(value);
         }
 
-        T ISerializer.Deserialize<T>(object data)
+        object ISerializer.Deserialize(Type type, object data)
         {
-            return Deserialize<T>((byte[])data);
+            ArgCheck.NotNull(nameof(type), type);
+
+            return Deserialize(type, (byte[])data);
         }
     }
 }

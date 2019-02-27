@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -28,15 +29,19 @@ namespace KodeAid.Json
             return sb.ToString();
         }
 
-        public T Deserialize<T>(string json)
+        public object Deserialize(Type type, string json)
         {
+            ArgCheck.NotNull(nameof(type), type);
+
             using (var sr = new StringReader(json))
             using (var jr = new JsonTextReader(sr))
-                return CreateJsonSerializer().Deserialize<T>(jr);
+                return CreateJsonSerializer().Deserialize(jr, type);
         }
 
         public void SerializeToStream(Stream stream, object graph)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
                 SerializeToWriter(writer, graph);
@@ -46,6 +51,8 @@ namespace KodeAid.Json
 
         public async Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             cancellationToken.ThrowIfCancellationRequested();
             using (var writer = new StreamWriter(stream, Encoding.UTF8))
             {
@@ -55,25 +62,31 @@ namespace KodeAid.Json
             }
         }
 
-        public T DeserializeFromStream<T>(Stream stream)
+        public object DeserializeFromStream(Type type, Stream stream)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                return DeserializeFromReader<T>(reader);
+                return DeserializeFromReader(type, reader);
             }
         }
 
-        public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public Task<object> DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             cancellationToken.ThrowIfCancellationRequested();
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                return Task.FromResult(DeserializeFromReader<T>(reader));
+                return Task.FromResult(DeserializeFromReader(type, reader));
             }
         }
 
         public void SerializeToWriter(TextWriter writer, object graph)
         {
+            ArgCheck.NotNull(nameof(writer), writer);
+
             using (var jw = new JsonTextWriter(writer))
             {
                 CreateJsonSerializer().Serialize(jw, graph);
@@ -81,11 +94,13 @@ namespace KodeAid.Json
             }
         }
 
-        public T DeserializeFromReader<T>(TextReader reader)
+        public object DeserializeFromReader(Type type, TextReader reader)
         {
+            ArgCheck.NotNull(nameof(reader), reader);
+
             using (var jr = new JsonTextReader(reader))
             {
-                return CreateJsonSerializer().Deserialize<T>(jr);
+                return CreateJsonSerializer().Deserialize(jr, type);
             }
         }
 
@@ -94,9 +109,9 @@ namespace KodeAid.Json
             return Serialize(value);
         }
 
-        T ISerializer.Deserialize<T>(object data)
+        object ISerializer.Deserialize(Type type, object data)
         {
-            return Deserialize<T>((string)data);
+            return Deserialize(type, (string)data);
         }
 
         private Newtonsoft.Json.JsonSerializer CreateJsonSerializer()

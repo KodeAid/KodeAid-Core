@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
@@ -20,33 +21,43 @@ namespace KodeAid.Serialization.Binary
             }
         }
 
-        public T Deserialize<T>(byte[] data)
+        public object Deserialize(byte[] data)
         {
             using (var stream = new MemoryStream(data))
-                return DeserializeFromStream<T>(stream);
+            {
+                return DeserializeFromStream(stream);
+            }
         }
 
         public void SerializeToStream(Stream stream, object graph)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             new BinaryFormatter().Serialize(stream, graph);
         }
 
         public Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             cancellationToken.ThrowIfCancellationRequested();
             new BinaryFormatter().Serialize(stream, graph);
             return Task.CompletedTask;
         }
 
-        public T DeserializeFromStream<T>(Stream stream)
+        public object DeserializeFromStream(Stream stream)
         {
-            return (T)new BinaryFormatter().Deserialize(stream);
+            ArgCheck.NotNull(nameof(stream), stream);
+
+            return new BinaryFormatter().Deserialize(stream);
         }
 
-        public Task<T> DeserializeFromStreamAsync<T>(Stream stream, CancellationToken cancellationToken = default)
+        public Task<object> DeserializeFromStreamAsync(Stream stream, CancellationToken cancellationToken = default)
         {
+            ArgCheck.NotNull(nameof(stream), stream);
+
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult((T)new BinaryFormatter().Deserialize(stream));
+            return Task.FromResult(new BinaryFormatter().Deserialize(stream));
         }
 
         object ISerializer.Serialize(object value)
@@ -54,9 +65,54 @@ namespace KodeAid.Serialization.Binary
             return Serialize(value);
         }
 
-        T ISerializer.Deserialize<T>(object data)
+        object ISerializer<byte[]>.Deserialize(Type type, byte[] data)
         {
-            return Deserialize<T>((byte[])data);
+            ArgCheck.NotNull(nameof(type), type);
+
+            var result = Deserialize(data);
+            if (result != null && result.GetType() != type)
+            {
+                throw new InvalidCastException();
+            }
+            return result;
+        }
+
+        object ISerializer.Deserialize(Type type, object data)
+        {
+            ArgCheck.NotNull(nameof(type), type);
+
+            var result = Deserialize((byte[])data);
+            if (result != null && result.GetType() != type)
+            {
+                throw new InvalidCastException();
+            }
+            return result;
+        }
+
+        object ISerializer.DeserializeFromStream(Type type, Stream stream)
+        {
+            ArgCheck.NotNull(nameof(type), type);
+            ArgCheck.NotNull(nameof(stream), stream);
+
+            var result = DeserializeFromStream(stream);
+            if (result != null && result.GetType() != type)
+            {
+                throw new InvalidCastException();
+            }
+            return result;
+        }
+
+        async Task<object> ISerializer.DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken)
+        {
+            ArgCheck.NotNull(nameof(type), type);
+            ArgCheck.NotNull(nameof(stream), stream);
+
+            var result = await DeserializeFromStreamAsync(stream, cancellationToken).ConfigureAwait(false);
+            if (result != null && result.GetType() != type)
+            {
+                throw new InvalidCastException();
+            }
+            return result;
         }
     }
 }
