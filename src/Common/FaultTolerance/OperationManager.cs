@@ -8,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace KodeAid.FaultTolerance
 {
-    public abstract class OperationManager
+    public abstract class OperationManager : OperationManager<object>
+    {
+    }
+
+    public abstract class OperationManager<TStatusCode>
     {
         public OperationManager(IRetryPolicy retryPolicy = null)
         {
@@ -42,8 +46,8 @@ namespace KodeAid.FaultTolerance
                 }
                 catch (Exception ex)
                 {
-                    var status = await ProcessOperationAsync(context, null, ex, cancellationToken).ConfigureAwait(false);
-                    if (status != OperationStatus.Retry)
+                    var operationStatus = await ProcessOperationAsync(context, default, ex, cancellationToken).ConfigureAwait(false);
+                    if (operationStatus != OperationStatus.Retry)
                     {
                         throw;
                     }
@@ -67,15 +71,16 @@ namespace KodeAid.FaultTolerance
                 try
                 {
                     var result = await operation().ConfigureAwait(false);
-                    var status = await ProcessOperationAsync(context, result, null, cancellationToken).ConfigureAwait(false);
-                    if (status != OperationStatus.Retry)
+                    var statusCode = GetStatusCodeFromResult(result);
+                    var operationStatus = await ProcessOperationAsync(context, statusCode, null, cancellationToken).ConfigureAwait(false);
+                    if (operationStatus != OperationStatus.Retry)
                     {
                         return result;
                     }
                 }
                 catch (Exception ex)
                 {
-                    var status = await ProcessOperationAsync(context, null, ex, cancellationToken).ConfigureAwait(false);
+                    var status = await ProcessOperationAsync(context, default, ex, cancellationToken).ConfigureAwait(false);
                     if (status != OperationStatus.Retry)
                     {
                         throw;
@@ -84,11 +89,11 @@ namespace KodeAid.FaultTolerance
             }
         }
 
-        public async virtual Task<OperationStatus> ProcessOperationAsync(OperationContext context, object result, Exception exception, CancellationToken cancellationToken = default)
+        public async virtual Task<OperationStatus> ProcessOperationAsync(OperationContext context, TStatusCode statusCode, Exception exception, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(context), context);
 
-            if (CheckIsSuccess(context.State, result, exception))
+            if (CheckIsSuccess(context.State, statusCode, exception))
             {
                 return OperationStatus.Success;
             }
@@ -98,7 +103,7 @@ namespace KodeAid.FaultTolerance
                 return OperationStatus.RetryDisabled;
             }
 
-            if (!CheckIsRetryable(context.State, result, exception))
+            if (!CheckIsRetryable(context.State, statusCode, exception))
             {
                 return OperationStatus.NonRetryable;
             }
@@ -112,14 +117,19 @@ namespace KodeAid.FaultTolerance
             return OperationStatus.RetryExhausted;
         }
 
-        protected virtual bool CheckIsSuccess(object state, object result, Exception exception)
+        protected virtual bool CheckIsSuccess(object state, TStatusCode statusCode, Exception exception)
+        {
+            return exception == null;
+        }
+
+        protected virtual bool CheckIsRetryable(object state, TStatusCode statusCode, Exception exception)
         {
             return false;
         }
 
-        protected virtual bool CheckIsRetryable(object state, object result, Exception exception)
+        protected virtual TStatusCode GetStatusCodeFromResult(object result)
         {
-            return false;
+            return result is TStatusCode ? (TStatusCode)result : default;
         }
     }
 }
