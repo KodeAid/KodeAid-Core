@@ -3,6 +3,8 @@
 
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
@@ -13,14 +15,49 @@ namespace KodeAid.FaultTolerance
     {
         public static bool CheckForRetryableHttpRequestException(Exception exception)
         {
-            while (exception != null)
+            return CheckForRetryableException<HttpRequestException>(exception, IsHttpRequestExceptionRetryable);
+        }
+
+        public static bool CheckForRetryableSocketException(Exception exception)
+        {
+            return CheckForRetryableException<SocketException>(exception, IsSocketExceptionRetryable);
+        }
+
+        public static bool CheckForRetryableException<TException>(Exception exception, Func<TException, bool> canRetry)
+            where TException : Exception
+        {
+            ArgCheck.NotNull(nameof(canRetry), canRetry);
+
+            if (exception == null)
             {
-                if (exception is HttpRequestException httpRequestException &&
-                    IsHttpRequestExceptionRetryable(httpRequestException))
+                return false;
+            }
+
+            var exceptions = new Queue<Exception>();
+            exceptions.Enqueue(exception);
+
+            while (exceptions.Count > 0)
+            {
+                exception = exceptions.Dequeue();
+                if (exception == null)
+                {
+                    continue;
+                }
+
+                if (exception is TException ex && canRetry(ex))
                 {
                     return true;
                 }
-                exception = exception.InnerException;
+
+                if (exception is AggregateException aggregateException)
+                {
+                    exceptions.EnqueueRange(aggregateException.InnerExceptions.WhereNotNull());
+                }
+
+                if (exception.InnerException != null)
+                {
+                    exceptions.Enqueue(exception.InnerException);
+                }
             }
 
             return false;
@@ -40,21 +77,6 @@ namespace KodeAid.FaultTolerance
                 {
                     return true;
                 }
-            }
-
-            return false;
-        }
-
-        public static bool CheckForRetryableSocketException(Exception exception)
-        {
-            while (exception != null)
-            {
-                if (exception is SocketException socketException &&
-                    IsSocketExceptionRetryable(socketException))
-                {
-                    return true;
-                }
-                exception = exception.InnerException;
             }
 
             return false;
