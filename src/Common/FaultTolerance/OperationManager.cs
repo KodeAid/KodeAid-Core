@@ -10,6 +10,10 @@ namespace KodeAid.FaultTolerance
 {
     public abstract class OperationManager : OperationManager<object>
     {
+        public OperationManager(IRetryPolicy retryPolicy = null)
+            : base(retryPolicy)
+        {
+        }
     }
 
     public abstract class OperationManager<TStatusCode>
