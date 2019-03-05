@@ -33,13 +33,19 @@ namespace KodeAid.Net.Http
                 return true;
             }
 
-            // look for a SocketException (root cause) and see if its retryable
+            // look for a TimeoutException
+            if (RetryableExceptionHelper.CheckForRetryableException<TimeoutException>(exception))
+            {
+                return true;
+            }
+
+            // look for a SocketException (root cause) and check if it's retryable
             if (RetryableExceptionHelper.CheckForRetryableSocketException(exception))
             {
                 return true;
             }
 
-            // look for an HttpRequestException (high-level) and see if its retryable
+            // look for an HttpRequestException (high-level) and check if it's retryable
             if (RetryableExceptionHelper.CheckForRetryableHttpRequestException(exception))
             {
                 return true;

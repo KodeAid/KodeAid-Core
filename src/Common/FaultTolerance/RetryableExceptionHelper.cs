@@ -23,7 +23,7 @@ namespace KodeAid.FaultTolerance
             return CheckForRetryableException<SocketException>(exception, IsSocketExceptionRetryable);
         }
 
-        public static bool CheckForRetryableException<TException>(Exception exception, Func<TException, bool> canRetry)
+        public static bool CheckForRetryableException<TException>(Exception exception, Func<TException, bool> canRetry = null)
             where TException : Exception
         {
             ArgCheck.NotNull(nameof(canRetry), canRetry);
@@ -44,9 +44,17 @@ namespace KodeAid.FaultTolerance
                     continue;
                 }
 
-                if (exception is TException ex && canRetry(ex))
+                if (exception is TException ex)
                 {
-                    return true;
+                    if (canRetry == null)
+                    {
+                        return true;
+                    }
+
+                    if (canRetry(ex))
+                    {
+                        return true;
+                    }
                 }
 
                 if (exception is AggregateException aggregateException)
