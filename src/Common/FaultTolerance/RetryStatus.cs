@@ -2,14 +2,15 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+
 namespace KodeAid.FaultTolerance
 {
-    public class RetryContext
+    public enum RetryStatus
     {
-        protected internal RetryContext()
-        {
-        }
-
-        public int RetryCount { get; internal set; }
+        Succeeded,
+        RetryDisabled,
+        NonRetryable,
+        Retry,
+        RetryExhausted
     }
 }

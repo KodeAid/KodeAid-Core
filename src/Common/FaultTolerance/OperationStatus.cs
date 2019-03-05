@@ -7,10 +7,8 @@ namespace KodeAid.FaultTolerance
 {
     public enum OperationStatus
     {
-        Success,
-        RetryDisabled,
-        NonRetryable,
-        Retry,
-        RetryExhausted
+        Started,
+        Succeeded,
+        Failed,
     }
 }

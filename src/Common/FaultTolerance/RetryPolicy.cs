@@ -18,20 +18,19 @@ namespace KodeAid.FaultTolerance
             return new RetryContext();
         }
 
-        public virtual async Task CheckRetryAndDelayAsync(RetryContext context, CancellationToken cancellationToken = default)
+        public virtual async Task<bool> CheckRetryAndDelayAsync(RetryContext context, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(context), context);
 
             if (context.RetryCount >= MaxRetryCount)
             {
-                context.CanRetry = false;
-                return;
+                return false;
             }
 
             await DelayAsync(context, cancellationToken).ConfigureAwait(false);
 
             context.RetryCount++;
-            context.CanRetry = true;
+            return true;
         }
 
         protected virtual Task DelayAsync(RetryContext context, CancellationToken cancellationToken = default)

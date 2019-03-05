@@ -46,13 +46,21 @@ namespace KodeAid.FaultTolerance
                 try
                 {
                     await operation().ConfigureAwait(false);
-                    return;
+                    var operationStatus = await ProcessOperationAsync(context, GetDefaultStatusCode(), null, cancellationToken).ConfigureAwait(false);
+                    if (operationStatus != RetryStatus.Retry)
+                    {
+                        context.SetCompleted(true);
+                        ExecuteOperationCompleted(context);
+                        return;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    var operationStatus = await ProcessOperationAsync(context, default, ex, cancellationToken).ConfigureAwait(false);
-                    if (operationStatus != OperationStatus.Retry)
+                    var operationStatus = await ProcessOperationAsync(context, GetDefaultStatusCode(), ex, cancellationToken).ConfigureAwait(false);
+                    if (operationStatus != RetryStatus.Retry)
                     {
+                        context.SetCompleted(false);
+                        ExecuteOperationCompleted(context);
                         throw;
                     }
                 }
@@ -77,48 +85,60 @@ namespace KodeAid.FaultTolerance
                     var result = await operation().ConfigureAwait(false);
                     var statusCode = GetStatusCodeFromResult(result);
                     var operationStatus = await ProcessOperationAsync(context, statusCode, null, cancellationToken).ConfigureAwait(false);
-                    if (operationStatus != OperationStatus.Retry)
+                    if (operationStatus != RetryStatus.Retry)
                     {
+                        context.SetCompleted(true);
+                        ExecuteOperationCompleted(context);
                         return result;
                     }
                 }
                 catch (Exception ex)
                 {
                     var status = await ProcessOperationAsync(context, default, ex, cancellationToken).ConfigureAwait(false);
-                    if (status != OperationStatus.Retry)
+                    if (status != RetryStatus.Retry)
                     {
+                        context.SetCompleted(false);
+                        ExecuteOperationCompleted(context);
                         throw;
                     }
                 }
             }
         }
 
-        public async virtual Task<OperationStatus> ProcessOperationAsync(OperationContext context, TStatusCode statusCode, Exception exception, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Called after an operation has completed within ExecuteOperationAsync,
+        /// regardless of success or failure and prior to any exception being thrown.
+        /// </summary>
+        protected virtual void ExecuteOperationCompleted(OperationContext context)
+        {
+        }
+
+        public async virtual Task<RetryStatus> ProcessOperationAsync(OperationContext context, TStatusCode statusCode, Exception exception, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(context), context);
 
             if (CheckIsSuccess(context.State, statusCode, exception))
             {
-                return OperationStatus.Success;
+                return RetryStatus.Succeeded;
             }
 
             if (RetryPolicy == null)
             {
-                return OperationStatus.RetryDisabled;
+                return RetryStatus.RetryDisabled;
             }
 
             if (!CheckIsRetryable(context.State, statusCode, exception))
             {
-                return OperationStatus.NonRetryable;
+                return RetryStatus.NonRetryable;
             }
 
-            await RetryPolicy.CheckRetryAndDelayAsync(context.RetryContext, cancellationToken).ConfigureAwait(false);
-            if (context.RetryContext.CanRetry)
+            var canRetry = await RetryPolicy.CheckRetryAndDelayAsync(context.RetryContext, cancellationToken).ConfigureAwait(false);
+            if (canRetry)
             {
-                return OperationStatus.Retry;
+                return RetryStatus.Retry;
             }
 
-            return OperationStatus.RetryExhausted;
+            return RetryStatus.RetryExhausted;
         }
 
         protected virtual bool CheckIsSuccess(object state, TStatusCode statusCode, Exception exception)
@@ -134,6 +154,11 @@ namespace KodeAid.FaultTolerance
         protected virtual TStatusCode GetStatusCodeFromResult(object result)
         {
             return result is TStatusCode ? (TStatusCode)result : default;
+        }
+
+        protected virtual TStatusCode GetDefaultStatusCode()
+        {
+            return default;
         }
     }
 }

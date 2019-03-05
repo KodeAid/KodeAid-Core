@@ -12,7 +12,7 @@ namespace KodeAid.FaultTolerance
     {
         int MaxRetryCount { get; }
         TimeSpan MaxRetryDelay { get; }
-        Task CheckRetryAndDelayAsync(RetryContext context, CancellationToken cancellationToken = default);
+        Task<bool> CheckRetryAndDelayAsync(RetryContext context, CancellationToken cancellationToken = default);
         RetryContext CreateRetryContext();
     }
 }

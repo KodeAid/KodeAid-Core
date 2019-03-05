@@ -1,11 +1,9 @@
 ﻿// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using KodeAid.FaultTolerance;
+
 using System;
-using System.Net.Http;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
+using KodeAid.FaultTolerance;
 
 namespace KodeAid.Net.Http
 {
@@ -18,7 +16,19 @@ namespace KodeAid.Net.Http
 
         protected override bool CheckIsSuccess(object state, int statusCode, Exception exception)
         {
-            if (statusCode >= 100 && statusCode < 400 && exception == null)
+            if (exception != null)
+            {
+                return false;
+            }
+
+            // default of integer suggests we are not using status codes
+            if (statusCode == 0)
+            {
+                return true;
+            }
+
+            // we are using status codes, check if it's success
+            if (statusCode >= 100 && statusCode < 400)
             {
                 return true;
             }
