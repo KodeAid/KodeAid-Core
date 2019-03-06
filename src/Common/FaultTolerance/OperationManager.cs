@@ -148,6 +148,16 @@ namespace KodeAid.FaultTolerance
 
         protected virtual bool CheckIsRetryable(object state, TStatusCode statusCode, Exception exception)
         {
+            if (statusCode is IRetryable retryableStatusCode)
+            {
+                return retryableStatusCode.CanRetry;
+            }
+
+            if (RetryableExceptionHelper.CheckForRetryableException(exception))
+            {
+                return true;
+            }
+
             return false;
         }
 

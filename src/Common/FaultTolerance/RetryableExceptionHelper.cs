@@ -13,18 +13,12 @@ namespace KodeAid.FaultTolerance
 {
     public static class RetryableExceptionHelper
     {
-        public static bool CheckForRetryableHttpRequestException(Exception exception)
+        public static bool CheckForRetryableException(Exception exception)
         {
-            return CheckForRetryableException<HttpRequestException>(exception, IsHttpRequestExceptionRetryable);
+            return CheckForRetryableException<IRetryable>(exception, retryable => retryable.CanRetry);
         }
 
-        public static bool CheckForRetryableSocketException(Exception exception)
-        {
-            return CheckForRetryableException<SocketException>(exception, IsSocketExceptionRetryable);
-        }
-
-        public static bool CheckForRetryableException<TException>(Exception exception, Func<TException, bool> canRetry = null)
-            where TException : Exception
+        public static bool CheckForRetryableException<T>(Exception exception, Func<T, bool> canRetry = null, bool skipAggregateExceptions = false)
         {
             ArgCheck.NotNull(nameof(canRetry), canRetry);
 
@@ -44,7 +38,7 @@ namespace KodeAid.FaultTolerance
                     continue;
                 }
 
-                if (exception is TException ex)
+                if (exception is T ex)
                 {
                     if (canRetry == null)
                     {
@@ -57,7 +51,7 @@ namespace KodeAid.FaultTolerance
                     }
                 }
 
-                if (exception is AggregateException aggregateException)
+                if (!skipAggregateExceptions && exception is AggregateException aggregateException)
                 {
                     exceptions.EnqueueRange(aggregateException.InnerExceptions.WhereNotNull());
                 }
@@ -69,6 +63,21 @@ namespace KodeAid.FaultTolerance
             }
 
             return false;
+        }
+
+        public static bool CheckForRetryableHttpRequestException(Exception exception)
+        {
+            return CheckForRetryableException<HttpRequestException>(exception, IsHttpRequestExceptionRetryable);
+        }
+
+        public static bool CheckForRetryableSocketException(Exception exception)
+        {
+            return CheckForRetryableException<SocketException>(exception, IsSocketExceptionRetryable);
+        }
+
+        public static bool CheckForRetryableTimeoutException(Exception exception)
+        {
+            return CheckForRetryableException<TimeoutException>(exception);
         }
 
         public static bool IsHttpRequestExceptionRetryable(HttpRequestException httpRequestException)
