@@ -25,6 +25,7 @@ namespace KodeAid.Net
         public const string OpenXSpreadsheet = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         public const string Pdf = "application/pdf";
         public const string Png = "image/png";
+        public const string Text = "text/plain";
         public const string Xml = "text/xml";
         public const string Zip = "application/x-zip-compressed";
     }
