@@ -33,7 +33,9 @@ namespace KodeAid.Azure.Storage
         private readonly string _endpointSuffix;
         private CloudBlobContainer _container;
         private readonly TimeSpan? _leaseDuration;
+        private readonly bool _useSnapshots;
         private readonly BlobRequestOptions _requestOptions = new BlobRequestOptions() { RetryPolicy = new ExponentialRetry() }; //EncryptionPolicy = new TableEncryptionPolicy()
+        private readonly BlobRequestOptions _requestOptionsWithoutRetry = new BlobRequestOptions() { }; //EncryptionPolicy = new TableEncryptionPolicy()
         private readonly bool _deleteExpiredDuringRequests = false;
 
         public AzureBlobStorageKeyValueStore(AzureBlobStorageKeyValueStoreOptions options)
@@ -58,6 +60,7 @@ namespace KodeAid.Azure.Storage
 
             _defaultDirectoryRelativeAddress = options.DefaultDirectoryRelativeAddress;
             _leaseDuration = options.LeaseDuration;
+            _useSnapshots = options.UseSnapshots;
         }
 
         public bool IsInitialized => _container != null;
@@ -320,7 +323,7 @@ namespace KodeAid.Azure.Storage
                 {
                     if (_leaseDuration.HasValue)
                     {
-                        leaseId = await blob.AcquireLeaseAsync(TimeSpan.FromSeconds(60), null, new AccessCondition(), _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                        leaseId = await blob.AcquireLeaseAsync(_leaseDuration.Value, null, new AccessCondition(), _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (StorageException ex)
@@ -334,18 +337,32 @@ namespace KodeAid.Azure.Storage
                     throw;
                 }
 
-                // !! once we open the blob stream it will have been created, so we should no longer honour the cancellation token otherwise we leave the blob in a bad state
+                if (_useSnapshots)
+                {
+                    try
+                    {
+                        await blob.CreateSnapshotAsync(null, new AccessCondition() { LeaseId = leaseId, IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (StorageException ex)
+                    {
+                        // if it was found then re-throw, only ignore 404: not found
+                        if (ex.RequestInformation.HttpStatusCode != 404)
+                        {
+                            throw;
+                        }
+                    }
+                }
 
-                using (var stream = await blob.OpenWriteAsync(new AccessCondition() { IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false))
+                using (var stream = await blob.OpenWriteAsync(new AccessCondition() { LeaseId = leaseId, IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false))
                 {
                     stream.Position = 0;
-                    await contents.CopyToAsync(stream).ConfigureAwait(false);
+                    await contents.CopyToAsync(stream, 81920, cancellationToken).ConfigureAwait(false);
                     //await stream.WriteAsync(contents, 0, contents.Length).ConfigureAwait(false);
-                    await stream.FlushAsync().ConfigureAwait(false);
+                    await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
 
                 // load metadata and properties
-                await blob.FetchAttributesAsync(new AccessCondition(), _requestOptions, new OperationContext()).ConfigureAwait(false);
+                await blob.FetchAttributesAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
 
                 if (!string.IsNullOrWhiteSpace(contentType) || !string.IsNullOrWhiteSpace(contentEncoding))
                 {
@@ -359,20 +376,20 @@ namespace KodeAid.Azure.Storage
                         blob.Properties.ContentEncoding = contentEncoding;
                     }
 
-                    await blob.SetPropertiesAsync(new AccessCondition(), _requestOptions, new OperationContext()).ConfigureAwait(false);
+                    await blob.SetPropertiesAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                 }
 
                 if (absoluteExpiration.HasValue)
                 {
                     // set expiration
                     blob.Metadata[_expiresMetadataKey] = absoluteExpiration.Value.ToString(_dateTimeFormatString);
-                    await blob.SetMetadataAsync(new AccessCondition(), _requestOptions, new OperationContext()).ConfigureAwait(false);
-                    await blob.FetchAttributesAsync(new AccessCondition(), _requestOptions, new OperationContext()).ConfigureAwait(false);
+                    await blob.SetMetadataAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                    await blob.FetchAttributesAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                 }
                 else if (blob.Metadata.Remove(_expiresMetadataKey))
                 {
-                    await blob.SetMetadataAsync(new AccessCondition(), _requestOptions, new OperationContext()).ConfigureAwait(false);
-                    await blob.FetchAttributesAsync(new AccessCondition(), _requestOptions, new OperationContext()).ConfigureAwait(false);
+                    await blob.SetMetadataAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                    await blob.FetchAttributesAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                 }
 
                 return new BlobPutResult()
@@ -416,7 +433,7 @@ namespace KodeAid.Azure.Storage
                     if (leaseId != null)
                     {
                         // do not pass cancellation token
-                        await blob.ReleaseLeaseAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext()).ConfigureAwait(false);
+                        await blob.ReleaseLeaseAsync(new AccessCondition() { LeaseId = leaseId }, cancellationToken.IsCancellationRequested ? _requestOptionsWithoutRetry : _requestOptions, new OperationContext()).ConfigureAwait(false);
                     }
                 }
                 catch
@@ -443,7 +460,7 @@ namespace KodeAid.Azure.Storage
                 {
                     if (_leaseDuration.HasValue)
                     {
-                        leaseId = await blob.AcquireLeaseAsync(TimeSpan.FromSeconds(60), null, new AccessCondition(), _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                        leaseId = await blob.AcquireLeaseAsync(_leaseDuration.Value, null, new AccessCondition(), _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                     }
                 }
                 catch (StorageException ex)
@@ -459,7 +476,7 @@ namespace KodeAid.Azure.Storage
 
                 try
                 {
-                    await blob.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, new AccessCondition() { IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                    await blob.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, new AccessCondition() { LeaseId = leaseId, IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                 }
                 catch (StorageException ex)
                 {
@@ -485,7 +502,7 @@ namespace KodeAid.Azure.Storage
                     if (leaseId != null)
                     {
                         // do not pass cancellation token
-                        await blob.ReleaseLeaseAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext()).ConfigureAwait(false);
+                        await blob.ReleaseLeaseAsync(new AccessCondition() { LeaseId = leaseId }, cancellationToken.IsCancellationRequested ? _requestOptionsWithoutRetry : _requestOptions, new OperationContext()).ConfigureAwait(false);
                     }
                 }
                 catch
@@ -497,6 +514,77 @@ namespace KodeAid.Azure.Storage
             return DeleteBlobStatus.OK;
         }
 
+        public async Task<SnapshotBlobStatus> SnapshopAsync(string blobName, string directoryRelativeAddress = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, CancellationToken cancellationToken = default)
+        {
+            ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
+            directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
+
+            await InitializeAsync(cancellationToken).ConfigureAwait(false);
+
+            var blob = GetBlobReference(blobName, directoryRelativeAddress);
+
+            var leaseId = (string)null;
+
+            try
+            {
+                try
+                {
+                    if (_leaseDuration.HasValue)
+                    {
+                        leaseId = await blob.AcquireLeaseAsync(_leaseDuration.Value, null, new AccessCondition(), _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                catch (StorageException ex)
+                {
+                    // 404: not found
+                    if (ex.RequestInformation.HttpStatusCode == 404)
+                    {
+                        return SnapshotBlobStatus.NotFound;
+                    }
+
+                    throw;
+                }
+
+                try
+                {
+                    await blob.CreateSnapshotAsync(null, new AccessCondition() { LeaseId = leaseId, IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                }
+                catch (StorageException ex)
+                {
+                    // 404: not found
+                    if (ex.RequestInformation.HttpStatusCode == 404)
+                    {
+                        return SnapshotBlobStatus.NotFound;
+                    }
+
+                    // 412: preconditions failed, optimistic concurrency check failed
+                    if (ex.RequestInformation.HttpStatusCode == 412)
+                    {
+                        return SnapshotBlobStatus.PreconditionFailed;
+                    }
+
+                    throw;
+                }
+            }
+            finally
+            {
+                try
+                {
+                    if (leaseId != null)
+                    {
+                        // do not pass cancellation token
+                        await blob.ReleaseLeaseAsync(new AccessCondition() { LeaseId = leaseId }, cancellationToken.IsCancellationRequested ? _requestOptionsWithoutRetry : _requestOptions, new OperationContext()).ConfigureAwait(false);
+                    }
+                }
+                catch
+                {
+                    // TODO: investigate what can happen here
+                }
+            }
+
+            return SnapshotBlobStatus.OK;
+        }
+
         public async Task CreateIfNotExistsAsync(BlobContainerPublicAccessType publicAccessType, CancellationToken cancellationToken = default)
         {
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
@@ -504,7 +592,7 @@ namespace KodeAid.Azure.Storage
             await _container.CreateIfNotExistsAsync(publicAccessType, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task RemoveExpiredAsync(CancellationToken cancellationToken = default)
+        public async Task RemoveExpiredAsync(string directoryRelativeAddress = null, CancellationToken cancellationToken = default)
         {
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
 
@@ -513,7 +601,7 @@ namespace KodeAid.Azure.Storage
             BlobResultSegment segment = null;
             while (segment == null || segment.ContinuationToken != null)
             {
-                segment = await _container.ListBlobsSegmentedAsync(null, true, BlobListingDetails.Metadata, null, segment?.ContinuationToken, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                segment = await _container.ListBlobsSegmentedAsync(directoryRelativeAddress, true, BlobListingDetails.Metadata, null, segment?.ContinuationToken, _requestOptionsWithoutRetry, new OperationContext(), cancellationToken).ConfigureAwait(false);
                 foreach (ICloudBlob blob in segment.Results)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -523,7 +611,26 @@ namespace KodeAid.Azure.Storage
                         DateTimeOffset.TryParseExact(expirationString, _dateTimeFormatString, null, DateTimeStyles.None, out var expiration) &&
                         expiration <= utcNow)
                     {
-                        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, new AccessCondition() { IfMatchETag = blob.Properties.ETag }, _requestOptions, new OperationContext()).ConfigureAwait(false);
+                        try
+                        {
+                            await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, new AccessCondition() { IfMatchETag = blob.Properties.ETag }, _requestOptionsWithoutRetry, new OperationContext()).ConfigureAwait(false);
+                        }
+                        catch (StorageException ex)
+                        {
+                            // 404: not found
+                            if (ex.RequestInformation.HttpStatusCode == 404)
+                            {
+                                continue;
+                            }
+
+                            // 412: preconditions failed, optimistic concurrency check failed
+                            if (ex.RequestInformation.HttpStatusCode == 412)
+                            {
+                                continue;
+                            }
+
+                            throw;
+                        }
                     }
                 }
             }

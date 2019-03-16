@@ -14,15 +14,15 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class AzureBlobStorageKeyValueStoreServiceCollectionExtensions
     {
-        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, string storeConfigurationKey = nameof(AzureBlobStorageKeyValueStore))
+        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, string configurationSection = nameof(AzureBlobStorageKeyValueStore))
         {
             ArgCheck.NotNull(nameof(services), services);
-            ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);
+            ArgCheck.NotNullOrEmpty(nameof(configurationSection), configurationSection);
 
             services.AddTransient<IKeyValueReadOnlyStore>(serviceProvider =>
             {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(storeConfigurationKey)
-                    ?? throw new InvalidOperationException($"Azure blob store configuration section '{storeConfigurationKey}' not found.");
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(configurationSection)
+                    ?? throw new InvalidOperationException($"Azure blob store configuration section '{configurationSection}' not found.");
                 var options = new AzureBlobStorageKeyValueStoreOptions();
                 configuration.Bind(options);
 
@@ -36,8 +36,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddTransient<IKeyValueStore>(serviceProvider =>
             {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(storeConfigurationKey)
-                    ?? throw new InvalidOperationException($"Azure blob store configuration section '{storeConfigurationKey}' not found.");
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(configurationSection)
+                    ?? throw new InvalidOperationException($"Azure blob store configuration section '{configurationSection}' not found.");
                 var options = new AzureBlobStorageKeyValueStoreOptions();
                 configuration.Bind(options);
 
@@ -50,15 +50,15 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, Action<AzureBlobStorageKeyValueStoreOptionsBuilder> setupAction)
+        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, Action<AzureBlobStorageKeyValueStoreOptionsBuilder> setup)
         {
             ArgCheck.NotNull(nameof(services), services);
-            ArgCheck.NotNull(nameof(setupAction), setupAction);
+            ArgCheck.NotNull(nameof(setup), setup);
 
             services.AddTransient<IKeyValueReadOnlyStore>(serviceProvider =>
             {
                 var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
-                setupAction(builder);
+                setup(builder);
                 var options = builder.Build();
 
                 if (options.SecretStore == null)
@@ -72,7 +72,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IKeyValueStore>(serviceProvider =>
             {
                 var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
-                setupAction(builder);
+                setup(builder);
                 var options = builder.Build();
 
                 if (options.SecretStore == null)
@@ -84,15 +84,15 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, string storeConfigurationKey = "AzureBlobStoragePublicCertificateStore")
+        public static void AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, string configurationSection = "AzureBlobStoragePublicCertificateStore")
         {
             ArgCheck.NotNull(nameof(services), services);
-            ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);
+            ArgCheck.NotNullOrEmpty(nameof(configurationSection), configurationSection);
 
             services.AddTransient<IPublicCertificateStore>(serviceProvider =>
             {
-                var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(storeConfigurationKey)
-                    ?? throw new InvalidOperationException($"Azure blob store configuration section '{storeConfigurationKey}' not found.");
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(configurationSection)
+                    ?? throw new InvalidOperationException($"Azure blob store configuration section '{configurationSection}' not found.");
                 var options = new AzureBlobStorageKeyValueStoreOptions();
                 configuration.Bind(options);
 
@@ -105,15 +105,15 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
-        public static void AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, Action<AzureBlobStorageKeyValueStoreOptionsBuilder> setupAction)
+        public static void AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, Action<AzureBlobStorageKeyValueStoreOptionsBuilder> setup)
         {
             ArgCheck.NotNull(nameof(services), services);
-            ArgCheck.NotNull(nameof(setupAction), setupAction);
+            ArgCheck.NotNull(nameof(setup), setup);
 
             services.AddTransient<IPublicCertificateStore>(serviceProvider =>
             {
                 var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
-                setupAction(builder);
+                setup(builder);
                 var options = builder.Build();
 
                 if (options.SecretStore == null)

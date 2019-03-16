@@ -10,6 +10,11 @@ namespace KodeAid.Azure.Storage
 {
     public sealed class AzureBlobStorageKeyValueStoreOptions
     {
+        /// <summary>
+        /// 60 seconds.
+        /// </summary>
+        public static readonly TimeSpan DefaultLeaseDuration = TimeSpan.FromSeconds(60);
+
         public CloudStorageAccount StorageAccount { get; set; }
 
         public string ConnectionString { get; set; }
@@ -30,6 +35,8 @@ namespace KodeAid.Azure.Storage
 
         public string DefaultDirectoryRelativeAddress { get; set; }
 
-        public TimeSpan? LeaseDuration { get; set; }
+        public TimeSpan? LeaseDuration { get; set; } = DefaultLeaseDuration;
+
+        public bool UseSnapshots { get; set; }
     }
 }

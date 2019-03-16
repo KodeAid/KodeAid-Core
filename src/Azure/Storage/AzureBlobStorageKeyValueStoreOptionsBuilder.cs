@@ -20,7 +20,8 @@ namespace KodeAid.Azure.Storage
         private string _sasTokenSecretName;
         private string _containerName;
         private string _defaultDirectoryRelativeAddress;
-        private TimeSpan? _leaseDuration;
+        private TimeSpan? _leaseDuration = AzureBlobStorageKeyValueStoreOptions.DefaultLeaseDuration;
+        private bool _useSnapshots;
 
         public AzureBlobStorageKeyValueStoreOptions Build()
         {
@@ -37,6 +38,7 @@ namespace KodeAid.Azure.Storage
                 SharedAccessSignature = _sasToken,
                 SharedAccessSignatureSecretName = _sasTokenSecretName,
                 StorageAccount = _storageAccount,
+                UseSnapshots = _useSnapshots,
             };
         }
 
@@ -88,15 +90,21 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithLeasesEnabled(TimeSpan duration)
+        public AzureBlobStorageKeyValueStoreOptionsBuilder WithLeaseDuration(TimeSpan duration)
         {
             _leaseDuration = duration;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithLeasesDisabled()
+        public AzureBlobStorageKeyValueStoreOptionsBuilder DisableLeases()
         {
             _leaseDuration = null;
+            return this;
+        }
+
+        public AzureBlobStorageKeyValueStoreOptionsBuilder UseSnapshots(bool useSnapshots)
+        {
+            _useSnapshots = useSnapshots;
             return this;
         }
     }
