@@ -8,9 +8,9 @@ using Microsoft.WindowsAzure.Storage.Auth;
 
 namespace KodeAid.Azure.Storage
 {
-    public static class AzureBlobStorageKeyValueStoreExtensions
+    public static class AzureBlobStorageClientExtensions
     {
-        internal static AzureBlobStorageKeyValueStoreOptions Verify(this AzureBlobStorageKeyValueStoreOptions options)
+        internal static AzureBlobStorageClientOptions Verify(this AzureBlobStorageClientOptions options)
         {
             if (options?.StorageAccount == null)
             {

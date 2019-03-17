@@ -8,7 +8,7 @@ using Microsoft.WindowsAzure.Storage;
 
 namespace KodeAid.Azure.Storage
 {
-    public sealed class AzureBlobStorageKeyValueStoreOptions
+    public sealed class AzureBlobStorageClientOptions
     {
         /// <summary>
         /// 60 seconds.

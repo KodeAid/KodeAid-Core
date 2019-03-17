@@ -8,7 +8,7 @@ using Microsoft.WindowsAzure.Storage;
 
 namespace KodeAid.Azure.Storage
 {
-    public sealed class AzureBlobStorageKeyValueStoreOptionsBuilder
+    public sealed class AzureBlobStorageClientOptionsBuilder
     {
         private CloudStorageAccount _storageAccount;
         private string _connectionString;
@@ -20,12 +20,12 @@ namespace KodeAid.Azure.Storage
         private string _sasTokenSecretName;
         private string _containerName;
         private string _defaultDirectoryRelativeAddress;
-        private TimeSpan? _leaseDuration = AzureBlobStorageKeyValueStoreOptions.DefaultLeaseDuration;
+        private TimeSpan? _leaseDuration = AzureBlobStorageClientOptions.DefaultLeaseDuration;
         private bool _useSnapshots;
 
-        public AzureBlobStorageKeyValueStoreOptions Build()
+        public AzureBlobStorageClientOptions Build()
         {
-            return new AzureBlobStorageKeyValueStoreOptions()
+            return new AzureBlobStorageClientOptions()
             {
                 AccountName = _accountName,
                 ConnectionString = _connectionString,
@@ -42,19 +42,19 @@ namespace KodeAid.Azure.Storage
             };
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithStorageAccount(CloudStorageAccount account)
+        public AzureBlobStorageClientOptionsBuilder WithStorageAccount(CloudStorageAccount account)
         {
             _storageAccount = account;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithConnectionString(string connectionString)
+        public AzureBlobStorageClientOptionsBuilder WithConnectionString(string connectionString)
         {
             _connectionString = connectionString;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithSharedAccessSignature(string sasToken, string accountName, string endpointSuffix = null)
+        public AzureBlobStorageClientOptionsBuilder WithSharedAccessSignature(string sasToken, string accountName, string endpointSuffix = null)
         {
             _sasToken = sasToken;
             _accountName = accountName;
@@ -62,14 +62,14 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithSecretConnectionString(string connectionStringSecretName, ISecretReadOnlyStore secretStore = null)
+        public AzureBlobStorageClientOptionsBuilder WithSecretConnectionString(string connectionStringSecretName, ISecretReadOnlyStore secretStore = null)
         {
             _connectionStringSecretName = connectionStringSecretName;
             _secretStore = secretStore;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithSecretSharedAccessSignature(string sasTokenSecretName, string accountName, ISecretReadOnlyStore secretStore = null, string endpointSuffix = null)
+        public AzureBlobStorageClientOptionsBuilder WithSecretSharedAccessSignature(string sasTokenSecretName, string accountName, ISecretReadOnlyStore secretStore = null, string endpointSuffix = null)
         {
             _sasTokenSecretName = sasTokenSecretName;
             _accountName = accountName;
@@ -78,31 +78,31 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithContainer(string containerName)
+        public AzureBlobStorageClientOptionsBuilder WithContainer(string containerName)
         {
             _containerName = containerName;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithDefaultDirectoryRelativeAddress(string directoryRelativeAddress)
+        public AzureBlobStorageClientOptionsBuilder WithDefaultDirectoryRelativeAddress(string directoryRelativeAddress)
         {
             _defaultDirectoryRelativeAddress = directoryRelativeAddress;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder WithLeaseDuration(TimeSpan duration)
+        public AzureBlobStorageClientOptionsBuilder WithLeaseDuration(TimeSpan duration)
         {
             _leaseDuration = duration;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder DisableLeases()
+        public AzureBlobStorageClientOptionsBuilder DisableLeases()
         {
             _leaseDuration = null;
             return this;
         }
 
-        public AzureBlobStorageKeyValueStoreOptionsBuilder UseSnapshots(bool useSnapshots)
+        public AzureBlobStorageClientOptionsBuilder UseSnapshots(bool useSnapshots)
         {
             _useSnapshots = useSnapshots;
             return this;

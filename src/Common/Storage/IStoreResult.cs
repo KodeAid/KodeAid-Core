@@ -2,14 +2,11 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
-using KodeAid.Data;
 
 namespace KodeAid.Storage
 {
-    public interface IStoreResult : ICreatedTime, IUpdatedTime, IExpiredTime, IOptimisticConcurrency
+    public interface IStoreResult : IStoreMeta
     {
-        string Key { get; set; }
-        string Partition { get; set; }
         StoreResultStatus Status { get; set; }
     }
 }

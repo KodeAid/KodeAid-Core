@@ -11,7 +11,7 @@ namespace KodeAid.Storage
     public interface IDataStore
     {
         Task<bool> ExistsAsync(string name, string partition = null, CancellationToken cancellationToken = default);
-        Task<IEnumerable<IBlobResult>> ListAsync(string directoryRelativeAddress = null, CancellationToken cancellationToken = default);
+        Task<IEnumerable<IBlobMeta>> ListAsync(string directoryRelativeAddress = null, CancellationToken cancellationToken = default);
         Task<IBlobResult> GetAsync(string name, string partition = null, object concurrencyStamp = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
         Task<object> AddOrReplaceAsync(BlobData blob, CancellationToken cancellationToken = default);
         Task RemoveAsync(string name, string partition = null, CancellationToken cancellationToken = default);

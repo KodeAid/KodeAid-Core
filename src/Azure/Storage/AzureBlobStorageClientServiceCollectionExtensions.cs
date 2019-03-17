@@ -12,9 +12,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class AzureBlobStorageKeyValueStoreServiceCollectionExtensions
+    public static class AzureBlobStorageClientServiceCollectionExtensions
     {
-        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, string configurationSection = nameof(AzureBlobStorageKeyValueStore))
+        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, string configurationSection = nameof(AzureBlobStorageClient))
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(configurationSection), configurationSection);
@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(configurationSection)
                     ?? throw new InvalidOperationException($"Azure blob store configuration section '{configurationSection}' not found.");
-                var options = new AzureBlobStorageKeyValueStoreOptions();
+                var options = new AzureBlobStorageClientOptions();
                 configuration.Bind(options);
 
                 if (options.SecretStore == null)
@@ -31,14 +31,14 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
                 }
 
-                return new AzureBlobStorageKeyValueStore(options);
+                return new AzureBlobStorageClient(options);
             });
 
             services.AddTransient<IKeyValueStore>(serviceProvider =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(configurationSection)
                     ?? throw new InvalidOperationException($"Azure blob store configuration section '{configurationSection}' not found.");
-                var options = new AzureBlobStorageKeyValueStoreOptions();
+                var options = new AzureBlobStorageClientOptions();
                 configuration.Bind(options);
 
                 if (options.SecretStore == null)
@@ -46,18 +46,18 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
                 }
 
-                return new AzureBlobStorageKeyValueStore(options);
+                return new AzureBlobStorageClient(options);
             });
         }
 
-        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, Action<AzureBlobStorageKeyValueStoreOptionsBuilder> setup)
+        public static void AddAzureBlobStorageKeyValueStore(this IServiceCollection services, Action<AzureBlobStorageClientOptionsBuilder> setup)
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setup), setup);
 
             services.AddTransient<IKeyValueReadOnlyStore>(serviceProvider =>
             {
-                var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
+                var builder = new AzureBlobStorageClientOptionsBuilder();
                 setup(builder);
                 var options = builder.Build();
 
@@ -66,12 +66,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
                 }
 
-                return new AzureBlobStorageKeyValueStore(options);
+                return new AzureBlobStorageClient(options);
             });
 
             services.AddTransient<IKeyValueStore>(serviceProvider =>
             {
-                var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
+                var builder = new AzureBlobStorageClientOptionsBuilder();
                 setup(builder);
                 var options = builder.Build();
 
@@ -80,7 +80,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
                 }
 
-                return new AzureBlobStorageKeyValueStore(options);
+                return new AzureBlobStorageClient(options);
             });
         }
 
@@ -93,7 +93,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(configurationSection)
                     ?? throw new InvalidOperationException($"Azure blob store configuration section '{configurationSection}' not found.");
-                var options = new AzureBlobStorageKeyValueStoreOptions();
+                var options = new AzureBlobStorageClientOptions();
                 configuration.Bind(options);
 
                 if (options.SecretStore == null)
@@ -101,18 +101,18 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
                 }
 
-                return new AzureBlobStorageKeyValueStore(options);
+                return new AzureBlobStorageClient(options);
             });
         }
 
-        public static void AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, Action<AzureBlobStorageKeyValueStoreOptionsBuilder> setup)
+        public static void AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, Action<AzureBlobStorageClientOptionsBuilder> setup)
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setup), setup);
 
             services.AddTransient<IPublicCertificateStore>(serviceProvider =>
             {
-                var builder = new AzureBlobStorageKeyValueStoreOptionsBuilder();
+                var builder = new AzureBlobStorageClientOptionsBuilder();
                 setup(builder);
                 var options = builder.Build();
 
@@ -121,7 +121,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SecretStore = serviceProvider.GetService<ISecretReadOnlyStore>();
                 }
 
-                return new AzureBlobStorageKeyValueStore(options);
+                return new AzureBlobStorageClient(options);
             });
         }
     }

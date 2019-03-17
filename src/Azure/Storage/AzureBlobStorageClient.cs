@@ -22,7 +22,7 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace KodeAid.Azure.Storage
 {
-    public class AzureBlobStorageKeyValueStore : IDataStore, IKeyValueStore, IPublicCertificateStore, IInitializableAsync
+    public class AzureBlobStorageClient : IDataStore, IKeyValueStore, IPublicCertificateStore, IInitializableAsync
     {
         private const string _expiresMetadataKey = "Expires";
         private const string _dateTimeFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
@@ -40,7 +40,7 @@ namespace KodeAid.Azure.Storage
         private readonly BlobRequestOptions _requestOptionsWithoutRetry = new BlobRequestOptions() { }; //EncryptionPolicy = new TableEncryptionPolicy()
         private readonly bool _deleteExpiredDuringRequests = false;
 
-        public AzureBlobStorageKeyValueStore(AzureBlobStorageKeyValueStoreOptions options)
+        public AzureBlobStorageClient(AzureBlobStorageClientOptions options)
         {
             ArgCheck.NotNull(nameof(options), options);
 
@@ -677,9 +677,9 @@ namespace KodeAid.Azure.Storage
             return await ExistsAsync(name, partition, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
-        async Task<IEnumerable<IBlobResult>> IDataStore.ListAsync(string partition, CancellationToken cancellationToken)
+        async Task<IEnumerable<IBlobMeta>> IDataStore.ListAsync(string partition, CancellationToken cancellationToken)
         {
-            return (await ListAsync(partition, cancellationToken: cancellationToken).ConfigureAwait(false)).Cast<IBlobResult>().ToList();
+            return await ListAsync(partition, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         async Task<IBlobResult> IDataStore.GetAsync(string name, string partition, object concurrencyStamp, bool throwOnNotFound, CancellationToken cancellationToken)
