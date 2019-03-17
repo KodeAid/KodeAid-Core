@@ -8,15 +8,15 @@ using KodeAid.Storage;
 
 namespace KodeAid.Azure.Storage
 {
-    public class BlobStreamResult : BlobGetResult, IStreamResult, IDisposable
+    public class BlobStreamResult : BlobGetResult, IBlobResult, IStreamResult, IDisposable
     {
         public BlobStreamResult()
         {
         }
 
-        public BlobStreamResult(Stream contents)
+        public BlobStreamResult(Stream content)
         {
-            Contents = contents;
+            Content = content;
         }
 
         internal BlobStreamResult(BlobGetResult copy)
@@ -24,19 +24,19 @@ namespace KodeAid.Azure.Storage
         {
         }
 
-        internal BlobStreamResult(BlobGetResult copy, Stream contents)
+        internal BlobStreamResult(BlobGetResult copy, Stream content)
             : base(copy)
         {
-            Contents = contents;
+            Content = content;
         }
 
-        public Stream Contents { get; set; }
+        public Stream Content { get; set; }
 
-        Stream IStreamResult.Stream => Contents;
+        Stream IStreamResult.Stream => Content;
 
         public void Dispose()
         {
-            Contents?.Dispose();
+            Content?.Dispose();
         }
     }
 }

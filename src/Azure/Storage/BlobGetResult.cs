@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using KodeAid.Data;
 using KodeAid.Storage;
 
@@ -31,6 +32,8 @@ namespace KodeAid.Azure.Storage
         }
 
         public GetBlobStatus Status { get; set; }
+
+        public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
 
         string IStoreResult.Partition { get => DirectoryRelativeAddress; set => DirectoryRelativeAddress = value; }
         string IStoreResult.Key { get => BlobName; set => BlobName = value; }

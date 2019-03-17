@@ -20,7 +20,7 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace KodeAid.Azure.Storage
 {
-    public class AzureBlobStorageKeyValueStore : IKeyValueStore, IPublicCertificateStore, IInitializableAsync
+    public class AzureBlobStorageKeyValueStore : IDataStore, IKeyValueStore, IPublicCertificateStore, IInitializableAsync
     {
         private const string _expiresMetadataKey = "Expires";
         private const string _dateTimeFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
@@ -83,6 +83,19 @@ namespace KodeAid.Azure.Storage
             }
         }
 
+        public async Task<bool> ExistsAsync(string blobName, string directoryRelativeAddress = null, CancellationToken cancellationToken = default)
+        {
+            ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
+
+            directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
+
+            await InitializeAsync(cancellationToken).ConfigureAwait(false);
+
+            var blob = GetBlobReference(blobName, directoryRelativeAddress);
+
+            return await blob.ExistsAsync(_requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+        }
+
         public async Task<BlobStringResult> GetStringAsync(string blobName, string directoryRelativeAddress = null, string ifNoneMatchETag = null, DateTimeOffset? ifModifiedSinceTime = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default)
         {
             using (var result = await GetStreamAsync(blobName, directoryRelativeAddress, ifNoneMatchETag, ifModifiedSinceTime, throwOnNotFound, cancellationToken).ConfigureAwait(false))
@@ -92,10 +105,10 @@ namespace KodeAid.Azure.Storage
                     return new BlobStringResult(result);
                 }
 
-                using (result.Contents)
+                using (result.Content)
                 using (var ms = new MemoryStream())
                 {
-                    await result.Contents.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
+                    await result.Content.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
                     await ms.FlushAsync(cancellationToken).ConfigureAwait(false);
 
                     var encoding = Encoding.GetEncoding(result.ContentEncoding) ?? Encoding.UTF8;
@@ -114,10 +127,10 @@ namespace KodeAid.Azure.Storage
                     return new BlobBytesResult(result);
                 }
 
-                using (result.Contents)
+                using (result.Content)
                 using (var ms = new MemoryStream())
                 {
-                    await result.Contents.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
+                    await result.Content.CopyToAsync(ms, 81920, cancellationToken).ConfigureAwait(false);
                     await ms.FlushAsync(cancellationToken).ConfigureAwait(false);
 
                     return new BlobBytesResult(result, ms.ToArray());
@@ -134,20 +147,8 @@ namespace KodeAid.Azure.Storage
 
             var blob = GetBlobReference(blobName, directoryRelativeAddress);
 
-            //if (!await blob.ExistsAsync(_options, new OperationContext()).ConfigureAwait(false))
-            //{
-            //    return new BlobResult<string>()
-            //    {
-            //        BlobUri = blobUri,
-            //        DirectoryUri = directoryUri,
-            //        Status = StoreResultStatus.NotFound
-            //    };
-            //}
-
-
             try
             {
-
                 // load metadata and properties
                 await blob.FetchAttributesAsync(new AccessCondition(), _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
             }
@@ -234,7 +235,8 @@ namespace KodeAid.Azure.Storage
             try
             {
                 var stream = await blob.OpenReadAsync(new AccessCondition() { IfNoneMatchETag = ifNoneMatchETag, IfModifiedSinceTime = ifModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
-                return new BlobStreamResult(stream)
+
+                var result = new BlobStreamResult(stream)
                 {
                     BlobName = blobName,
                     DirectoryRelativeAddress = directoryRelativeAddress,
@@ -246,6 +248,13 @@ namespace KodeAid.Azure.Storage
                     LastModified = blob.Properties.LastModified,
                     Expires = expires,
                 };
+
+                foreach (var md in blob.Metadata)
+                {
+                    result.Metadata.Add(md.Key, md.Value);
+                }
+
+                return result;
             }
             catch (StorageException ex)
             {
@@ -278,37 +287,37 @@ namespace KodeAid.Azure.Storage
             }
         }
 
-        public Task<BlobResult> PutAsync(string blobName, string contents, string directoryRelativeAddress = null, string contentType = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
+        public Task<BlobResult> PutAsync(string blobName, string content, string directoryRelativeAddress = null, string contentType = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
         {
-            return PutAsync(blobName, contents, Encoding.UTF8, directoryRelativeAddress, contentType, ifMatchETag, ifNotModifiedSinceTime, absoluteExpiration, cancellationToken);
+            return PutAsync(blobName, content, Encoding.UTF8, directoryRelativeAddress, contentType, ifMatchETag, ifNotModifiedSinceTime, absoluteExpiration, cancellationToken);
         }
 
-        public Task<BlobResult> PutAsync(string blobName, string contents, Encoding encoding, string directoryRelativeAddress = null, string contentType = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
+        public Task<BlobResult> PutAsync(string blobName, string content, Encoding encoding, string directoryRelativeAddress = null, string contentType = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
-            ArgCheck.NotNull(nameof(contents), contents);
+            ArgCheck.NotNull(nameof(content), content);
 
             encoding = encoding ?? Encoding.UTF8;
 
-            return PutAsync(blobName, encoding.GetBytes(contents), directoryRelativeAddress, contentType, encoding.WebName, ifMatchETag, ifNotModifiedSinceTime, absoluteExpiration, cancellationToken);
+            return PutAsync(blobName, encoding.GetBytes(content), directoryRelativeAddress, contentType, encoding.WebName, ifMatchETag, ifNotModifiedSinceTime, absoluteExpiration, cancellationToken);
         }
 
-        public Task<BlobResult> PutAsync(string blobName, byte[] contents, string directoryRelativeAddress = null, string contentType = null, string contentEncoding = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
+        public async Task<BlobResult> PutAsync(string blobName, byte[] content, string directoryRelativeAddress = null, string contentType = null, string contentEncoding = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
-            ArgCheck.NotNull(nameof(contents), contents);
+            ArgCheck.NotNull(nameof(content), content);
 
-            using (var ms = new MemoryStream(contents, false))
+            using (var ms = new MemoryStream(content, false))
             {
                 ms.Position = 0;
-                return PutAsync(blobName, ms, directoryRelativeAddress, contentType, contentEncoding, ifMatchETag, ifNotModifiedSinceTime, absoluteExpiration, cancellationToken);
+                return await PutAsync(blobName, ms, directoryRelativeAddress, contentType, contentEncoding, ifMatchETag, ifNotModifiedSinceTime, absoluteExpiration, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public async Task<BlobResult> PutAsync(string blobName, Stream contents, string directoryRelativeAddress = null, string contentType = null, string contentEncoding = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
+        public async Task<BlobResult> PutAsync(string blobName, Stream content, string directoryRelativeAddress = null, string contentType = null, string contentEncoding = null, string ifMatchETag = null, DateTimeOffset? ifNotModifiedSinceTime = null, DateTimeOffset? absoluteExpiration = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
-            ArgCheck.NotNull(nameof(contents), contents);
+            ArgCheck.NotNull(nameof(content), content);
             directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
 
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
@@ -334,7 +343,7 @@ namespace KodeAid.Azure.Storage
                     }
                 }
 
-                await blob.UploadFromStreamAsync(contents, new AccessCondition() { LeaseId = leaseId, IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                await blob.UploadFromStreamAsync(content, new AccessCondition() { LeaseId = leaseId, IfMatchETag = ifMatchETag, IfNotModifiedSinceTime = ifNotModifiedSinceTime }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
 
                 if (leaseId == null && _leaseDuration.HasValue)
                 {
@@ -605,6 +614,26 @@ namespace KodeAid.Azure.Storage
             return _container.GetBlockBlobReference(blobName);
         }
 
+        async Task<bool> IDataStore.ExistsAsync(string name, string partition, CancellationToken cancellationToken)
+        {
+            return await ExistsAsync(name, partition, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
+        async Task<IBlobResult> IDataStore.GetAsync(string name, string partition, object concurrencyStamp, bool throwOnNotFound, CancellationToken cancellationToken)
+        {
+            return await GetStreamAsync(name, partition, (string)concurrencyStamp, throwOnNotFound: throwOnNotFound, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
+        async Task<object> IDataStore.AddOrReplaceAsync(BlobData blob, CancellationToken cancellationToken)
+        {
+            return (await PutAsync(blob?.Key, blob?.Content, directoryRelativeAddress: blob?.Partition, contentType: blob?.ContentType, contentEncoding: blob?.ContentEncoding, ifMatchETag: (string)blob?.ConcurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
+        }
+
+        async Task IDataStore.RemoveAsync(string key, string partition, CancellationToken cancellationToken)
+        {
+            await DeleteAsync(key, partition, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
         async Task<IStringResult> IKeyValueReadOnlyStore.GetStringAsync(string key, string partition, object concurrencyStamp, bool throwOnNotFound, CancellationToken cancellationToken)
         {
             return await GetStringAsync(key, partition, (string)concurrencyStamp, throwOnNotFound: throwOnNotFound, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -622,17 +651,17 @@ namespace KodeAid.Azure.Storage
 
         async Task<object> IKeyValueStore.AddOrReplaceAsync(string key, string value, string partition, object concurrencyStamp, DateTimeOffset? absoluteExpiration, CancellationToken cancellationToken)
         {
-            return (await PutAsync(key, value, partition, (string)concurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
+            return (await PutAsync(key, value, directoryRelativeAddress: partition, ifMatchETag: (string)concurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
         }
 
         async Task<object> IKeyValueStore.AddOrReplaceAsync(string key, byte[] bytes, string partition, object concurrencyStamp, DateTimeOffset? absoluteExpiration, CancellationToken cancellationToken)
         {
-            return (await PutAsync(key, bytes, partition, (string)concurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
+            return (await PutAsync(key, bytes, directoryRelativeAddress: partition, ifMatchETag: (string)concurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
         }
 
         async Task<object> IKeyValueStore.AddOrReplaceAsync(string key, Stream stream, string partition, object concurrencyStamp, DateTimeOffset? absoluteExpiration, CancellationToken cancellationToken)
         {
-            return (await PutAsync(key, stream, partition, (string)concurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
+            return (await PutAsync(key, stream, directoryRelativeAddress: partition, ifMatchETag: (string)concurrencyStamp, cancellationToken: cancellationToken).ConfigureAwait(false))?.ETag;
         }
 
         async Task IKeyValueStore.RemoveAsync(string key, string partition, CancellationToken cancellationToken)
