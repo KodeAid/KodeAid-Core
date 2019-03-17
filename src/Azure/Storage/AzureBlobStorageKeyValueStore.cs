@@ -3,8 +3,10 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -94,6 +96,53 @@ namespace KodeAid.Azure.Storage
             var blob = GetBlobReference(blobName, directoryRelativeAddress);
 
             return await blob.ExistsAsync(_requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<BlobResult>> ListAsync(string directoryRelativeAddress = null, CancellationToken cancellationToken = default)
+        {
+            await InitializeAsync(cancellationToken).ConfigureAwait(false);
+
+            var utcNow = DateTimeOffset.UtcNow;
+
+            var results = new List<BlobResult>();
+
+            BlobResultSegment segment = null;
+            while (segment == null || segment.ContinuationToken != null)
+            {
+                segment = await _container.ListBlobsSegmentedAsync(directoryRelativeAddress, true, BlobListingDetails.Metadata, null, segment?.ContinuationToken, _requestOptionsWithoutRetry, new OperationContext(), cancellationToken).ConfigureAwait(false);
+                foreach (ICloudBlob blob in segment.Results)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // skip expired
+                    DateTimeOffset? expires = null;
+                    if (blob.Metadata.TryGetValue(_expiresMetadataKey, out var expirationString) &&
+                        DateTimeOffset.TryParseExact(expirationString, _dateTimeFormatString, null, DateTimeStyles.None, out var expiration))
+                    {
+                        expires = expiration;
+                        if (expiration <= utcNow)
+                        {
+                            continue;
+                        }
+                    }
+
+                    var result = new BlobResult()
+                    {
+                        BlobName = Path.GetFileName(blob.Name),
+                        ContentEncoding = blob.Properties.ContentEncoding,
+                        ContentType = blob.Properties.ContentType,
+                        Created = blob.Properties.Created,
+                        DirectoryRelativeAddress = Path.GetDirectoryName(blob.Name)?.Trim('/').TrimToNull(),
+                        ETag = blob.Properties.ETag,
+                        Expires = expires,
+                        LastModified = blob.Properties.LastModified,
+                    };
+                    result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
+                    results.Add(result);
+                }
+            }
+
+            return results;
         }
 
         public async Task<BlobStringResult> GetStringAsync(string blobName, string directoryRelativeAddress = null, string ifNoneMatchETag = null, DateTimeOffset? ifModifiedSinceTime = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default)
@@ -202,7 +251,7 @@ namespace KodeAid.Azure.Storage
 
             if (ifNoneMatchETag != null && blob.Properties.ETag != null && blob.Properties.ETag == ifNoneMatchETag)
             {
-                return new BlobStreamResult()
+                var result = new BlobStreamResult()
                 {
                     BlobName = blobName,
                     DirectoryRelativeAddress = directoryRelativeAddress,
@@ -214,11 +263,13 @@ namespace KodeAid.Azure.Storage
                     LastModified = blob.Properties.LastModified,
                     Expires = expires,
                 };
+                result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
+                return result;
             }
 
             if (ifModifiedSinceTime.HasValue && blob.Properties.LastModified.HasValue && blob.Properties.LastModified <= ifModifiedSinceTime)
             {
-                return new BlobStreamResult()
+                var result = new BlobStreamResult()
                 {
                     BlobName = blobName,
                     DirectoryRelativeAddress = directoryRelativeAddress,
@@ -230,6 +281,8 @@ namespace KodeAid.Azure.Storage
                     LastModified = blob.Properties.LastModified,
                     Expires = expires,
                 };
+                result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
+                return result;
             }
 
             try
@@ -248,12 +301,7 @@ namespace KodeAid.Azure.Storage
                     LastModified = blob.Properties.LastModified,
                     Expires = expires,
                 };
-
-                foreach (var md in blob.Metadata)
-                {
-                    result.Metadata.Add(md.Key, md.Value);
-                }
-
+                result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
                 return result;
             }
             catch (StorageException ex)
@@ -273,14 +321,20 @@ namespace KodeAid.Azure.Storage
                 // use cached version
                 if (ex.RequestInformation.HttpStatusCode == 304 || ex.RequestInformation.HttpStatusCode == 412)
                 {
-                    return new BlobStreamResult()
+                    var result = new BlobStreamResult()
                     {
                         BlobName = blobName,
                         DirectoryRelativeAddress = directoryRelativeAddress,
                         Status = GetBlobStatus.NotModified,
                         ContentType = blob.Properties.ContentType,
                         ContentEncoding = blob.Properties.ContentEncoding,
+                        ETag = blob.Properties.ETag,
+                        Created = blob.Properties.Created,
+                        LastModified = blob.Properties.LastModified,
+                        Expires = expires,
                     };
+                    result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
+                    return result;
                 }
 
                 throw;
@@ -386,7 +440,7 @@ namespace KodeAid.Azure.Storage
                     await blob.FetchAttributesAsync(new AccessCondition() { LeaseId = leaseId }, _requestOptions, new OperationContext(), cancellationToken).ConfigureAwait(false);
                 }
 
-                return new BlobPutResult()
+                var result = new BlobPutResult()
                 {
                     BlobName = blobName,
                     DirectoryRelativeAddress = directoryRelativeAddress,
@@ -398,13 +452,15 @@ namespace KodeAid.Azure.Storage
                     LastModified = blob.Properties.LastModified,
                     Expires = absoluteExpiration
                 };
+                result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
+                return result;
             }
             catch (StorageException ex)
             {
                 // preconditions failed, optimistic concurrency check failed
                 if (ex.RequestInformation.HttpStatusCode == 412)
                 {
-                    return new BlobPutResult()
+                    var result = new BlobPutResult()
                     {
                         BlobName = blobName,
                         DirectoryRelativeAddress = directoryRelativeAddress,
@@ -416,6 +472,8 @@ namespace KodeAid.Azure.Storage
                         LastModified = blob.Properties.LastModified,
                         Expires = absoluteExpiration
                     };
+                    result.Metadata.AddRange(blob.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
+                    return result;
                 }
 
                 throw;
@@ -617,6 +675,11 @@ namespace KodeAid.Azure.Storage
         async Task<bool> IDataStore.ExistsAsync(string name, string partition, CancellationToken cancellationToken)
         {
             return await ExistsAsync(name, partition, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
+        async Task<IEnumerable<IBlobResult>> IDataStore.ListAsync(string partition, CancellationToken cancellationToken)
+        {
+            return (await ListAsync(partition, cancellationToken: cancellationToken).ConfigureAwait(false)).Cast<IBlobResult>().ToList();
         }
 
         async Task<IBlobResult> IDataStore.GetAsync(string name, string partition, object concurrencyStamp, bool throwOnNotFound, CancellationToken cancellationToken)

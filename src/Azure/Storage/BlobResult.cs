@@ -3,10 +3,11 @@
 
 
 using System;
+using System.Collections.Generic;
 
 namespace KodeAid.Azure.Storage
 {
-    public abstract class BlobResult
+    public class BlobResult
     {
         public string BlobName { get; set; }
         public string DirectoryRelativeAddress { get; set; }
@@ -16,5 +17,6 @@ namespace KodeAid.Azure.Storage
         public string ETag { get; set; }
         public string ContentEncoding { get; set; }
         public string ContentType { get; set; }
+        public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
     }
 }

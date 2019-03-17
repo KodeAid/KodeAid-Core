@@ -33,8 +33,6 @@ namespace KodeAid.Azure.Storage
 
         public GetBlobStatus Status { get; set; }
 
-        public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
-
         string IStoreResult.Partition { get => DirectoryRelativeAddress; set => DirectoryRelativeAddress = value; }
         string IStoreResult.Key { get => BlobName; set => BlobName = value; }
         StoreResultStatus IStoreResult.Status { get => (StoreResultStatus)Status; set => Status = (GetBlobStatus)value; }
