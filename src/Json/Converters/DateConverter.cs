@@ -9,8 +9,13 @@ namespace KodeAid.Serialization.Json.Converters
     public class DateConverter : IsoDateTimeConverter
     {
         public DateConverter()
+            : this("yyyy-MM-dd")
         {
-            DateTimeFormat = "yyyy-MM-dd";
+        }
+
+        public DateConverter(string format)
+        {
+            DateTimeFormat = format;
         }
     }
 }
