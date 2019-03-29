@@ -68,7 +68,12 @@ namespace KodeAid.Serialization
             return (T)await serializer.DeserializeFromFileAsync(typeof(T), path, cancellationToken).ConfigureAwait(false);
         }
 
-        public static T Deserialize<TSerialized, T>(this ISerializer<TSerialized> serializer, TSerialized data)
+        public static T Deserialize<T>(this ISerializer<string> serializer, string data)
+        {
+            return (T)serializer.Deserialize(typeof(T), data);
+        }
+
+        public static T Deserialize<T>(this ISerializer<byte[]> serializer, byte[] data)
         {
             return (T)serializer.Deserialize(typeof(T), data);
         }
