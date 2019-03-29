@@ -54,50 +54,50 @@ namespace KodeAid.Security.Cryptography
 
         public static string ProtectDataToBase64(this IDataProtector dataProtector, byte[] unprotectedData, Encoding encoding = null, bool urlEncoded = false)
         {
-            return dataProtector.ProtectData(unprotectedData).ToBase64(urlEncoded);
+            return dataProtector.ProtectData(unprotectedData).ToBase64String(urlEncoded);
         }
 
         public static string ProtectStringToBase64(this IDataProtector dataProtector, string unprotectedString, Encoding encoding = null, bool urlEncoded = false)
         {
-            return dataProtector.ProtectString(unprotectedString, encoding).ToBase64(urlEncoded);
+            return dataProtector.ProtectString(unprotectedString, encoding).ToBase64String(urlEncoded);
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, string[] unprotectedStrings, Encoding encoding = null, bool urlEncoded = false)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64(urlEncoded);
+            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64String(urlEncoded);
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, bool urlEncoded = false, params string[] unprotectedStrings)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, null).ToBase64(urlEncoded);
+            return dataProtector.ProtectStrings(unprotectedStrings, null).ToBase64String(urlEncoded);
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, Encoding encoding, params string[] unprotectedStrings)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64();
+            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64String();
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, Encoding encoding, bool urlEncoded, params string[] unprotectedStrings)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64(urlEncoded);
+            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64String(urlEncoded);
         }
 
         public static byte[] UnprotectDataFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
-            return dataProtector.UnprotectData(protectedBase64.FromBase64(urlEncoded));
+            return dataProtector.UnprotectData(protectedBase64.FromBase64String(urlEncoded));
         }
 
         public static string UnprotectStringFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
-            return dataProtector.UnprotectString(protectedBase64.FromBase64(urlEncoded), encoding);
+            return dataProtector.UnprotectString(protectedBase64.FromBase64String(urlEncoded), encoding);
         }
 
         public static string[] UnprotectStringsFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
-            return dataProtector.UnprotectStrings(protectedBase64.FromBase64(urlEncoded), encoding);
+            return dataProtector.UnprotectStrings(protectedBase64.FromBase64String(urlEncoded), encoding);
         }
 
         private static byte[] GetBytesFromStrings(string[] values, Encoding encoding)

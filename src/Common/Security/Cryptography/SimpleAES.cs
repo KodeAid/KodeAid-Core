@@ -6,7 +6,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace KodeAid.Security.Cryptography
@@ -26,7 +25,9 @@ namespace KodeAid.Security.Cryptography
             ArgCheck.NotNull(nameof(unprotectedData), unprotectedData);
             var iv = Guid.NewGuid().ToByteArray();
             using (var rm = new RijndaelManaged())
+            {
                 return Transform(unprotectedData, rm.CreateEncryptor(_key, iv)).Concat(iv).ToArray();
+            }
         }
 
         public async Task<byte[]> ProtectDataAsync(byte[] unprotectedData)
@@ -34,38 +35,56 @@ namespace KodeAid.Security.Cryptography
             ArgCheck.NotNull(nameof(unprotectedData), unprotectedData);
             var iv = Guid.NewGuid().ToByteArray();
             using (var rm = new RijndaelManaged())
+            {
                 return (await TransformAsync(unprotectedData, rm.CreateEncryptor(_key, iv)).ConfigureAwait(false)).Concat(iv).ToArray();
+            }
         }
 
         public byte[] UnprotectData(byte[] protectedData)
         {
             ArgCheck.NotNull(nameof(protectedData), protectedData);
             if (protectedData.Length < 16)
+            {
                 throw new ArgumentException($"Parameter {nameof(protectedData)} must be at least 16 bytes long.", nameof(protectedData));
+            }
+
             var iv = protectedData.Skip(protectedData.Length - 16).ToArray();
             protectedData = protectedData.Take(protectedData.Length - 16).ToArray();
             using (var rm = new RijndaelManaged())
+            {
                 return Transform(protectedData, rm.CreateDecryptor(_key, iv));
+            }
         }
 
         public async Task<byte[]> UnprotectDataAsync(byte[] protectedData)
         {
             ArgCheck.NotNull(nameof(protectedData), protectedData);
             if (protectedData.Length < 16)
+            {
                 throw new ArgumentException($"Parameter {nameof(protectedData)} must be at least 16 bytes long.", nameof(protectedData));
+            }
+
             var iv = protectedData.Skip(protectedData.Length - 16).ToArray();
             protectedData = protectedData.Take(protectedData.Length - 16).ToArray();
             using (var rm = new RijndaelManaged())
+            {
                 return await TransformAsync(protectedData, rm.CreateDecryptor(_key, iv)).ConfigureAwait(false);
+            }
         }
 
         private byte[] GetValidKey(byte[] suggestedKey)
         {
             ArgCheck.NotNullOrEmpty(nameof(suggestedKey), suggestedKey);
             while (suggestedKey.Length < 32)
+            {
                 suggestedKey = suggestedKey.Concat(suggestedKey).ToArray();
+            }
+
             if (suggestedKey.Length > 32)
+            {
                 suggestedKey = suggestedKey.Take(32).ToArray();
+            }
+
             return suggestedKey;
         }
 
