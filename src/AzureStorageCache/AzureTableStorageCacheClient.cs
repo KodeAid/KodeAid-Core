@@ -29,13 +29,13 @@ namespace KodeAid.Caching.AzureStorage
         private readonly TableRequestOptions _options = new TableRequestOptions() { RetryPolicy = new ExponentialRetry() }; //EncryptionPolicy = new TableEncryptionPolicy()
 
         public AzureTableStorageCacheClient(string connectionString, ISerializer<string> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
-            : this(connectionString, serializer, tableName, defaultPartitionKey, logger, throwOnError)
+            : this(connectionString, SerializerHelper.WrapSerializer(serializer), tableName, defaultPartitionKey, logger, throwOnError)
         {
             _isBinarySerializer = false;
         }
 
         public AzureTableStorageCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
-            : this(connectionString, serializer, tableName, defaultPartitionKey, logger, throwOnError)
+            : this(connectionString, SerializerHelper.WrapSerializer(serializer), tableName, defaultPartitionKey, logger, throwOnError)
         {
             _isBinarySerializer = true;
         }
@@ -47,13 +47,13 @@ namespace KodeAid.Caching.AzureStorage
         }
 
         public AzureTableStorageCacheClient(CloudStorageAccount account, ISerializer<string> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
-            : this(account, serializer, tableName, defaultPartitionKey, logger, throwOnError)
+            : this(account, SerializerHelper.WrapSerializer(serializer), tableName, defaultPartitionKey, logger, throwOnError)
         {
             _isBinarySerializer = false;
         }
 
         public AzureTableStorageCacheClient(CloudStorageAccount account, ISerializer<byte[]> serializer, ILogger<AzureTableStorageCacheClient> logger, string tableName = _defaultTableName, string defaultPartitionKey = _defaultDefaultPartitionKey, bool throwOnError = false)
-            : this(account, serializer, tableName, defaultPartitionKey, logger, throwOnError)
+            : this(account, SerializerHelper.WrapSerializer(serializer), tableName, defaultPartitionKey, logger, throwOnError)
         {
             _isBinarySerializer = true;
         }
@@ -260,7 +260,7 @@ namespace KodeAid.Caching.AzureStorage
             var data = _serializer.Serialize(value);
             if (_isBinarySerializer)
             {
-                return ((byte[])data).ToBase64();
+                return ((byte[])data).ToBase64String();
             }
 
             return (string)data;
@@ -276,7 +276,7 @@ namespace KodeAid.Caching.AzureStorage
             object data = value;
             if (_isBinarySerializer)
             {
-                data = value.FromBase64();
+                data = value.FromBase64String();
             }
 
             return _serializer.Deserialize<T>(data);

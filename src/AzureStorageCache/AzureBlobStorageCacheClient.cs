@@ -23,7 +23,7 @@ namespace KodeAid.Caching.AzureStorage
         private const string _defaultDefaultPartitionDirectory = "";
         private readonly string _containerName;
         private readonly string _defaultPartitionDirectory;
-        private readonly ISerializer _serializer;
+        private readonly IAsyncStreamSerializer _serializer;
         private readonly CloudStorageAccount _storageAccount;
         private readonly CloudBlobClient _client;
         private readonly CloudBlobContainer _container;
@@ -34,7 +34,7 @@ namespace KodeAid.Caching.AzureStorage
         {
         }
 
-        public AzureBlobStorageCacheClient(string connectionString, ISerializer serializer, string containerName, string defaultPartitionDirectory, ILogger logger, bool throwOnError)
+        public AzureBlobStorageCacheClient(string connectionString, IAsyncStreamSerializer serializer, string containerName, string defaultPartitionDirectory, ILogger logger, bool throwOnError)
             : base(throwOnError, logger)
         {
             ArgCheck.NotNullOrEmpty(nameof(connectionString), connectionString);

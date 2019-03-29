@@ -11,7 +11,7 @@ namespace KodeAid.Serialization
 {
     public static class SerializerExtensions
     {
-        public static void SerializeToFile(this ISerializer serializer, string path, object graph, bool overwrite = false)
+        public static void SerializeToFile(this IStreamSerializer serializer, string path, object graph, bool overwrite = false)
         {
             using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
             {
@@ -19,7 +19,7 @@ namespace KodeAid.Serialization
             }
         }
 
-        public static async Task SerializeToFileAsync(this ISerializer serializer, string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
+        public static async Task SerializeToFileAsync(this IAsyncStreamSerializer serializer, string path, object graph, bool overwrite = false, CancellationToken cancellationToken = default)
         {
             using (var stream = File.Open(path, overwrite ? FileMode.Create : FileMode.CreateNew))
             {
@@ -32,18 +32,17 @@ namespace KodeAid.Serialization
             return (T)serializer.Deserialize(typeof(T), data);
         }
 
-
-        public static T DeserializeFromStream<T>(this ISerializer serializer, Stream stream)
+        public static T DeserializeFromStream<T>(this IStreamSerializer serializer, Stream stream)
         {
             return (T)serializer.DeserializeFromStream(typeof(T), stream);
         }
 
-        public static async Task<T> DeserializeFromStreamAsync<T>(this ISerializer serializer, Stream stream, CancellationToken cancellationToken = default)
+        public static async Task<T> DeserializeFromStreamAsync<T>(this IAsyncStreamSerializer serializer, Stream stream, CancellationToken cancellationToken = default)
         {
             return (T)await serializer.DeserializeFromStreamAsync(typeof(T), stream, cancellationToken).ConfigureAwait(false);
         }
 
-        public static object DeserializeFromFile(this ISerializer serializer, Type type, string path)
+        public static object DeserializeFromFile(this IStreamSerializer serializer, Type type, string path)
         {
             using (var stream = File.OpenRead(path))
             {
@@ -51,7 +50,7 @@ namespace KodeAid.Serialization
             }
         }
 
-        public static async Task<object> DeserializeFromFileAsync(this ISerializer serializer, Type type, string path, CancellationToken cancellationToken = default)
+        public static async Task<object> DeserializeFromFileAsync(this IAsyncStreamSerializer serializer, Type type, string path, CancellationToken cancellationToken = default)
         {
             using (var stream = File.OpenRead(path))
             {
@@ -59,12 +58,12 @@ namespace KodeAid.Serialization
             }
         }
 
-        public static T DeserializeFromFile<T>(this ISerializer serializer, string path)
+        public static T DeserializeFromFile<T>(this IStreamSerializer serializer, string path)
         {
             return (T)serializer.DeserializeFromFile(typeof(T), path);
         }
 
-        public static async Task<T> DeserializeFromFileAsync<T>(this ISerializer serializer, string path, CancellationToken cancellationToken = default)
+        public static async Task<T> DeserializeFromFileAsync<T>(this IAsyncStreamSerializer serializer, string path, CancellationToken cancellationToken = default)
         {
             return (T)await serializer.DeserializeFromFileAsync(typeof(T), path, cancellationToken).ConfigureAwait(false);
         }

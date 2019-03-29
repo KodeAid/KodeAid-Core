@@ -25,24 +25,20 @@ namespace KodeAid.Caching.SqlDb
         private readonly string _defaultTableName;
         private readonly string _schemaName;
         private readonly ISerializer _serializer;
-        private readonly bool _isBinarySerializer;
 
         public SqlCacheClient(string connectionString, ISerializer<string> serializer, ILogger<SqlCacheClient> logger, string defaultTableName = _defaultDefaultTableName, string schemaName = _defaultSchemaName, bool throwOnError = false)
-            : this(connectionString, serializer, defaultTableName, schemaName, logger, throwOnError)
+            : this(connectionString, SerializerHelper.WrapSerializer(serializer), defaultTableName, schemaName, logger, throwOnError)
         {
-            _isBinarySerializer = false;
         }
 
         public SqlCacheClient(string connectionString, ISerializer<byte[]> serializer, ILogger<SqlCacheClient> logger, string defaultTableName = _defaultDefaultTableName, string schemaName = _defaultSchemaName, bool throwOnError = false)
-            : this(connectionString, serializer, defaultTableName, schemaName, logger, throwOnError)
+            : this(connectionString, SerializerHelper.WrapSerializer(serializer), defaultTableName, schemaName, logger, throwOnError)
         {
-            _isBinarySerializer = true;
         }
 
         public SqlCacheClient(string connectionString, ILogger<SqlCacheClient> logger, string defaultTableName = _defaultDefaultTableName, string schemaName = _defaultSchemaName, bool throwOnError = false)
             : this(connectionString, new DotNetBinarySerializer(), defaultTableName, schemaName, logger, throwOnError)
         {
-            _isBinarySerializer = true;
         }
 
         private SqlCacheClient(string connectionString, ISerializer serializer, string defaultTableName, string schemaName, ILogger<SqlCacheClient> logger, bool throwOnError)
@@ -90,7 +86,10 @@ namespace KodeAid.Caching.SqlDb
                           $@"SELECT [Key], [Value], [Updated], [Expiry] FROM [{_schemaName}].[{tableName}] WHERE ([Key] IN ({string.Join(",", Enumerable.Range(0, keyParition.Count()).Select(i => "@key" + i))}) AND ([Expiry] IS NULL OR [Expiry] < @now));";
                         var p = -1;
                         foreach (var key in keyParition)
+                        {
                             command.AddParameter("@key" + (++p), key, DbType.String);
+                        }
+
                         command.AddParameter("@now", DateTime.UtcNow, DbType.DateTime2);
                         using (var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
                         {
@@ -138,7 +137,7 @@ ELSE
 ");
 
                             command.AddParameter("@pk" + p, item.Key, DbType.String);
-                            command.AddParameter("@pv" + p, item.Value == null ? DBNull.Value : SerializeValue(item.Value), _isBinarySerializer ? DbType.Binary : DbType.String);
+                            command.AddParameter("@pv" + p, item.Value == null ? DBNull.Value : SerializeValue(item.Value), _serializer.SerializedType == typeof(string) ? DbType.String : DbType.Binary);
                             command.AddParameter("@pu" + p, item.LastUpdated, DbType.DateTime2);
                             command.AddParameter("@px" + p, item.Expiration == null ? DBNull.Value : (object)item.Expiration.Value, DbType.DateTime2);
                         }
@@ -170,7 +169,10 @@ ELSE
                           $@"DELETE FROM [{_schemaName}].[{tableName}] WHERE ([Key] IN ({string.Join(",", Enumerable.Range(0, keyParition.Count()).Select(i => "@key" + i))}));";
                         var p = -1;
                         foreach (var key in keyParition)
+                        {
                             command.AddParameter("@key" + (++p), key, DbType.String);
+                        }
+
                         await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                     }
                     connection.Close();
@@ -184,7 +186,7 @@ ELSE
 BEGIN
   CREATE TABLE [{_schemaName}].[{tableName}] (
     [Key] NVARCHAR(1000) NOT NULL,
-    [Value] {(_isBinarySerializer ? "VARBINARY(MAX)" : "NVARCHAR(MAX)")} NULL,
+    [Value] {(_serializer.SerializedType == typeof(string) ? "NVARCHAR(MAX)" : "VARBINARY(MAX)")} NULL,
     [Updated] DATETIME2 NOT NULL,
     [Expiry] DATETIME2 NULL,
     CONSTRAINT [PK_{tableName}] PRIMARY KEY ([Key]),
@@ -196,14 +198,20 @@ END";
         private object SerializeValue<T>(T value)
         {
             if (value == null)
+            {
                 return null;
+            }
+
             return _serializer.Serialize(value);
         }
 
         private T DeserializeValue<T>(object value)
         {
             if (value == null)
+            {
                 return default;
+            }
+
             return _serializer.Deserialize<T>(value);
         }
     }

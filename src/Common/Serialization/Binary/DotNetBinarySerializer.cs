@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KodeAid.Serialization.Binary
 {
-    public class DotNetBinarySerializer : IBinarySerializer
+    public class DotNetBinarySerializer : IBinarySerializer, ISerializer, IStreamSerializer, IAsyncStreamSerializer
     {
         public byte[] Serialize(object graph)
         {
@@ -60,6 +60,8 @@ namespace KodeAid.Serialization.Binary
             return Task.FromResult(new BinaryFormatter().Deserialize(stream));
         }
 
+        Type ISerializer.SerializedType => typeof(byte[]);
+
         object ISerializer.Serialize(object value)
         {
             return Serialize(value);
@@ -89,7 +91,7 @@ namespace KodeAid.Serialization.Binary
             return result;
         }
 
-        object ISerializer.DeserializeFromStream(Type type, Stream stream)
+        object IStreamSerializer.DeserializeFromStream(Type type, Stream stream)
         {
             ArgCheck.NotNull(nameof(type), type);
             ArgCheck.NotNull(nameof(stream), stream);
@@ -102,7 +104,7 @@ namespace KodeAid.Serialization.Binary
             return result;
         }
 
-        async Task<object> ISerializer.DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken)
+        async Task<object> IAsyncStreamSerializer.DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken)
         {
             ArgCheck.NotNull(nameof(type), type);
             ArgCheck.NotNull(nameof(stream), stream);

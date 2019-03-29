@@ -2,16 +2,16 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
-using KodeAid.Serialization;
-using ProtoBuf;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using KodeAid.Serialization;
+using ProtoBuf;
 
 namespace KodeAid.ProtocolBuffers
 {
-    public class ProtobufSerializer : IBinarySerializer
+    public class ProtobufSerializer : IBinarySerializer, ISerializer, IStreamSerializer, IAsyncStreamSerializer
     {
         public byte[] Serialize(object graph)
         {
@@ -64,6 +64,8 @@ namespace KodeAid.ProtocolBuffers
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(Serializer.Deserialize(type, stream));
         }
+
+        Type ISerializer.SerializedType => typeof(byte[]);
 
         object ISerializer.Serialize(object value)
         {

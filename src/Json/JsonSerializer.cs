@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace KodeAid.Json
 {
-    public class JsonSerializer : IStringSerializer
+    public class JsonSerializer : IStringSerializer, ISerializer, IStreamSerializer, IAsyncStreamSerializer
     {
         public JsonSerializerSettings Settings { get; set; }
 
@@ -35,7 +35,9 @@ namespace KodeAid.Json
 
             using (var sr = new StringReader(json))
             using (var jr = new JsonTextReader(sr))
+            {
                 return CreateJsonSerializer().Deserialize(jr, type);
+            }
         }
 
         public void SerializeToStream(Stream stream, object graph)
@@ -103,6 +105,8 @@ namespace KodeAid.Json
                 return CreateJsonSerializer().Deserialize(jr, type);
             }
         }
+
+        Type ISerializer.SerializedType => typeof(string);
 
         object ISerializer.Serialize(object value)
         {
