@@ -3,7 +3,6 @@
 
 
 using System;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 
@@ -14,14 +13,14 @@ namespace KodeAid
         private const string _codepage = "0123456789abcdefghijklmnopqrstuvwxyz";
         private static readonly BigInteger _codepageLength = new BigInteger(_codepage.Length);
 
-        internal static string EncodeBytes(byte[] data)
+        internal static string EncodeBytes(byte[] bytes)
         {
-            if (data == null)
+            if (bytes == null)
             {
                 return null;
             }
 
-            var dividend = new BigInteger(data);
+            var dividend = new BigInteger(bytes);
 
             // this isn't possible due to MSB bytes of value 0 being dropped as they add no value to the BigInteger
             // we also lose the sign of the number so sometehing like the below could help that but there must be a cleaner way

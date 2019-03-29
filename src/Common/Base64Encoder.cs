@@ -12,12 +12,35 @@ namespace KodeAid
 {
     public static class Base64Encoder
     {
+        public static string EncodeBytes(byte[] bytes)
+        {
+            if (bytes == null)
+            {
+                return null;
+            }
+
+            return Convert.ToBase64String(bytes);
+        }
+
+        public static byte[] DecodeBytes(string base64String)
+        {
+            if (base64String == null)
+            {
+                return null;
+            }
+
+            return Convert.FromBase64String(base64String);
+        }
+
         private static readonly Encoding _defaultEncoding = Encoding.UTF8;
 
         public static string EncodeString(string value, bool urlEncoded = false)
         {
             if (value == null)
+            {
                 return null;
+            }
+
             return EncodeBytes(_defaultEncoding.GetBytes(value), urlEncoded);
         }
 
@@ -34,21 +57,28 @@ namespace KodeAid
         public static string EncodeStrings(string[] values, bool urlEncoded = false)
         {
             if (values == null)
+            {
                 return null;
+            }
+
             return EncodeBytes(GetBytesFromStrings(_defaultEncoding, values), urlEncoded);
         }
 
-        public static string EncodeBytes(byte[] data, bool urlEncoded = false)
+        public static string EncodeBytes(byte[] data, bool urlEncoded)
         {
             if (data == null)
+            {
                 return null;
+            }
 
             var base64String = Convert.ToBase64String(data);
 
             // https://en.wikipedia.org/wiki/Base64#URL_applications
             // https://brockallen.com/2014/10/17/base64url-encoding/
             if (urlEncoded)
+            {
                 base64String = base64String.Replace("+", "-").Replace("/", "_").TrimEnd('=');
+            }
 
             return base64String;
         }
@@ -56,26 +86,36 @@ namespace KodeAid
         public static string DecodeString(string base64String, bool urlEncoded = false)
         {
             if (base64String == null)
+            {
                 return null;
+            }
+
             return _defaultEncoding.GetString(DecodeBytes(base64String, urlEncoded));
         }
 
         public static string[] DecodeStrings(string base64String, bool urlEncoded = false)
         {
             if (base64String == null)
+            {
                 return null;
+            }
+
             return GetStringsFromBytes(_defaultEncoding, DecodeBytes(base64String, urlEncoded));
         }
 
-        public static byte[] DecodeBytes(string base64String, bool urlEncoded = false)
+        public static byte[] DecodeBytes(string base64String, bool urlEncoded)
         {
             if (base64String == null)
+            {
                 return null;
+            }
 
             // https://en.wikipedia.org/wiki/Base64#URL_applications
             // https://brockallen.com/2014/10/17/base64url-encoding/
             if (urlEncoded)
+            {
                 base64String = base64String?.Replace("-", "+").Replace("_", "/");
+            }
 
             base64String = Regex.Replace(base64String, @"\s", "", RegexOptions.Compiled);
             switch (base64String.Length % 4)  // pad with trailing '='s
@@ -103,7 +143,9 @@ namespace KodeAid
                     {
                         w.Write(v != null);
                         if (v != null)
+                        {
                             w.Write(v);
+                        }
                     }
                     w.Flush();
                 }
@@ -125,9 +167,13 @@ namespace KodeAid
                     for (var i = r.ReadInt32(); i > 0; --i)
                     {
                         if (r.ReadBoolean())
+                        {
                             values.Add(r.ReadString());
+                        }
                         else
+                        {
                             values.Add(null);
+                        }
                     }
                 }
             }

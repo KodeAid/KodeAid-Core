@@ -8,7 +8,7 @@ namespace System
     {
         public static string ToBase36(this Guid guid)
         {
-            return guid.ToByteArray().ToBase36();
+            return guid.ToByteArray().ToBase36String();
         }
     }
 }

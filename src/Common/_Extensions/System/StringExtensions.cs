@@ -18,6 +18,26 @@ namespace System
             return str != null ? string.Intern(str) : null;
         }
 
+        public static byte[] ToUtf8Bytes(this string str)
+        {
+            return Encoding.UTF8.GetBytes(str);
+        }
+
+        public static byte[] FromBase64String(this string base64String)
+        {
+            return Base64Encoder.DecodeBytes(base64String);
+        }
+
+        public static byte[] FromBase64String(this string base64String, bool urlEncoded)
+        {
+            return Base64Encoder.DecodeBytes(base64String, urlEncoded);
+        }
+
+        internal static byte[] FromBase36String(this string base36String)
+        {
+            return Base36Encoder.DecodeBytes(base36String);
+        }
+
         /// <summary>
         /// Trims a string of all leading and trailing whitespace, and returns null if the result would be an empty string.
         /// </summary>
@@ -98,16 +118,6 @@ namespace System
         public static string[] SplitAndRemoveWhiteSpaceEntries(this string str, params char[] separator)
         {
             return str.Split(separator).Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToArray();
-        }
-
-        public static byte[] FromBase64(this string base64String, bool urlEncoded = false)
-        {
-            return Base64Encoder.DecodeBytes(base64String, urlEncoded);
-        }
-
-        internal static byte[] FromBase36(this string base36String)
-        {
-            return Base36Encoder.DecodeBytes(base36String);
         }
 
         /// <summary>
