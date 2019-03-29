@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using KodeAid.Security.Cryptography.X509Certificates;
 using KodeAid.Security.Secrets;
 using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 
 namespace KodeAid.Azure.KeyVault
 {
@@ -32,9 +31,7 @@ namespace KodeAid.Azure.KeyVault
         {
             ArgCheck.NotNullOrEmpty(nameof(name), name);
 
-            var tokenProvider = new AzureServiceTokenProvider();
-
-            using (var client = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback)))
+            using (var client = new ManagedServiceIdentityKeyVaultClient())
             {
                 var secretBundle = await client.GetSecretAsync(_keyVaultBaseUrl, name).ConfigureAwait(false);
 
