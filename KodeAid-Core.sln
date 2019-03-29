@@ -61,6 +61,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure", "src\Azure\Azure.cs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions", "src\Extensions\Extensions.csproj", "{0D1DE70F-B909-4377-BA84-0B29DB318842}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Base32", "src\Base32\Base32.csproj", "{2A4BEBAE-E256-4557-B90A-8AE32F19291B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Base64Url", "src\Base64Url\Base64Url.csproj", "{9E805EE7-D1E5-4550-955D-D166E414A7B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +167,14 @@ Global
 		{0D1DE70F-B909-4377-BA84-0B29DB318842}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D1DE70F-B909-4377-BA84-0B29DB318842}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D1DE70F-B909-4377-BA84-0B29DB318842}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A4BEBAE-E256-4557-B90A-8AE32F19291B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A4BEBAE-E256-4557-B90A-8AE32F19291B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A4BEBAE-E256-4557-B90A-8AE32F19291B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A4BEBAE-E256-4557-B90A-8AE32F19291B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E805EE7-D1E5-4550-955D-D166E414A7B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E805EE7-D1E5-4550-955D-D166E414A7B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E805EE7-D1E5-4550-955D-D166E414A7B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E805EE7-D1E5-4550-955D-D166E414A7B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
