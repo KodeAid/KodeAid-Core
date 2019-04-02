@@ -77,5 +77,10 @@ namespace KodeAid.Serialization
         {
             return (T)serializer.Deserialize(typeof(T), data);
         }
+
+        public static T DeserializeFromReader<T>(this IStringSerializer serializer, TextReader reader)
+        {
+            return (T)serializer.DeserializeFromReader(typeof(T), reader);
+        }
     }
 }
