@@ -3,24 +3,36 @@
 
 
 using System;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace KodeAid.Serialization.Json.Converters
 {
     public class MaxDecimalPlacesConverter : JsonConverter
     {
+        public const int InifinteDecimalPlaces = -1;
+
         public MaxDecimalPlacesConverter()
             : this(2)
         {
         }
 
         public MaxDecimalPlacesConverter(int maxDecimalPlaces)
+            : this(maxDecimalPlaces, true)
         {
-            ArgCheck.GreaterThanOrEqualTo(nameof(maxDecimalPlaces), maxDecimalPlaces, -1);
+        }
+
+        public MaxDecimalPlacesConverter(int maxDecimalPlaces, bool forceDecimalPlaces)
+        {
+            ArgCheck.GreaterThanOrEqualTo(nameof(maxDecimalPlaces), maxDecimalPlaces, InifinteDecimalPlaces);
+
             MaxDecimalPlaces = maxDecimalPlaces;
+            ForceDecimalPlaces = forceDecimalPlaces;
         }
 
         public int MaxDecimalPlaces { get; set; }
+
+        public bool ForceDecimalPlaces { get; set; }
 
         public override bool CanRead => false;
 
@@ -39,27 +51,51 @@ namespace KodeAid.Serialization.Json.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value == null)
+            if (value == null || MaxDecimalPlaces == InifinteDecimalPlaces)
             {
                 serializer.Serialize(writer, value);
                 return;
             }
 
-            if (value is decimal d)
+            if (value is decimal m)
             {
-                serializer.Serialize(writer, decimal.Round(d, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
+                m = decimal.Round(m, MaxDecimalPlaces, MidpointRounding.AwayFromZero);
+                if (ForceDecimalPlaces)
+                {
+                    writer.WriteRawValue(m.ToString($"F{MaxDecimalPlaces}", CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    serializer.Serialize(writer, m);
+                }
                 return;
             }
 
-            if (value is double d1)
+            if (value is double d)
             {
-                serializer.Serialize(writer, Math.Round(d1, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
+                d = Math.Round(d, MaxDecimalPlaces, MidpointRounding.AwayFromZero);
+                if (ForceDecimalPlaces)
+                {
+                    writer.WriteRawValue(d.ToString($"F{MaxDecimalPlaces}", CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    serializer.Serialize(writer, d);
+                }
                 return;
             }
 
             if (value is float f)
             {
-                serializer.Serialize(writer, Math.Round(f, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
+                d = Math.Round(f, MaxDecimalPlaces, MidpointRounding.AwayFromZero);
+                if (ForceDecimalPlaces)
+                {
+                    writer.WriteRawValue(d.ToString($"F{MaxDecimalPlaces}", CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    serializer.Serialize(writer, d);
+                }
                 return;
             }
 
