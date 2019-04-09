@@ -33,6 +33,18 @@ namespace System
             return Base64Encoder.DecodeBytes(base64String, urlEncoded);
         }
 
+        public static int GetBase64DecodedByteCount(this string base64String)
+        {
+            if (string.IsNullOrEmpty(base64String))
+            {
+                return 0;
+            }
+
+            var characterCount = base64String.Length;
+            var paddingCount = base64String.Reverse().TakeWhile(c => c == '=').Count();
+            return (3 * (characterCount / 4)) - paddingCount;
+        }
+
         internal static byte[] FromBase36String(this string base36String)
         {
             return Base36Encoder.DecodeBytes(base36String);
