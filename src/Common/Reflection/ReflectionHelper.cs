@@ -4,6 +4,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -96,6 +98,65 @@ namespace KodeAid.Reflection
             }
 
             return obj;
+        }
+
+        /// <summary>
+        /// Find all defined types across all referenced assemblies including those in the executin paths
+        /// </summary>
+        /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
+        /// <param name="searchSubDirectories">True to search sub-directories of referenced assemlbies to find more assemblies, such as a plug-ins folder.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, the default is all public instance non-abstract and non-generic classes or value-types with a default constructor.</param>
+        /// <returns></returns>
+        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, bool searchSubDirectories = false, Predicate<Type> typeFilter = null, params string[] assemblyNamePrefixes)
+        {
+            var matchedAssemblies = new List<Assembly>();
+            var assembliesSearched = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
+            var assembliesToSearch = new Queue<Assembly>();
+            assembliesToSearch.Enqueue(startingPoint ?? Assembly.GetEntryAssembly());
+
+            while (assembliesToSearch.Count > 0)
+            {
+                var assembly = assembliesToSearch.Dequeue();
+                if (assembliesSearched.Add(assembly.FullName))
+                {
+                    if (assemblyNamePrefixes.Length == 0 || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        matchedAssemblies.Add(assembly);
+                        assembliesToSearch.EnqueueRange(assembly.GetReferencedAssemblies().Select(Assembly.Load));
+                        var codebaseDirectory = Path.GetDirectoryName(assembly.CodeBase);
+                        if (codebaseDirectory.StartsWith(@"file:"))
+                        {
+                            codebaseDirectory = codebaseDirectory.Substring(@"file:".Length);
+                        }
+                        codebaseDirectory = codebaseDirectory.Trim('\\', '/');
+                        if (assembliesSearched.Add(codebaseDirectory))
+                        {
+                            var dllFiles = new List<string>();
+                            if (assemblyNamePrefixes.Length == 0)
+                            {
+                                dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", searchSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
+                            }
+                            else
+                            {
+                                dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", searchSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)));
+                            }
+
+                            foreach (var dllFile in dllFiles.Distinct())
+                            {
+                                assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
+                            }
+                        }
+                    }
+                }
+            }
+
+            return matchedAssemblies
+                .Distinct() // shouldn't be required
+                .SelectMany(a => a.DefinedTypes)
+                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType && t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null))
+                .Distinct() // shouldn't be required
+                .ToList();
         }
 
         private static TValue GetFromDictionary<TKey, TValue>(IDictionary<TKey, TValue> dict, object index)
