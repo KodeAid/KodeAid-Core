@@ -18,7 +18,6 @@ namespace KodeAid
     {
         private static readonly string[] _trueStringsForBooleanParsing = new[] { "true", "t", "1", "y", "yes", "on" };
         private static readonly string[] _falseStringsForBooleanParsing = new[] { "false", "f", "0", "n", "no", "off" };
-        private static readonly ConcurrentDictionary<Type, List<(string AttributeName, string EnumName)>> _enumMemberCache = new ConcurrentDictionary<Type, List<(string, string)>>();
 
         public static T Parse<T>(string str, bool ignoreCase = false)
         {
@@ -161,34 +160,7 @@ namespace KodeAid
 
             if (targetType.IsEnum)
             {
-                str = str.Trim().Normalize();
-
-                // get any EnumMember attributes defined on the enum's values (cached)
-                var names = _enumMemberCache.GetOrAdd(targetType, t => t
-                    .GetFields(BindingFlags.Public | BindingFlags.Static)
-                    .Where(f => f.IsLiteral)
-                    .Select(f => new { Field = f, Attribute = f.GetCustomAttribute<EnumMemberAttribute>() })
-                    .Where(p => (p.Attribute?.IsValueSetExplicitly).GetValueOrDefault() && p.Attribute.Value != null)
-                    .Select(p => (p.Attribute.Value.Trim(), Enum.ToObject(targetType, p.Field.GetRawConstantValue()).ToString()))
-                    .ToList());
-
-                // are there any EnumMember attributes defined on the enum's values?
-                if (names.Count > 0)
-                {
-                    // replace any EnumMember attribute names with the matching enum's value constant name
-                    var hasFlags = targetType.GetCustomAttribute<FlagsAttribute>() != null;
-                    if (hasFlags)
-                    {
-                        foreach (var (AttributeName, EnumName) in names)
-                        {
-                            str = Regex.Replace(str, $@"(^|,)\s*{AttributeName}\s*(,|$)", $"$1{EnumName}$3", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
-                        }
-                    }
-                    else
-                    {
-                        str = names.FirstOrDefault(n => string.Equals(str, n.AttributeName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)).EnumName ?? str;
-                    }
-                }
+                str = EnumHelper.NormalizeName(targetType, str, ignoreCase, true);
 
                 try
                 {
