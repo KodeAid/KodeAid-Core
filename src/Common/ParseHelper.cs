@@ -3,11 +3,14 @@
 
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace KodeAid
 {
@@ -15,6 +18,7 @@ namespace KodeAid
     {
         private static readonly string[] _trueStringsForBooleanParsing = new[] { "true", "t", "1", "y", "yes", "on" };
         private static readonly string[] _falseStringsForBooleanParsing = new[] { "false", "f", "0", "n", "no", "off" };
+        private static readonly ConcurrentDictionary<Type, List<(string AttributeName, string EnumName)>> _enumMemberCache = new ConcurrentDictionary<Type, List<(string, string)>>();
 
         public static T Parse<T>(string str, bool ignoreCase = false)
         {
@@ -24,7 +28,10 @@ namespace KodeAid
         public static object Parse(string str, Type targetType, bool ignoreCase = false)
         {
             if (TryParse(str, targetType, out var value, ignoreCase: ignoreCase))
+            {
                 return value;
+            }
+
             throw new ArgumentException($"Parameter {nameof(str)} cannot be parsed as type {targetType.FullName}.", "strValue");
         }
 
@@ -37,9 +44,15 @@ namespace KodeAid
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
             if (defaultValue != null && !targetType.IsAssignableFrom(defaultValue.GetType()))
+            {
                 throw new ArgumentException($"Parameter '{nameof(defaultValue)}' must be assignable to '{nameof(targetType)}'.", nameof(defaultValue));
+            }
+
             if (TryParse(str, targetType, out var value, ignoreCase: ignoreCase))
+            {
                 return value;
+            }
+
             return defaultValue;
         }
 
@@ -146,28 +159,35 @@ namespace KodeAid
                 return false;
             }
 
-            if (targetType.GetTypeInfo().IsEnum)
+            if (targetType.IsEnum)
             {
                 str = str.Trim().Normalize();
 
-                // EnumMemberAttribute
-                value = targetType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                    .SingleOrDefault(f =>
-                    {
-                        if (!f.IsLiteral)
-                            return false;
-                        var a = f.GetCustomAttribute<EnumMemberAttribute>(true);
-                        if (a == null || !a.IsValueSetExplicitly)
-                            return false;
-                        if (!string.Equals(str, a.Value, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-                            return false;
-                        return true;
-                    })?.GetRawConstantValue();
+                // get any EnumMember attributes defined on the enum's values (cached)
+                var names = _enumMemberCache.GetOrAdd(targetType, t => t
+                    .GetFields(BindingFlags.Public | BindingFlags.Static)
+                    .Where(f => f.IsLiteral)
+                    .Select(f => new { Field = f, Attribute = f.GetCustomAttribute<EnumMemberAttribute>() })
+                    .Where(p => (p.Attribute?.IsValueSetExplicitly).GetValueOrDefault() && p.Attribute.Value != null)
+                    .Select(p => (p.Attribute.Value.Trim(), Enum.ToObject(targetType, p.Field.GetRawConstantValue()).ToString()))
+                    .ToList());
 
-                if (value != null)
+                // are there any EnumMember attributes defined on the enum's values?
+                if (names.Count > 0)
                 {
-                    value = Enum.ToObject(targetType, value);
-                    return true;
+                    // replace any EnumMember attribute names with the matching enum's value constant name
+                    var hasFlags = targetType.GetCustomAttribute<FlagsAttribute>() != null;
+                    if (hasFlags)
+                    {
+                        foreach (var (AttributeName, EnumName) in names)
+                        {
+                            str = Regex.Replace(str, $@"(^|,)\s*{AttributeName}\s*(,|$)", $"$1{EnumName}$3", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
+                        }
+                    }
+                    else
+                    {
+                        str = names.FirstOrDefault(n => string.Equals(str, n.AttributeName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)).EnumName ?? str;
+                    }
                 }
 
                 try

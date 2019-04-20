@@ -11,13 +11,13 @@ namespace KodeAid
     public static class Enum<T>
          where T : struct, IConvertible
     {
-        public static bool HasOnlyOneFlagSet(T value, bool singleBitFlagsOnly = false)
+        public static bool IsSingleBitFlagSet(T value)
         {
             var i = value.ToInt32(null);
             return i.IsPowerOfTwo();
         }
 
-        public static int FlagCount(T value, bool singleBitFlagsOnly = false)
+        public static int GetNumberOfFlagsSet(T value, bool singleBitFlagsOnly = false)
         {
             var i = value.ToInt32(null);
 
@@ -26,10 +26,10 @@ namespace KodeAid
                 return 0;
             }
 
-            return GetFlags(value, singleBitFlagsOnly).Count();
+            return GetFlagsSet(value, singleBitFlagsOnly).Count();
         }
 
-        public static IEnumerable<T> GetFlags(T value, bool singleBitFlagsOnly = false)
+        public static IEnumerable<T> GetFlagsSet(T value, bool singleBitFlagsOnly = false)
         {
             var i = value.ToInt32(null);
 
@@ -51,7 +51,7 @@ namespace KodeAid
                 .Cast<T>()
                 .Distinct()
                 .Where(e => includeZero || e.ToInt32(null) != 0)
-                .Where(e => (includeZero && e.ToInt32(null) == 0) || (!singleBitValuesOnly || HasOnlyOneFlagSet(e, true))))
+                .Where(e => !singleBitValuesOnly || (includeZero && e.ToInt32(null) == 0) || IsSingleBitFlagSet(e)))
             {
                 yield return v;
             }
