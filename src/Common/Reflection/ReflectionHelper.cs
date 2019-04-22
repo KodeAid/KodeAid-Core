@@ -101,14 +101,31 @@ namespace KodeAid.Reflection
         }
 
         /// <summary>
-        /// Find all defined types across all referenced assemblies including those in the executin paths
+        /// Find all defined types across all referenced assemblies including those in the execution paths.
+        /// </summary>
+        /// <typeparam name="T">Type which the results must be assignable to.</typeparam>
+        /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
+        /// <returns></returns>
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, params string[] assemblyNamePrefixes)
+        {
+            return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, assemblyNamePrefixes);
+        }
+
+        /// <summary>
+        /// Find all defined types across all referenced assemblies including those in the execution paths.
         /// </summary>
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
-        /// <param name="searchSubDirectories">True to search sub-directories of referenced assemlbies to find more assemblies, such as a plug-ins folder.</param>
-        /// <param name="typeFilter">Predicate to filter out returned types, the default is all public instance non-abstract and non-generic classes or value-types with a default constructor.</param>
+        /// <param name="ofType">Type which the results must be assignable to, null for no filter.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, bool searchSubDirectories = false, Predicate<Type> typeFilter = null, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, params string[] assemblyNamePrefixes)
         {
+            var directorySearchOptions = assemblySearchOptions.HasFlagSet(AssemblySearchOptions.IncludeSubdirectories) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var matchedAssemblies = new List<Assembly>();
             var assembliesSearched = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -123,28 +140,37 @@ namespace KodeAid.Reflection
                     if (assemblyNamePrefixes.Length == 0 || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         matchedAssemblies.Add(assembly);
-                        assembliesToSearch.EnqueueRange(assembly.GetReferencedAssemblies().Select(Assembly.Load));
-                        var codebaseDirectory = Path.GetDirectoryName(assembly.CodeBase);
-                        if (codebaseDirectory.StartsWith(@"file:"))
-                        {
-                            codebaseDirectory = codebaseDirectory.Substring(@"file:".Length);
-                        }
-                        codebaseDirectory = codebaseDirectory.Trim('\\', '/');
-                        if (assembliesSearched.Add(codebaseDirectory))
-                        {
-                            var dllFiles = new List<string>();
-                            if (assemblyNamePrefixes.Length == 0)
-                            {
-                                dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", searchSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
-                            }
-                            else
-                            {
-                                dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", searchSubDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)));
-                            }
 
-                            foreach (var dllFile in dllFiles.Distinct())
+                        if (assemblySearchOptions.HasFlagSet(AssemblySearchOptions.ReferencedAssemblies))
+                        {
+                            assembliesToSearch.EnqueueRange(assembly.GetReferencedAssemblies().Select(Assembly.Load));
+                        }
+
+                        if ((assembliesSearched.Count == 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.StartingDirectory)) ||
+                            (assembliesSearched.Count > 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.AssemblyDirectories)))
+                        {
+                            var codebaseDirectory = Path.GetDirectoryName(assembly.CodeBase);
+                            if (codebaseDirectory.StartsWith(@"file:"))
                             {
-                                assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
+                                codebaseDirectory = codebaseDirectory.Substring(@"file:".Length);
+                            }
+                            codebaseDirectory = codebaseDirectory.Trim('\\', '/');
+                            if (assembliesSearched.Add(codebaseDirectory))
+                            {
+                                var dllFiles = new List<string>();
+                                if (assemblyNamePrefixes.Length == 0)
+                                {
+                                    dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
+                                }
+                                else
+                                {
+                                    dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
+                                }
+
+                                foreach (var dllFile in dllFiles.Distinct())
+                                {
+                                    assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
+                                }
                             }
                         }
                     }
@@ -154,7 +180,8 @@ namespace KodeAid.Reflection
             return matchedAssemblies
                 .Distinct() // shouldn't be required
                 .SelectMany(a => a.DefinedTypes)
-                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType && t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null))
+                .Where(t => ofType == null || ofType.IsAssignableFrom(t))
+                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType && (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null)))
                 .Distinct() // shouldn't be required
                 .ToList();
         }
