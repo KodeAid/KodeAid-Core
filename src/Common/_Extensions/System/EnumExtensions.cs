@@ -10,6 +10,12 @@ namespace System
 {
     public static class EnumExtensions
     {
+        public static bool HasFlagSet<TEnum>(this TEnum value, TEnum flag)
+            where TEnum : Enum
+        {
+            return value.HasFlag(flag);
+        }
+
         public static bool IsSingleBitSet<TEnum>(this TEnum value)
             where TEnum : Enum, IConvertible
         {
