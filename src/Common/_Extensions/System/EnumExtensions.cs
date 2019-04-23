@@ -24,7 +24,7 @@ namespace System
         }
 
         public static int GetNumberOfFlagsSet<TEnum>(this TEnum value, bool singleBitFlagsOnly = false)
-            where TEnum : Enum, IConvertible
+            where TEnum : struct, Enum, IConvertible
         {
             var i = value.ToInt32(null);
 
@@ -37,7 +37,7 @@ namespace System
         }
 
         public static IEnumerable<TEnum> GetFlagsSet<TEnum>(this TEnum value, bool singleBitFlagsOnly = false)
-            where TEnum : Enum, IConvertible
+            where TEnum : struct, Enum, IConvertible
         {
             var i = value.ToInt32(null);
 
@@ -54,13 +54,13 @@ namespace System
         }
 
         public static string ToString<TEnum>(this TEnum value, bool useEnumMemberAttribute)
-            where TEnum : Enum, IFormattable
+            where TEnum : struct, Enum, IFormattable
         {
             return value.ToString(useEnumMemberAttribute, null);
         }
 
         public static string ToString<TEnum>(this TEnum value, bool useEnumMemberAttribute, string format)
-            where TEnum : Enum, IFormattable
+            where TEnum : struct, Enum, IFormattable
         {
             if (useEnumMemberAttribute)
             {
