@@ -14,6 +14,16 @@ namespace System.Linq
             return source ?? Enumerable.Empty<TSource>();
         }
 
+        public static IEnumerable<TSource> NullIfEmpty<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null || !source.Any())
+            {
+                return null;
+            }
+
+            return source;
+        }
+
         public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource> source)
         {
             return source.Where(f => f != null);
