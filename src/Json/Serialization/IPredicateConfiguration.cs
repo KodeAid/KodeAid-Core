@@ -10,6 +10,7 @@ namespace KodeAid.Json.Serialization
 {
     public interface IPredicateConfiguration
     {
-        Predicate<object> GetPredicate(MemberInfo member, JsonProperty property);
+        Predicate<object> GetShouldSerializePredicate(MemberInfo member, JsonProperty property);
+        Predicate<object> GetShouldDeserializePredicate(MemberInfo member, JsonProperty property);
     }
 }

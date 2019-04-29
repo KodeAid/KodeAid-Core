@@ -44,18 +44,30 @@ namespace KodeAid.Json.Serialization
                 return property;
             }
 
-            var predicates = _predicateConfigurations.Select(c => c.GetPredicate(member, property)).WhereNotNull().ToList();
-            if (predicates.Count == 0)
+            // should serialize
+
+            var predicates = _predicateConfigurations.Select(c => c.GetShouldSerializePredicate(member, property)).WhereNotNull().ToList();
+            if (predicates.Count > 0)
             {
-                return property;
+                if (property.ShouldSerialize != null)
+                {
+                    predicates.Insert(0, property.ShouldSerialize);
+                }
+
+                property.ShouldSerialize = obj => predicates.All(p => p(obj));
             }
 
-            if (property.ShouldSerialize != null)
+            // should deserialize
+            predicates = _predicateConfigurations.Select(c => c.GetShouldDeserializePredicate(member, property)).WhereNotNull().ToList();
+            if (predicates.Count > 0)
             {
-                predicates.Insert(0, property.ShouldDeserialize);
-            }
+                if (property.ShouldDeserialize != null)
+                {
+                    predicates.Insert(0, property.ShouldDeserialize);
+                }
 
-            property.ShouldSerialize = obj => predicates.All(p => p(obj));
+                property.ShouldDeserialize = obj => predicates.All(p => p(obj));
+            }
 
             return property;
         }

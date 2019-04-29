@@ -14,6 +14,7 @@ namespace KodeAid.AspNetCore.Json
             ArgCheck.NotNull(nameof(httpContextAccessor), httpContextAccessor);
 
             Add(new EmptyArrayPredicate());
+            Add(new ReadWritePredicate());
             Add(new VersionedApiPredicate(httpContextAccessor));
         }
     }

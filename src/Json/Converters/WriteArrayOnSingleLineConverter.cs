@@ -16,9 +16,15 @@ namespace KodeAid.Serialization.Json.Converters
         public override bool CanConvert(Type objectType)
         {
             if (objectType == typeof(string))
+            {
                 return false;
+            }
+
             if (typeof(IEnumerable).IsAssignableFrom(objectType))
+            {
                 return true;
+            }
+
             return false;
         }
 
