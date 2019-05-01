@@ -92,7 +92,7 @@ namespace KodeAid
         /// <returns></returns>
         public static string NewGuid()
         {
-            return Guid.NewGuid().ToBase36();
+            return Guid.NewGuid().ToBase36String();
         }
     }
 }

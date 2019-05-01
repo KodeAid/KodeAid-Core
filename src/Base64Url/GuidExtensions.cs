@@ -6,9 +6,9 @@ namespace System
 {
     public static class GuidExtensions
     {
-        public static string ToBase36String(this Guid guid)
+        public static string ToBase64Url(this Guid guid)
         {
-            return guid.ToByteArray().ToBase36String();
+            return guid.ToByteArray().ToBase64Url();
         }
     }
 }
