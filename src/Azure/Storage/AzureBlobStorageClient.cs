@@ -22,7 +22,7 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace KodeAid.Azure.Storage
 {
-    public class AzureBlobStorageClient : IDataStore, IKeyValueStore, IPublicCertificateStore, IInitializableAsync
+    public class AzureBlobStorageClient : IDataStore, IKeyValueStore, ISharedUriAccessible, IPublicCertificateStore, IInitializableAsync
     {
         private const string _expiresMetadataKey = "Expires";
         private const string _dateTimeFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
@@ -611,6 +611,27 @@ namespace KodeAid.Azure.Storage
             return SnapshotBlobStatus.OK;
         }
 
+        public async Task<Uri> GetSharedAccessUri(string blobName, string directoryRelativeAddress = null, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read, DateTimeOffset? sharedAccessStartTime = null, DateTimeOffset? sharedAccessExpiryTime = null, CancellationToken cancellationToken = default)
+        {
+            ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
+            directoryRelativeAddress = directoryRelativeAddress ?? _defaultDirectoryRelativeAddress;
+
+            await InitializeAsync(cancellationToken).ConfigureAwait(false);
+
+            var blob = GetBlobReference(blobName, directoryRelativeAddress);
+
+            var policy = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = sharedAccessStartTime,
+                SharedAccessExpiryTime = sharedAccessExpiryTime,
+                Permissions = permissions,
+            };
+
+            var sas = blob.GetSharedAccessSignature(policy, null, null, SharedAccessProtocol.HttpsOnly, null);
+
+            return new Uri(blob.Uri + sas);
+        }
+
         public async Task CreateIfNotExistsAsync(BlobContainerPublicAccessType publicAccessType, CancellationToken cancellationToken = default)
         {
             await InitializeAsync(cancellationToken).ConfigureAwait(false);
@@ -695,6 +716,28 @@ namespace KodeAid.Azure.Storage
         async Task IDataStore.RemoveAsync(string key, string partition, CancellationToken cancellationToken)
         {
             await DeleteAsync(key, partition, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+
+        async Task<Uri> ISharedUriAccessible.GetSharedUri(string name, string partition, AccessPermissions permissions, DateTimeOffset? startTime, DateTimeOffset? expiryTime, CancellationToken cancellationToken)
+        {
+            var sharedAccessBlobPermissions = SharedAccessBlobPermissions.None;
+
+            if (permissions.HasFlagSet(AccessPermissions.Read))
+            {
+                sharedAccessBlobPermissions |= SharedAccessBlobPermissions.Read;
+            }
+
+            if (permissions.HasFlagSet(AccessPermissions.Write))
+            {
+                sharedAccessBlobPermissions |= SharedAccessBlobPermissions.Write;
+            }
+
+            if (permissions.HasFlagSet(AccessPermissions.Delete))
+            {
+                sharedAccessBlobPermissions |= SharedAccessBlobPermissions.Delete;
+            }
+
+            return await GetSharedAccessUri(name, partition, sharedAccessBlobPermissions, startTime, expiryTime, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         async Task<IStringResult> IKeyValueReadOnlyStore.GetStringAsync(string key, string partition, object concurrencyStamp, bool throwOnNotFound, CancellationToken cancellationToken)
