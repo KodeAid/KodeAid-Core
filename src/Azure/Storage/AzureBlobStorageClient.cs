@@ -29,6 +29,7 @@ namespace KodeAid.Azure.Storage
         private readonly string _defaultDirectoryRelativeAddress;
         private readonly ISecretReadOnlyStore _secretStore;
         private readonly string _connectionStringSecretName;
+        private readonly string _accountKeySecretName;
         private readonly string _sharedAccessSignatureSecretName;
         private readonly string _containerName;
         private readonly string _accountName;
@@ -54,6 +55,7 @@ namespace KodeAid.Azure.Storage
             {
                 _secretStore = options.SecretStore;
                 _connectionStringSecretName = options.ConnectionStringSecretName;
+                _accountKeySecretName = options.AccountKeySecretName;
                 _sharedAccessSignatureSecretName = options.SharedAccessSignatureSecretName;
                 _accountName = options.AccountName;
                 _endpointSuffix = options.EndpointSuffix;
@@ -74,10 +76,14 @@ namespace KodeAid.Azure.Storage
                 return;
             }
 
-            var secret = await _secretStore.GetSecretAsync(_connectionStringSecretName ?? _sharedAccessSignatureSecretName, cancellationToken).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty(_connectionStringSecretName))
+            var secret = await _secretStore.GetSecretAsync(_connectionStringSecretName ?? _accountKeySecretName ?? _sharedAccessSignatureSecretName, cancellationToken).ConfigureAwait(false);
+            if (_connectionStringSecretName != null)
             {
                 _container = CloudStorageAccount.Parse(secret.Unsecure()).CreateCloudBlobClient().GetContainerReference(_containerName);
+            }
+            else if (_accountKeySecretName != null)
+            {
+                _container = new CloudStorageAccount(new StorageCredentials(_accountName, secret.Unsecure()), _accountName, _endpointSuffix ?? "core.windows.net", true).CreateCloudBlobClient().GetContainerReference(_containerName);
             }
             else
             {

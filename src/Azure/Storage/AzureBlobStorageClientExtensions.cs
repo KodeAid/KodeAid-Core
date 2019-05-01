@@ -18,12 +18,17 @@ namespace KodeAid.Azure.Storage
                 {
                     options.StorageAccount = CloudStorageAccount.Parse(options.ConnectionString);
                 }
+                else if (!string.IsNullOrEmpty(options?.AccountName) && !string.IsNullOrEmpty(options?.AccountKey))
+                {
+                    options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.AccountName, options.AccountKey), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
+                }
                 else if (!string.IsNullOrEmpty(options?.AccountName) && !string.IsNullOrEmpty(options?.SharedAccessSignature))
                 {
                     options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.SharedAccessSignature), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
                 }
-                else if (options.SecretStore != null && (!string.IsNullOrEmpty(options?.ConnectionStringSecretName) || !string.IsNullOrEmpty(options?.SharedAccessSignatureSecretName)))
+                else if (options.SecretStore != null && (!string.IsNullOrEmpty(options?.ConnectionStringSecretName) || !string.IsNullOrEmpty(options?.AccountKeySecretName) || !string.IsNullOrEmpty(options?.SharedAccessSignatureSecretName)))
                 {
+                    // will load from secret store
                     //options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.SharedAccessSignature), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
                 }
                 else

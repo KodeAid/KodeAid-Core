@@ -12,11 +12,13 @@ namespace KodeAid.Azure.Storage
     {
         private CloudStorageAccount _storageAccount;
         private string _connectionString;
+        private string _accountKey;
         private string _sasToken;
         private string _accountName;
         private string _endpointSuffix;
         private ISecretReadOnlyStore _secretStore;
         private string _connectionStringSecretName;
+        private string _accountKeySecretName;
         private string _sasTokenSecretName;
         private string _containerName;
         private string _defaultDirectoryRelativeAddress;
@@ -28,6 +30,8 @@ namespace KodeAid.Azure.Storage
             return new AzureBlobStorageClientOptions()
             {
                 AccountName = _accountName,
+                AccountKey = _accountKey,
+                AccountKeySecretName = _accountKeySecretName,
                 ConnectionString = _connectionString,
                 ConnectionStringSecretName = _connectionStringSecretName,
                 ContainerName = _containerName,
@@ -54,6 +58,14 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
+        public AzureBlobStorageClientOptionsBuilder WithAccountKey(string accountKey, string accountName, string endpointSuffix = null)
+        {
+            _accountKey = accountKey;
+            _accountName = accountName;
+            _endpointSuffix = endpointSuffix;
+            return this;
+        }
+
         public AzureBlobStorageClientOptionsBuilder WithSharedAccessSignature(string sasToken, string accountName, string endpointSuffix = null)
         {
             _sasToken = sasToken;
@@ -66,6 +78,15 @@ namespace KodeAid.Azure.Storage
         {
             _connectionStringSecretName = connectionStringSecretName;
             _secretStore = secretStore;
+            return this;
+        }
+
+        public AzureBlobStorageClientOptionsBuilder WithSecretAccountKey(string accountKeySecretName, string accountName, ISecretReadOnlyStore secretStore = null, string endpointSuffix = null)
+        {
+            _accountKeySecretName = accountKeySecretName;
+            _accountName = accountName;
+            _secretStore = secretStore;
+            _endpointSuffix = endpointSuffix;
             return this;
         }
 
