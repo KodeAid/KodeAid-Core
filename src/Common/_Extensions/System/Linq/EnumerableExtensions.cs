@@ -29,10 +29,10 @@ namespace System.Linq
             return source.Where(f => f != null);
         }
 
-        public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource?> source)
+        public static IEnumerable<TSource> SelectValueOrDefault<TSource>(this IEnumerable<TSource?> source, TSource defaultValue = default)
             where TSource : struct
         {
-            return source.Where(f => f.HasValue).Select(f => f.Value);
+            return source.Select(f => f.GetValueOrDefault(defaultValue));
         }
 
         public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> source, int size)
