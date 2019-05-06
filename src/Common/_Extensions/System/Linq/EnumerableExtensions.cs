@@ -29,6 +29,12 @@ namespace System.Linq
             return source.Where(f => f != null);
         }
 
+        public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource?> source)
+            where TSource : struct
+        {
+            return source.Where(f => f.HasValue).Select(f => f.Value);
+        }
+
         public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> source, int size)
         {
             ArgCheck.NotNull(nameof(source), source);
