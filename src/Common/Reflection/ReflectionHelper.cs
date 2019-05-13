@@ -109,9 +109,9 @@ namespace KodeAid.Reflection
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
-            return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, assemblyNamePrefixes);
+            return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace KodeAid.Reflection
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
             var directorySearchOptions = assemblySearchOptions.HasFlagSet(AssemblySearchOptions.IncludeSubdirectories) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var matchedAssemblies = new List<Assembly>();
@@ -143,7 +143,22 @@ namespace KodeAid.Reflection
 
                         if (assemblySearchOptions.HasFlagSet(AssemblySearchOptions.ReferencedAssemblies))
                         {
-                            assembliesToSearch.EnqueueRange(assembly.GetReferencedAssemblies().Select(Assembly.Load));
+                            assembliesToSearch.EnqueueRange(assembly.GetReferencedAssemblies().Select(a =>
+                            {
+                                try
+                                {
+                                    return Assembly.Load(a);
+                                }
+                                catch (SystemException)
+                                {
+                                    if (throwOnError)
+                                    {
+                                        throw;
+                                    }
+
+                                    return null;
+                                }
+                            }).WhereNotNull());
                         }
 
                         if ((assembliesSearched.Count == 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.StartingDirectory)) ||
@@ -158,18 +173,39 @@ namespace KodeAid.Reflection
                             if (assembliesSearched.Add(codebaseDirectory))
                             {
                                 var dllFiles = new List<string>();
-                                if (assemblyNamePrefixes.Length == 0)
+
+                                try
                                 {
-                                    dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
+                                    if (assemblyNamePrefixes.Length == 0)
+                                    {
+                                        dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
+                                    }
+                                    else
+                                    {
+                                        dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
+                                    }
                                 }
-                                else
+                                catch (SystemException)
                                 {
-                                    dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
+                                    if (throwOnError)
+                                    {
+                                        throw;
+                                    }
                                 }
 
                                 foreach (var dllFile in dllFiles.Distinct())
                                 {
-                                    assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
+                                    try
+                                    {
+                                        assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
+                                    }
+                                    catch (SystemException)
+                                    {
+                                        if (throwOnError)
+                                        {
+                                            throw;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -179,7 +215,22 @@ namespace KodeAid.Reflection
 
             return matchedAssemblies
                 .Distinct() // shouldn't be required
-                .SelectMany(a => a.DefinedTypes)
+                .SelectMany(a =>
+                {
+                    try
+                    {
+                        return a.DefinedTypes;
+                    }
+                    catch (SystemException)
+                    {
+                        if (throwOnError)
+                        {
+                            throw;
+                        }
+
+                        return Enumerable.Empty<TypeInfo>();
+                    }
+                })
                 .Where(t => ofType == null || ofType.IsAssignableFrom(t))
                 .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType && (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null)))
                 .Distinct() // shouldn't be required
