@@ -18,9 +18,9 @@ namespace AutoMapper
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
-        public static void AddRegisteredProfiles(this IMapperConfigurationExpression configuration, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, params string[] assemblyNamePrefixes)
+        public static void AddRegisteredProfiles(this IMapperConfigurationExpression configuration, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
-            var registrationTypes = ReflectionHelper.FindAllTypes<IMappingRegistration>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, assemblyNamePrefixes: assemblyNamePrefixes);
+            var registrationTypes = ReflectionHelper.FindAllTypes<IMappingRegistration>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes);
             foreach (var registrationType in registrationTypes)
             {
                 var registration = (IMappingRegistration)Activator.CreateInstance(registrationType);
@@ -35,9 +35,9 @@ namespace AutoMapper
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
-        public static void AddProfilesFromAssemblies(this IMapperConfigurationExpression configuration, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, params string[] assemblyNamePrefixes)
+        public static void AddProfilesFromAssemblies(this IMapperConfigurationExpression configuration, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
-            var profileTypes = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, assemblyNamePrefixes: assemblyNamePrefixes);
+            var profileTypes = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes);
             foreach (var profileType in profileTypes)
             {
                 configuration.AddProfile(profileType);
