@@ -9,10 +9,10 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CertificateProviderServiceCollectionExtensions
     {
-        public static void AddCertificateProvider(this IServiceCollection services)
+        public static IServiceCollection AddCertificateProvider(this IServiceCollection services)
         {
             ArgCheck.NotNull(nameof(services), services);
-            services.AddTransient<ICertificateProvider, CertificateProvider>();
+            return services.AddTransient<ICertificateProvider, CertificateProvider>();
         }
     }
 }
