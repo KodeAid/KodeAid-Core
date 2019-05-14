@@ -215,22 +215,7 @@ namespace KodeAid.Reflection
 
             return matchedAssemblies
                 .Distinct() // shouldn't be required
-                .SelectMany(a =>
-                {
-                    try
-                    {
-                        return a.DefinedTypes;
-                    }
-                    catch
-                    {
-                        if (throwOnError)
-                        {
-                            throw;
-                        }
-
-                        return Enumerable.Empty<TypeInfo>();
-                    }
-                })
+                .SelectMany(a => a.GetLoadableTypes())
                 .Where(t => ofType == null || ofType.IsAssignableFrom(t))
                 .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType && (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null)))
                 .Distinct() // shouldn't be required
