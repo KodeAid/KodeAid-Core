@@ -149,7 +149,7 @@ namespace KodeAid.Reflection
                                 {
                                     return Assembly.Load(a);
                                 }
-                                catch (SystemException)
+                                catch
                                 {
                                     if (throwOnError)
                                     {
@@ -185,7 +185,7 @@ namespace KodeAid.Reflection
                                         dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
                                     }
                                 }
-                                catch (SystemException)
+                                catch
                                 {
                                     if (throwOnError)
                                     {
@@ -199,7 +199,7 @@ namespace KodeAid.Reflection
                                     {
                                         assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
                                     }
-                                    catch (SystemException)
+                                    catch
                                     {
                                         if (throwOnError)
                                         {
@@ -221,7 +221,7 @@ namespace KodeAid.Reflection
                     {
                         return a.DefinedTypes;
                     }
-                    catch (SystemException)
+                    catch
                     {
                         if (throwOnError)
                         {
