@@ -198,5 +198,46 @@ namespace KodeAid
                 throw new ArgumentOutOfRangeException(paramName, value, $"Parameter {paramName} must not be equal to {(unequalValueName ?? unequalValue.ToString())}.");
             }
         }
+
+        public static void OfType<T>(string paramName, object value)
+        {
+            OfType(paramName, value, typeof(T));
+        }
+
+
+        public static void OfType(string paramName, object value, Type ofType)
+        {
+            if (value == null)
+            {
+                return;
+            }
+
+            OfType(paramName, value.GetType(), ofType);
+        }
+
+        public static void OfType<T>(string paramName, Type type)
+        {
+            OfType(paramName, type, typeof(T));
+        }
+
+        public static void OfType(string paramName, Type type, Type ofType)
+        {
+            NotNull(nameof(ofType), ofType);
+
+            if (type == null)
+            {
+                return;
+            }
+
+            if (!ofType.IsAssignableFrom(type))
+            {
+                if (ofType.IsInterface)
+                {
+                    throw new ArgumentException($"Parameter {paramName} must implement {ofType.Name}.", paramName);
+                }
+
+                throw new ArgumentException($"Parameter {paramName} must be of type {ofType.Name}.", paramName);
+            }
+        }
     }
 }
