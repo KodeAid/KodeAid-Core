@@ -13,6 +13,25 @@ namespace KodeAid.Reflection
 {
     public static class ReflectionHelper
     {
+        public static bool IsNullable(Type t)
+        {
+            ArgCheck.NotNull(nameof(t), t);
+
+            if (t.IsValueType)
+            {
+                return IsNullableType(t);
+            }
+
+            return true;
+        }
+
+        public static bool IsNullableType(Type t)
+        {
+            ArgCheck.NotNull(nameof(t), t);
+
+            return (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
+        }
+
         /// <summary>
         /// Traverses a path down an object including properties, dictionaries, lists and arrays.
         /// "Employees[John].Addresses[0].StreetName"
