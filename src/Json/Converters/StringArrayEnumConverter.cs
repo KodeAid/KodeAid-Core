@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-namespace KodeAid.Serialization.Json.Converters
+namespace KodeAid.Json.Converters
 {
     public class StringArrayEnumConverter : StringEnumConverter
     {

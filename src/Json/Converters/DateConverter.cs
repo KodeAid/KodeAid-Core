@@ -2,11 +2,9 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
-using Newtonsoft.Json.Converters;
-
-namespace KodeAid.Serialization.Json.Converters
+namespace KodeAid.Json.Converters
 {
-    public class DateConverter : IsoDateTimeConverter
+    public class DateConverter : DateTimeConverter
     {
         public DateConverter()
             : this("yyyy-MM-dd")
@@ -15,7 +13,10 @@ namespace KodeAid.Serialization.Json.Converters
 
         public DateConverter(string format)
         {
-            DateTimeFormat = format;
+            ArgCheck.NotNull(nameof(format), format);
+
+            WriteDateTimeFormat = format;
+            ReadDateTimeFormats = new[] { format };
         }
     }
 }

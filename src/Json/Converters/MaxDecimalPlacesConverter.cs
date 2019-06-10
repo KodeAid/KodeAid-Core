@@ -6,7 +6,7 @@ using System;
 using System.Globalization;
 using Newtonsoft.Json;
 
-namespace KodeAid.Serialization.Json.Converters
+namespace KodeAid.Json.Converters
 {
     public class MaxDecimalPlacesConverter : JsonConverter
     {
@@ -44,12 +44,12 @@ namespace KodeAid.Serialization.Json.Converters
             return objectType == typeof(decimal) || objectType == typeof(double) || objectType == typeof(float);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
             throw new NotSupportedException();
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
         {
             if (value == null || MaxDecimalPlaces == InifinteDecimalPlaces)
             {

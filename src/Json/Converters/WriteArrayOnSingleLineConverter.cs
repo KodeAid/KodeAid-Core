@@ -6,7 +6,7 @@ using System;
 using System.Collections;
 using Newtonsoft.Json;
 
-namespace KodeAid.Serialization.Json.Converters
+namespace KodeAid.Json.Converters
 {
     public class WriteArrayOnSingleLineConverter : JsonConverter
     {
