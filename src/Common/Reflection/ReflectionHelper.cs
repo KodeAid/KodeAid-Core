@@ -119,13 +119,12 @@ namespace KodeAid.Reflection
             return obj;
         }
 
-        public static bool ConfirmPropertyPath(object obj, string path, bool ignoreCase = false)
+        public static bool ConfirmPropertyPath(Type type, string path, bool ignoreCase = false)
         {
-            ArgCheck.NotNull(nameof(obj), obj);
+            ArgCheck.NotNull(nameof(type), type);
             ArgCheck.NotNull(nameof(path), path);
 
             var traversed = new StringBuilder();
-            var type = obj.GetType();
 
             foreach (var propertyName in path.Split('.', '['))
             {
@@ -144,7 +143,7 @@ namespace KodeAid.Reflection
                 else  // get by index
                 {
                     var indexed = false;
-                    foreach (var indexerInterface in obj.GetType().GetInterfaces())
+                    foreach (var indexerInterface in type.GetInterfaces())
                     {
                         if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                         {
