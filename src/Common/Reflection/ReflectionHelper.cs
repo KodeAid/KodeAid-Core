@@ -94,7 +94,7 @@ namespace KodeAid.Reflection
                             indexed = true;
                             obj = typeof(ReflectionHelper).GetMethod(nameof(GetFromList), BindingFlags.Static | BindingFlags.NonPublic)
                                 .MakeGenericMethod(indexerInterface.GetGenericArguments())
-                                .Invoke(null, new object[] { obj, index });
+                                .Invoke(null, new object[] { obj, index, ignoreCase, throwOnPathNotFound, throwOnNullReference });
                             break;
                         }
                     }
@@ -117,6 +117,63 @@ namespace KodeAid.Reflection
             }
 
             return obj;
+        }
+
+        public static bool ConfirmPropertyPath(object obj, string path, bool ignoreCase = false)
+        {
+            ArgCheck.NotNull(nameof(obj), obj);
+            ArgCheck.NotNull(nameof(path), path);
+
+            var traversed = new StringBuilder();
+            var type = obj.GetType();
+
+            foreach (var propertyName in path.Split('.', '['))
+            {
+                var index = propertyName.EndsWith("]") ? propertyName.Substring(0, propertyName.Length - 1) : null;
+
+                if (index == null)  // get by property
+                {
+                    PropertyInfo property = null;
+                    property = type.GetProperty(propertyName, (BindingFlags.Instance | BindingFlags.Public) | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
+                    if (property == null)
+                    {
+                        return false;
+                    }
+                    type = property.PropertyType;
+                }
+                else  // get by index
+                {
+                    var indexed = false;
+                    foreach (var indexerInterface in obj.GetType().GetInterfaces())
+                    {
+                        if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                        {
+                            indexed = true;
+                            type = indexerInterface.GenericTypeArguments[1];
+                            break;
+                        }
+                        if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IList<>))
+                        {
+                            indexed = true;
+                            type = indexerInterface.GenericTypeArguments[0];
+                            break;
+                        }
+                    }
+                    if (!indexed && type.IsArray)
+                    {
+                        indexed = true;
+                        type = type.GetElementType();
+                    }
+                    if (!indexed)
+                    {
+                        return false;
+                    }
+                }
+
+                traversed.Append(index != null ? $"[{index}]" : (traversed.Length == 0 ? propertyName : $".{propertyName}"));
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -247,8 +304,27 @@ namespace KodeAid.Reflection
             return dict[key];
         }
 
-        private static T GetFromList<T>(IList<T> list, object index)
+        private static T GetFromList<T>(IList<T> list, object index, bool ignoreCase, bool throwOnPathNotFound, bool throwOnNullReference)
         {
+            if (index is string s && s.Contains('='))
+            {
+                var parts = s.Split('=');
+                if (parts.Length == 2)
+                {
+                    return list.FirstOrDefault(item =>
+                    {
+                        var value = FollowPropertyPath(item, parts[0], ignoreCase, throwOnPathNotFound, throwOnNullReference);
+
+                        if (value != null)
+                        {
+                            return Equals(value, ParseHelper.Parse(parts[1], value.GetType(), ignoreCase));
+                        }
+
+                        return false;
+                    });
+                }
+            }
+
             return list[Convert.ToInt32(index)];
         }
     }
