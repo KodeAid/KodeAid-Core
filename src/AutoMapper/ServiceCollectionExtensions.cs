@@ -15,20 +15,32 @@ namespace AutoMapper
     {
         public static IServiceCollection AddAutoMapper(this IServiceCollection services, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
         {
-            var profileTypes = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes);
-            return services.AddAutoMapper(profileTypes.ToArray());
+            var assemblies = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes)
+                .Select(t => t.Assembly)
+                .Distinct()
+                .ToList();
+
+            return services.AddAutoMapper(assemblies.ToArray());
         }
 
         public static IServiceCollection AddAutoMapper(this IServiceCollection services, Action<IMapperConfigurationExpression> configAction, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         {
-            var profileTypes = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes);
-            return services.AddAutoMapper(configAction, profileTypes, serviceLifetime);
+            var assemblies = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes)
+                .Select(t => t.Assembly)
+                .Distinct()
+                .ToList();
+
+            return services.AddAutoMapper(configAction, assemblies, serviceLifetime);
         }
 
         public static IServiceCollection AddAutoMapper(this IServiceCollection services, Action<IServiceProvider, IMapperConfigurationExpression> configAction, Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         {
-            var profileTypes = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes);
-            return services.AddAutoMapper(configAction, profileTypes, serviceLifetime);
+            var assemblies = ReflectionHelper.FindAllTypes<Profile>(startingPoint: startingPoint, assemblySearchOptions: assemblySearchOptions, throwOnError: throwOnError, assemblyNamePrefixes: assemblyNamePrefixes)
+                .Select(t => t.Assembly)
+                .Distinct()
+                .ToList();
+
+            return services.AddAutoMapper(configAction, assemblies, serviceLifetime);
         }
     }
 }
