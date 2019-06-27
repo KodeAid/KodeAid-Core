@@ -184,6 +184,20 @@ namespace KodeAid.Reflection
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        {
+            return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
+        }
+
+        /// <summary>
+        /// Find all defined types across all referenced assemblies including those in the execution paths.
+        /// </summary>
+        /// <typeparam name="T">Type which the results must be assignable to.</typeparam>
+        /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
+        /// <returns></returns>
         public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
             return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
@@ -200,6 +214,20 @@ namespace KodeAid.Reflection
         /// <returns></returns>
         public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
+            return FindAllTypes(startingPoint, ofType, typeFilter, assemblySearchOptions, throwOnError, (IEnumerable<string>)assemblyNamePrefixes);
+        }
+
+        /// <summary>
+        /// Find all defined types across all referenced assemblies including those in the execution paths.
+        /// </summary>
+        /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
+        /// <param name="ofType">Type which the results must be assignable to, null for no filter.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
+        /// <returns></returns>
+        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        {
             var directorySearchOptions = assemblySearchOptions.HasFlagSet(AssemblySearchOptions.IncludeSubdirectories) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var matchedAssemblies = new List<Assembly>();
             var assembliesSearched = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
@@ -212,7 +240,7 @@ namespace KodeAid.Reflection
                 var assembly = assembliesToSearch.Dequeue();
                 if (assembliesSearched.Add(assembly.FullName))
                 {
-                    if (assemblyNamePrefixes.Length == 0 || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
+                    if (!assemblyNamePrefixes.Any() || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         matchedAssemblies.Add(assembly);
 
@@ -251,7 +279,7 @@ namespace KodeAid.Reflection
 
                                 try
                                 {
-                                    if (assemblyNamePrefixes.Length == 0)
+                                    if (!assemblyNamePrefixes.Any())
                                     {
                                         dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
                                     }
