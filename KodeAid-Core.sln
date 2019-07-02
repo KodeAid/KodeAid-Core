@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper", "src\AutoMappe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "src\DependencyInjection\DependencyInjection.csproj", "{E1B9A73A-CA46-4B02-87C9-656E28F57743}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diagnostics", "src\Diagnostics\Diagnostics.csproj", "{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +189,10 @@ Global
 		{E1B9A73A-CA46-4B02-87C9-656E28F57743}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1B9A73A-CA46-4B02-87C9-656E28F57743}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1B9A73A-CA46-4B02-87C9-656E28F57743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
