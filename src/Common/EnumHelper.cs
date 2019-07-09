@@ -135,12 +135,12 @@ namespace KodeAid
                         if (ignoreWhitespace)
                         {
                             var delimiter = Regex.Escape(flagsDelimiter.Trim());
-                            str = Regex.Replace(str, $@"(^|{delimiter})\s*{Regex.Escape(SerializedName.Trim())}\s*({delimiter}|$)", $"$1{Name}$3", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
+                            str = Regex.Replace(str, $@"(^|{delimiter})\s*{Regex.Escape(SerializedName.Trim())}\s*({delimiter}|$)", $"$1{Name}$2", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
                         }
                         else
                         {
                             var delimiter = Regex.Escape(flagsDelimiter);
-                            str = Regex.Replace(str, $@"(^|{delimiter}){Regex.Escape(SerializedName)}({delimiter}|$)", $"$1{Name}$3", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
+                            str = Regex.Replace(str, $@"(^|{delimiter}){Regex.Escape(SerializedName)}({delimiter}|$)", $"$1{Name}$2", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
                         }
                     }
 
