@@ -120,7 +120,13 @@ namespace KodeAid.Json
 
         private Newtonsoft.Json.JsonSerializer CreateJsonSerializer()
         {
-            return Newtonsoft.Json.JsonSerializer.CreateDefault(Settings);
+            var settings = Settings;
+            if (settings != null)
+            {
+                return Newtonsoft.Json.JsonSerializer.Create(Settings);
+            }
+
+            return Newtonsoft.Json.JsonSerializer.CreateDefault();
         }
     }
 }
