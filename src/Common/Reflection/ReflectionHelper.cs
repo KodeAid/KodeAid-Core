@@ -180,13 +180,15 @@ namespace KodeAid.Reflection
         /// </summary>
         /// <typeparam name="T">Type which the results must be assignable to.</typeparam>
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
-        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types.</param>
+        /// <param name="mustHavePublicDefaultCtor">True to ensure all returned types have a public default constructor defined, otherwise false.</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
         {
-            return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
+            return FindAllTypes(startingPoint, typeof(T), typeFilter, mustHavePublicDefaultCtor, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
         }
 
         /// <summary>
@@ -194,13 +196,15 @@ namespace KodeAid.Reflection
         /// </summary>
         /// <typeparam name="T">Type which the results must be assignable to.</typeparam>
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
-        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types.</param>
+        /// <param name="mustHavePublicDefaultCtor">True to ensure all returned types have a public default constructor defined, otherwise false.</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
-            return FindAllTypes(startingPoint, typeof(T), typeFilter, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
+            return FindAllTypes(startingPoint, typeof(T), typeFilter, mustHavePublicDefaultCtor, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
         }
 
         /// <summary>
@@ -208,13 +212,15 @@ namespace KodeAid.Reflection
         /// </summary>
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
         /// <param name="ofType">Type which the results must be assignable to, null for no filter.</param>
-        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types.</param>
+        /// <param name="mustHavePublicDefaultCtor">True to ensure all returned types have a public default constructor defined, otherwise false.</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
-            return FindAllTypes(startingPoint, ofType, typeFilter, assemblySearchOptions, throwOnError, (IEnumerable<string>)assemblyNamePrefixes);
+            return FindAllTypes(startingPoint, ofType, typeFilter, mustHavePublicDefaultCtor, assemblySearchOptions, throwOnError, (IEnumerable<string>)assemblyNamePrefixes);
         }
 
         /// <summary>
@@ -222,11 +228,13 @@ namespace KodeAid.Reflection
         /// </summary>
         /// <param name="startingPoint">Assemblies to start the search from, if not provided the entry assembly is used: Assembly.GetEntryAssembly().</param>
         /// <param name="ofType">Type which the results must be assignable to, null for no filter.</param>
-        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types with a public default constructor.</param>
+        /// <param name="typeFilter">Predicate to filter out returned types, or null for the default which is to include all public instance non-abstract and non-generic classes or value-types.</param>
+        /// <param name="mustHavePublicDefaultCtor">True to ensure all returned types have a public default constructor defined, otherwise false.</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
+        /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
         {
             var directorySearchOptions = assemblySearchOptions.HasFlagSet(AssemblySearchOptions.IncludeSubdirectories) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var matchedAssemblies = new List<Assembly>();
@@ -300,7 +308,7 @@ namespace KodeAid.Reflection
                                 {
                                     try
                                     {
-                                        assembliesToSearch.Enqueue(Assembly.LoadFile(dllFile));
+                                        assembliesToSearch.Enqueue(Assembly.Load(dllFile));
                                     }
                                     catch
                                     {
@@ -320,7 +328,8 @@ namespace KodeAid.Reflection
                 .Distinct() // shouldn't be required
                 .SelectMany(a => a.GetLoadableTypes())
                 .Where(t => ofType == null || ofType.IsAssignableFrom(t))
-                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType && (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null)))
+                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType))
+                .Where(t => !mustHavePublicDefaultCtor || (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null))
                 .Distinct() // shouldn't be required
                 .ToList();
         }
