@@ -308,13 +308,20 @@ namespace KodeAid.Reflection
                                 {
                                     try
                                     {
-                                        assembliesToSearch.Enqueue(Assembly.Load(dllFile));
+                                        assembliesToSearch.Enqueue(Assembly.Load(AssemblyName.GetAssemblyName(dllFile)));
                                     }
                                     catch
                                     {
-                                        if (throwOnError)
+                                        try
                                         {
-                                            throw;
+                                            assembliesToSearch.Enqueue(Assembly.LoadFrom(dllFile));
+                                        }
+                                        catch
+                                        {
+                                            if (throwOnError)
+                                            {
+                                                throw;
+                                            }
                                         }
                                     }
                                 }
