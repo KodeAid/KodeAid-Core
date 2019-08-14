@@ -17,9 +17,19 @@ namespace KodeAid.Testing.DataGeneration
             return dataGenerator.GetBoolean() ? trueValue : falseValue;
         }
 
-        public static string GetNumber(this IDataGenerator dataGenerator, int numberOfDigits)
+        public static string GetNumber(this IDataGenerator dataGenerator, int numberOfDigits, bool canStartWithZero = false)
         {
-            return dataGenerator.GetString(numberOfDigits, numberOfDigits, "0123456789");
+            if (canStartWithZero)
+            {
+                return dataGenerator.GetString(numberOfDigits, numberOfDigits, "0123456789");
+            }
+
+            if (numberOfDigits <= 1)
+            {
+                return dataGenerator.GetString(numberOfDigits, numberOfDigits, "123456789");
+            }
+
+            return $"{dataGenerator.GetString(numberOfDigits, numberOfDigits, "123456789")}{dataGenerator.GetString(numberOfDigits, numberOfDigits, "0123456789")}";
         }
 
         public static string ChooseString(this IDataGenerator dataGenerator, Type constantsClass, int nullOdds = 0)
@@ -241,14 +251,40 @@ namespace KodeAid.Testing.DataGeneration
             return dataGenerator.GetNumber(5);
         }
 
-        public static string GetSocialInsuranceNumber(this IDataGenerator dataGenerator, bool formatted = false, int nullOdds = 0)
+        public static string GetSocialInsuranceNumber(this IDataGenerator dataGenerator, bool formatted = false, string separator = "-", bool useDesignatedTestPrefixOfZero = false, int nullOdds = 0)
         {
-            if (formatted)
+            const int length = 9;
+
+            var sin = $"{(useDesignatedTestPrefixOfZero ? "0" : dataGenerator.ChooseString("1", "2", "3", "4", "5", "6", "7", "9"))}{dataGenerator.GetNumber(7)}";
+
+            var sum = 0;
+            var i = 0;
+            var reversed = new string(sin.Reverse().ToArray());
+
+            while (i < length - 1)
             {
-                return dataGenerator.GetString("000-000-000");
+                var odd = reversed[i] * 2;
+                if (odd > 9)
+                {
+                    odd -= 9;
+                }
+                sum += odd;
+                if (i != (length - 2))
+                {
+                    sum += reversed[i + 1];
+                }
+                i += 2;
             }
 
-            return dataGenerator.GetNumber(9);
+            var checkdigit = (((int)Math.Floor(sum / 10.0) + 1) * 10 - sum) % 10;
+            sin += checkdigit;
+
+            if (formatted)
+            {
+                sin = $"{sin.Substring(0, 3)}{separator}{sin.Substring(3, 3)}{separator}{sin.Substring(6, 3)}";
+            }
+
+            return sin;
         }
 
         public static string GetSocialSecurityNumber(this IDataGenerator dataGenerator, bool formatted = false, int nullOdds = 0)
