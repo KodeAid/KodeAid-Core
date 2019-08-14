@@ -1094,6 +1094,7 @@ namespace KodeAid.Testing.DataGeneration
 
         public static List<string> CompanyNames { get; } = new List<string>()
         {
+            "OmniCorp",
             "Wonka Industries",
             "Acme Corp.",
             "Stark Industries",
@@ -1112,6 +1113,8 @@ namespace KodeAid.Testing.DataGeneration
             "Soylent",
             "Hooli",
             "Good Burger",
+            "Contoso",
+            "Foo Bar Inc.",
         };
 
         public static List<string> ProvinceCodes { get; } = new List<string>()
@@ -1146,6 +1149,16 @@ namespace KodeAid.Testing.DataGeneration
             "Quebec",
             "Saskatchewan",
             "Yukon",
+        };
+
+        public static List<string> DomainNames { get; } = new List<string>()
+        {
+            "acme.test",
+            "gmail.test",
+            "hotmail.test",
+            "yahoo.test",
+            "contoso.test",
+            "foobar.test",
         };
     }
 }
