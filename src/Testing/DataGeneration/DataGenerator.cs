@@ -7,7 +7,7 @@ using System.Text;
 
 namespace KodeAid.Testing.DataGeneration
 {
-    internal class DataGenerator : IDataGenerator
+    public class DataGenerator : IDataGenerator
     {
         private static readonly Random _random = new Random(Guid.NewGuid().GetHashCode());
 
