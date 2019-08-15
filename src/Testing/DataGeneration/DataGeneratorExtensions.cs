@@ -29,7 +29,8 @@ namespace KodeAid.Testing.DataGeneration
                 return dataGenerator.GetString(numberOfDigits, numberOfDigits, "123456789");
             }
 
-            return $"{dataGenerator.GetString(numberOfDigits, numberOfDigits, "123456789")}{dataGenerator.GetString(numberOfDigits, numberOfDigits, "0123456789")}";
+            --numberOfDigits;
+            return $"{dataGenerator.GetCharacter("123456789")}{dataGenerator.GetString(numberOfDigits, numberOfDigits, "0123456789")}";
         }
 
         public static string ChooseString(this IDataGenerator dataGenerator, Type constantsClass, int nullOdds = 0)
