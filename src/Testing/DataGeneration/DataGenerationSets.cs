@@ -1114,6 +1114,7 @@ namespace KodeAid.Testing.DataGeneration
             "Hooli",
             "Good Burger",
             "Contoso",
+            "Fabrikam",
             "Foo Bar Inc.",
         };
 
