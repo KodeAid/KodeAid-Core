@@ -2,20 +2,20 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using KodeAid.AspNetCore.Mvc.Versioning;
 using KodeAid.Json.Serialization;
-using Microsoft.AspNetCore.Http;
 
 namespace KodeAid.AspNetCore.Json
 {
     public class ApiContractResolver : PredicateContractResolver
     {
-        public ApiContractResolver(IHttpContextAccessor httpContextAccessor)
+        public ApiContractResolver(IApiVersionAccessor versionAccessor)
         {
-            ArgCheck.NotNull(nameof(httpContextAccessor), httpContextAccessor);
+            ArgCheck.NotNull(nameof(versionAccessor), versionAccessor);
 
             Add(new EmptyArrayPredicate());
             Add(new ReadWritePredicate());
-            Add(new VersionedApiPredicate(httpContextAccessor));
+            Add(new VersionedApiPredicate(versionAccessor));
         }
     }
 }

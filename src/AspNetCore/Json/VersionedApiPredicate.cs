@@ -3,16 +3,15 @@
 
 
 using System.Collections.Generic;
+using KodeAid.AspNetCore.Mvc.Versioning;
 using KodeAid.Json.Serialization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace KodeAid.AspNetCore.Json
 {
     public class VersionedApiPredicate : VersionedModelPredicate
     {
-        public VersionedApiPredicate(IHttpContextAccessor httpContextAccessor, IEqualityComparer<string> comparer = null)
-            : base(() => httpContextAccessor.HttpContext.GetRequestedApiVersion()?.ToString(), comparer)
+        public VersionedApiPredicate(IApiVersionAccessor versionAccessor, IEqualityComparer<string> comparer = null)
+            : base(() => versionAccessor.GetRequestedApiVersion()?.ToString(), comparer)
         {
         }
     }
