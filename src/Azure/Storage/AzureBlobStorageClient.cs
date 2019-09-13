@@ -65,6 +65,11 @@ namespace KodeAid.Azure.Storage
             _defaultDirectoryRelativeAddress = options.DefaultDirectoryRelativeAddress;
             _leaseDuration = options.LeaseDuration;
             _useSnapshots = options.UseSnapshots;
+
+            _requestOptions.ServerTimeout = options.ServerTimeout;
+            _requestOptions.MaximumExecutionTime = options.MaximumExecutionTime;
+            _requestOptionsWithoutRetry.ServerTimeout = options.ServerTimeout;
+            _requestOptionsWithoutRetry.MaximumExecutionTime = options.MaximumExecutionTime;
         }
 
         public bool IsInitialized => _container != null;

@@ -8,7 +8,7 @@ using Microsoft.WindowsAzure.Storage;
 
 namespace KodeAid.Azure.Storage
 {
-    public sealed class AzureBlobStorageClientOptionsBuilder
+    public sealed class AzureBlobStorageClientOptionsBuilder : IBuilder<AzureBlobStorageClientOptions>
     {
         private CloudStorageAccount _storageAccount;
         private string _connectionString;
@@ -22,8 +22,10 @@ namespace KodeAid.Azure.Storage
         private string _sasTokenSecretName;
         private string _containerName;
         private string _defaultDirectoryRelativeAddress;
-        private TimeSpan? _leaseDuration = AzureBlobStorageClientOptions.DefaultLeaseDuration;
         private bool _useSnapshots;
+        private TimeSpan? _leaseDuration;
+        private TimeSpan? _serverTimeout;
+        private TimeSpan? _maximumExecutionTime;
 
         public AzureBlobStorageClientOptions Build()
         {
@@ -38,7 +40,9 @@ namespace KodeAid.Azure.Storage
                 DefaultDirectoryRelativeAddress = _defaultDirectoryRelativeAddress,
                 EndpointSuffix = _endpointSuffix,
                 LeaseDuration = _leaseDuration,
+                MaximumExecutionTime = _maximumExecutionTime,
                 SecretStore = _secretStore,
+                ServerTimeout = _serverTimeout,
                 SharedAccessSignature = _sasToken,
                 SharedAccessSignatureSecretName = _sasTokenSecretName,
                 StorageAccount = _storageAccount,
@@ -111,21 +115,33 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
+        public AzureBlobStorageClientOptionsBuilder UseSnapshots(bool useSnapshots)
+        {
+            _useSnapshots = useSnapshots;
+            return this;
+        }
+
         public AzureBlobStorageClientOptionsBuilder WithLeaseDuration(TimeSpan duration)
         {
             _leaseDuration = duration;
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder DisableLeases()
+        public AzureBlobStorageClientOptionsBuilder WithInfiniteLeaseDuration()
         {
             _leaseDuration = null;
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder UseSnapshots(bool useSnapshots)
+        public AzureBlobStorageClientOptionsBuilder WithServerTimeout(TimeSpan? timeout)
         {
-            _useSnapshots = useSnapshots;
+            _serverTimeout = timeout;
+            return this;
+        }
+
+        public AzureBlobStorageClientOptionsBuilder WithMaximumExecutionTime(TimeSpan? timeout)
+        {
+            _maximumExecutionTime = timeout;
             return this;
         }
     }
