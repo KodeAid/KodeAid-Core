@@ -31,25 +31,33 @@ namespace KodeAid.Azure.KeyVault
         {
             ArgCheck.NotNullOrEmpty(nameof(name), name);
 
-            using (var client = new ManagedServiceIdentityKeyVaultClient())
+            var unsecuredSecret = await GetUnsecuredSecretAsync(name, cancellationToken).ConfigureAwait(false);
+
+            var securedSecret = new SecureString();
+            foreach (var c in unsecuredSecret)
             {
-                var secretBundle = await client.GetSecretAsync(_keyVaultBaseUrl, name).ConfigureAwait(false);
-
-                var secureString = new SecureString();
-                foreach (var c in secretBundle.Value)
-                {
-                    secureString.AppendChar(c);
-                }
-                secureString.MakeReadOnly();
-
-                return secureString;
+                securedSecret.AppendChar(c);
             }
+            securedSecret.MakeReadOnly();
+
+            return securedSecret;
         }
 
         public async Task<X509Certificate2> GetPrivateCertificateAsync(string name, CancellationToken cancellationToken = default)
         {
-            var securedBase64Key = await GetSecretAsync(name, cancellationToken).ConfigureAwait(false);
-            return new X509Certificate2(Convert.FromBase64String(securedBase64Key.Unsecure()), (string)null, _keyStorageFlags);
+            var keyBase64String = await GetUnsecuredSecretAsync(name, cancellationToken).ConfigureAwait(false);
+            var keyBytes = keyBase64String.FromBase64String();
+            return new X509Certificate2(keyBytes, (string)null, _keyStorageFlags);
+        }
+
+        private async Task<string> GetUnsecuredSecretAsync(string name, CancellationToken cancellationToken = default)
+        {
+            ArgCheck.NotNullOrEmpty(nameof(name), name);
+
+            using (var client = new ManagedServiceIdentityKeyVaultClient())
+            {
+                return (await client.GetSecretAsync(_keyVaultBaseUrl, name, cancellationToken).ConfigureAwait(false)).Value;
+            }
         }
     }
 }
