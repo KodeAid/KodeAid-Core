@@ -13,12 +13,12 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class AzureKeyVaultSecretStoreServiceCollectionExtensions
     {
-        public static IServiceCollection AddAzureKeyVaultSecretStore(this IServiceCollection services, string storeConfigurationKey = nameof(AzureKeyVaultSecretStore))
+        public static IServiceCollection AddAzureKeyVaultSecretStore(this IServiceCollection services, string storeConfigurationKey = "AzureKeyVaultSecretStore")
         {
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);
 
-            return services.AddTransient<ISecretReadOnlyStore>(serviceProvider =>
+            return services.AddSingleton<ISecretReadOnlyStore>(serviceProvider =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(storeConfigurationKey)
                     ?? throw new InvalidOperationException($"Azure key vault store configuration section '{storeConfigurationKey}' not found.");
@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setupAction), setupAction);
 
-            return services.AddTransient<ISecretReadOnlyStore>(serviceProvider =>
+            return services.AddSingleton<ISecretReadOnlyStore>(serviceProvider =>
             {
                 var builder = new AzureKeyVaultSecretStoreOptionsBuilder();
                 setupAction(builder);
@@ -47,7 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(storeConfigurationKey), storeConfigurationKey);
 
-            return services.AddTransient<IPrivateCertificateStore>(serviceProvider =>
+            return services.AddSingleton<IPrivateCertificateStore>(serviceProvider =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>()?.GetSection(storeConfigurationKey)
                     ?? throw new InvalidOperationException($"Azure key vault store configuration section '{storeConfigurationKey}' not found.");
@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setupAction), setupAction);
 
-            return services.AddTransient<IPrivateCertificateStore>(serviceProvider =>
+            return services.AddSingleton<IPrivateCertificateStore>(serviceProvider =>
             {
                 var builder = new AzureKeyVaultSecretStoreOptionsBuilder();
                 setupAction(builder);

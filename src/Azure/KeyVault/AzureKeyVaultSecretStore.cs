@@ -13,10 +13,12 @@ using Microsoft.Azure.KeyVault;
 
 namespace KodeAid.Azure.KeyVault
 {
-    public class AzureKeyVaultSecretStore : ISecretReadOnlyStore, IPrivateCertificateStore
+    public class AzureKeyVaultSecretStore : ISecretReadOnlyStore, IPrivateCertificateStore, IDisposable
     {
         private readonly string _keyVaultBaseUrl;
         private readonly X509KeyStorageFlags _keyStorageFlags = X509KeyStorageFlags.MachineKeySet;
+        private readonly ManagedServiceIdentityKeyVaultClient _client = new ManagedServiceIdentityKeyVaultClient();
+        private bool _disposed = false;
 
         public AzureKeyVaultSecretStore(AzureKeyVaultSecretStoreOptions options)
         {
@@ -50,14 +52,29 @@ namespace KodeAid.Azure.KeyVault
             return new X509Certificate2(keyBytes, (string)null, _keyStorageFlags);
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _client.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
         private async Task<string> GetUnsecuredSecretAsync(string name, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(name), name);
 
-            using (var client = new ManagedServiceIdentityKeyVaultClient())
-            {
-                return (await client.GetSecretAsync(_keyVaultBaseUrl, name, cancellationToken).ConfigureAwait(false)).Value;
-            }
+            return (await _client.GetSecretAsync(_keyVaultBaseUrl, name, cancellationToken).ConfigureAwait(false)).Value;
         }
     }
 }
