@@ -3,11 +3,10 @@
 
 
 
-using KodeAid.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace KodeAid.AspNetCore.Mvc
+namespace KodeAid.AspNetCore.Mvc.Versioning
 {
     public class HttpApiVersionAccessor : IApiVersionAccessor
     {
