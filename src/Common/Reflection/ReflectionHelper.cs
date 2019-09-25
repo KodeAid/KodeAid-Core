@@ -236,6 +236,17 @@ namespace KodeAid.Reflection
         /// <returns></returns>
         public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
         {
+            return FindAssemblies(startingPoint, assemblySearchOptions, throwOnError, assemblyNamePrefixes)
+                .SelectMany(a => a.GetLoadableTypes())
+                .Where(t => ofType == null || ofType.IsAssignableFrom(t))
+                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType))
+                .Where(t => !mustHavePublicDefaultCtor || (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null))
+                .Distinct() // shouldn't be required
+                .ToList();
+        }
+
+        public static IEnumerable<Assembly> FindAssemblies(Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        {
             var directorySearchOptions = assemblySearchOptions.HasFlagSet(AssemblySearchOptions.IncludeSubdirectories) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var matchedAssemblies = new List<Assembly>();
             var assembliesSearched = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
@@ -332,11 +343,6 @@ namespace KodeAid.Reflection
             }
 
             return matchedAssemblies
-                .Distinct() // shouldn't be required
-                .SelectMany(a => a.GetLoadableTypes())
-                .Where(t => ofType == null || ofType.IsAssignableFrom(t))
-                .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType))
-                .Where(t => !mustHavePublicDefaultCtor || (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null))
                 .Distinct() // shouldn't be required
                 .ToList();
         }
