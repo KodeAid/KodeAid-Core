@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Linq;
 using KodeAid;
 
 namespace System.Collections.Generic
@@ -40,7 +41,6 @@ namespace System.Collections.Generic
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <param name="item"></param>
-        /// <param name="allowNulls"></param>
         public static void Replace<T>(this IList<T> list, IEnumerable<T> items)
         {
             ArgCheck.NotNull(nameof(list), list);
