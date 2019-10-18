@@ -63,12 +63,12 @@ namespace KodeAid.EntityFrameworkCore
             return GetAsync(id, false, cancellationToken);
         }
 
-        public Task<TEntity> GetAsync(object id, bool trackChanges, CancellationToken cancellationToken = default)
+        public async Task<TEntity> GetAsync(object id, bool trackChanges, CancellationToken cancellationToken = default)
         {
             // todo: make sure entity is not attached to context if not already attached and trackChanges is false
             // Find() will attach the entity for change tracking
             // we don't want that unless the entity was already being tracked
-            return Context.Set<TEntity>().FindAsync(new[] { id }, cancellationToken);
+            return await Context.Set<TEntity>().FindAsync(new[] { id }, cancellationToken).ConfigureAwait(false);
         }
 
         public IEnumerable<TEntity> GetAll()

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using KodeAid.AspNetCore.Mvc.Formatters.Internal;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -42,18 +42,16 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
 
             if (!request.Body.CanSeek && !_suppressInputFormatterBuffering)
             {
-                BufferingHelper.EnableRewind(request);
+                request.EnableBuffering();
                 Debug.Assert(request.Body.CanSeek);
 
                 await request.Body.DrainAsync(CancellationToken.None);
                 request.Body.Seek(0L, SeekOrigin.Begin);
             }
 
-            using (var reader = new StreamReader(request.Body))
-            {
-                var text = await reader.ReadToEndAsync();
-                return await InputFormatterResult.SuccessAsync(text);
-            }
+            using var reader = new StreamReader(request.Body);
+            var text = await reader.ReadToEndAsync();
+            return await InputFormatterResult.SuccessAsync(text);
         }
     }
 }

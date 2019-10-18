@@ -8,7 +8,7 @@ namespace KodeAid.AutoMapper
     {
         protected override void Register()
         {
-            AddProfilesFromAssembly();
+            AddMapsFromAssembly();
         }
     }
 }

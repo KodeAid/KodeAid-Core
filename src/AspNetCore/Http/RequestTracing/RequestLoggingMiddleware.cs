@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace KodeAid.AspNetCore.Http.RequestTracing
@@ -43,7 +42,7 @@ namespace KodeAid.AspNetCore.Http.RequestTracing
             var queryAsText = string.Join("\n", request.Query.Select(q => $"{q.Key}={q.Value.FirstOrDefault()}"));
             var headersAsText = string.Join("\n", request.Headers.Select(h => $"{h.Key}: {h.Value.FirstOrDefault()}"));
             //var body = request.Body;
-            request.EnableRewind();
+            request.EnableBuffering();
             var buffer = new byte[Math.Min(Math.Max(request.Body.Length, request.ContentLength.GetValueOrDefault()), int.MaxValue)];
             await request.Body.ReadAsync(buffer, 0, buffer.Length);
             var bodyAsText = Encoding.UTF8.GetString(buffer);

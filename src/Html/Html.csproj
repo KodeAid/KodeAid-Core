@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<AssemblyName>KodeAid.Html</AssemblyName>
 		<RootNamespace>KodeAid.Html</RootNamespace>
 		<Description>Kode-Aid shared HTML utility library.</Description>
@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.1" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
 	</ItemGroup>
 
 	<ItemGroup>
