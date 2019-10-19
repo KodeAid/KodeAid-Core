@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.WebEncoders.Sources;
 
 namespace KodeAid
 {
@@ -15,7 +15,7 @@ namespace KodeAid
                 return null;
             }
 
-            return Base64UrlTextEncoder.Encode(bytes);
+            return WebEncoders.Base64UrlEncode(bytes);
         }
 
         public static byte[] DecodeBytes(string base64Url)
@@ -25,7 +25,7 @@ namespace KodeAid
                 return null;
             }
 
-            return Base64UrlTextEncoder.Decode(base64Url);
+            return WebEncoders.Base64UrlDecode(base64Url);
         }
     }
 }
