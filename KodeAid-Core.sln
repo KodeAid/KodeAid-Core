@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "src\Common\Common.csproj", "{DE81F0BB-0FE0-4161-BB17-3ADB2CC902F3}"
 EndProject
@@ -25,8 +25,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore", "src\AspNetCor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{8DE82B69-A512-4953-B0B5-1013AF3C8FBF}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
 		src\Directory.Build.props = src\Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caching", "src\Caching\Caching.csproj", "{65ACBE82-8821-4D9F-BCA4-D7429AC6DB8D}"
@@ -70,6 +74,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "src\DependencyInjection\DependencyInjection.csproj", "{E1B9A73A-CA46-4B02-87C9-656E28F57743}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diagnostics", "src\Diagnostics\Diagnostics.csproj", "{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Http", "src\Http\Http.csproj", "{CCAF234D-1039-46F8-9874-3D4C258999D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -193,6 +199,10 @@ Global
 		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA70D45E-A5F5-4989-AAE6-B2F9DA922065}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
