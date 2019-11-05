@@ -66,7 +66,7 @@ namespace KodeAid.Reflection
                 if (index == null)  // get by property
                 {
                     PropertyInfo property = null;
-                    property = type.GetProperty(propertyName, (BindingFlags.Instance | BindingFlags.Public) | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
+                    property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
 
                     if (property == null)
                     {
@@ -142,7 +142,7 @@ namespace KodeAid.Reflection
                 if (index == null)  // get by property
                 {
                     PropertyInfo property = null;
-                    property = type.GetProperty(propertyName, (BindingFlags.Instance | BindingFlags.Public) | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
+                    property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
 
                     if (property == null)
                     {
@@ -254,7 +254,7 @@ namespace KodeAid.Reflection
                 .SelectMany(a => a.GetLoadableTypes())
                 .Where(t => ofType == null || ofType.IsAssignableFrom(t))
                 .Where(t => typeFilter?.Invoke(t) ?? ((t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType))
-                .Where(t => !mustHavePublicDefaultCtor || (t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null))
+                .Where(t => !mustHavePublicDefaultCtor || t.IsValueType || t.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null)
                 .Distinct() // shouldn't be required
                 .ToList();
         }
