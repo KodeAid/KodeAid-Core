@@ -56,6 +56,7 @@ namespace KodeAid.Reflection
                     {
                         throw new NullReferenceException($"Path '{traversed.ToString()}' is null.");
                     }
+
                     return null;
                 }
 
@@ -66,19 +67,23 @@ namespace KodeAid.Reflection
                 {
                     PropertyInfo property = null;
                     property = type.GetProperty(propertyName, (BindingFlags.Instance | BindingFlags.Public) | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
+
                     if (property == null)
                     {
                         if (throwOnPathNotFound)
                         {
                             throw new InvalidOperationException($"Property {propertyName} not found on {type.FullName} at '{traversed.ToString()}'.");
                         }
+
                         return null;
                     }
+
                     obj = property.GetValue(obj, null);
                 }
                 else  // get by index
                 {
                     var indexed = false;
+
                     foreach (var indexerInterface in obj.GetType().GetInterfaces())
                     {
                         if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IDictionary<,>))
@@ -89,6 +94,7 @@ namespace KodeAid.Reflection
                                 .Invoke(null, new object[] { obj, index });
                             break;
                         }
+
                         if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IList<>))
                         {
                             indexed = true;
@@ -98,17 +104,20 @@ namespace KodeAid.Reflection
                             break;
                         }
                     }
+
                     if (!indexed && obj is Array array)
                     {
                         indexed = true;
                         obj = array.GetValue(Convert.ToInt32(index));
                     }
+
                     if (!indexed)
                     {
                         if (throwOnPathNotFound)
                         {
                             throw new InvalidOperationException($"Index {index} not found on {type.FullName} at '{traversed.ToString()}'.");
                         }
+
                         return null;
                     }
                 }
@@ -134,10 +143,12 @@ namespace KodeAid.Reflection
                 {
                     PropertyInfo property = null;
                     property = type.GetProperty(propertyName, (BindingFlags.Instance | BindingFlags.Public) | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
+
                     if (property == null)
                     {
                         return false;
                     }
+
                     type = property.PropertyType;
                 }
                 else  // get by index
@@ -151,6 +162,7 @@ namespace KodeAid.Reflection
                             type = indexerInterface.GenericTypeArguments[1];
                             break;
                         }
+
                         if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IList<>))
                         {
                             indexed = true;
@@ -158,11 +170,13 @@ namespace KodeAid.Reflection
                             break;
                         }
                     }
+
                     if (!indexed && type.IsArray)
                     {
                         indexed = true;
                         type = type.GetElementType();
                     }
+
                     if (!indexed)
                     {
                         return false;
@@ -257,6 +271,7 @@ namespace KodeAid.Reflection
             while (assembliesToSearch.Count > 0)
             {
                 var assembly = assembliesToSearch.Dequeue();
+
                 if (assembliesSearched.Add(assembly.FullName))
                 {
                     if (!assemblyNamePrefixes.Any() || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
@@ -287,11 +302,14 @@ namespace KodeAid.Reflection
                             (assembliesSearched.Count > 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.AssemblyDirectories)))
                         {
                             var codebaseDirectory = Path.GetDirectoryName(assembly.CodeBase);
+
                             if (codebaseDirectory.StartsWith(@"file:"))
                             {
                                 codebaseDirectory = codebaseDirectory.Substring(@"file:".Length);
                             }
+
                             codebaseDirectory = codebaseDirectory.Trim('\\', '/');
+
                             if (assembliesSearched.Add(codebaseDirectory))
                             {
                                 var dllFiles = new List<string>();
@@ -355,21 +373,43 @@ namespace KodeAid.Reflection
 
         private static T GetFromList<T>(IList<T> list, object index, bool ignoreCase, bool throwOnPathNotFound, bool throwOnNullReference)
         {
-            if (index is string s && s.Contains('='))
+            if (index is string s)
             {
-                var parts = s.Split('=');
-                if (parts.Length == 2)
+                if (s.Contains('='))
                 {
+                    var parts = s.Split('=');
+
+                    if (parts.Length == 2)
+                    {
+                        return list.FirstOrDefault(item =>
+                        {
+                            var value = FollowPropertyPath(item, parts[0], ignoreCase, throwOnPathNotFound, throwOnNullReference);
+
+                            if (value != null)
+                            {
+                                return Equals(value, ParseHelper.Parse(parts[1], value.GetType(), ignoreCase));
+                            }
+
+                            return false;
+                        });
+                    }
+                }
+                else if  (s.EndsWith(" -isnull"))
+                {
+                    s = s.Substring(0, s.Length - " -isnull".Length);
+
                     return list.FirstOrDefault(item =>
                     {
-                        var value = FollowPropertyPath(item, parts[0], ignoreCase, throwOnPathNotFound, throwOnNullReference);
+                        return FollowPropertyPath(item, s, ignoreCase, throwOnPathNotFound, throwOnNullReference) == null;
+                    });
+                }
+                else if (s.EndsWith(" -notnull"))
+                {
+                    s = s.Substring(0, s.Length - " -notnull".Length);
 
-                        if (value != null)
-                        {
-                            return Equals(value, ParseHelper.Parse(parts[1], value.GetType(), ignoreCase));
-                        }
-
-                        return false;
+                    return list.FirstOrDefault(item =>
+                    {
+                        return FollowPropertyPath(item, s, ignoreCase, throwOnPathNotFound, throwOnNullReference) != null;
                     });
                 }
             }
