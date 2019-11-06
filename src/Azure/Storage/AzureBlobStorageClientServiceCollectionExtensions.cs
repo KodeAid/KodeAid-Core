@@ -18,20 +18,21 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(configurationSection), configurationSection);
 
-            return services.AddTransient<IKeyValueReadOnlyStore, AzureBlobStorageClient, AzureBlobStorageClientOptions>(configurationSection: configurationSection, verifyOptions: (provider, options) =>
-            {
-                if (options.SecretStore == null)
+            return services
+                .AddTransient<IKeyValueReadOnlyStore, AzureBlobStorageClient, AzureBlobStorageClientOptions>(configurationSection: configurationSection, verifyOptions: (provider, options) =>
                 {
-                    options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
-                }
-            })
-            .AddTransient<IKeyValueStore, AzureBlobStorageClient, AzureBlobStorageClientOptions>(configurationSection: configurationSection, verifyOptions: (provider, options) =>
-            {
-                if (options.SecretStore == null)
+                    if (options.SecretStore == null)
+                    {
+                        options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
+                    }
+                })
+                .AddTransient<IKeyValueStore, AzureBlobStorageClient, AzureBlobStorageClientOptions>(configurationSection: configurationSection, verifyOptions: (provider, options) =>
                 {
-                    options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
-                }
-            });
+                    if (options.SecretStore == null)
+                    {
+                        options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
+                    }
+                });
         }
 
         public static IServiceCollection AddAzureBlobStorageKeyValueStore(this IServiceCollection services, Action<AzureBlobStorageClientOptionsBuilder> setup)
@@ -39,20 +40,21 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setup), setup);
 
-            return services.AddTransient<IKeyValueReadOnlyStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(defaultSetup: setup, verifyOptions: (provider, options) =>
-            {
-                if (options.SecretStore == null)
+            return services
+                .AddTransient<IKeyValueReadOnlyStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(defaultSetup: setup, verifyOptions: (provider, options) =>
                 {
-                    options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
-                }
-            })
-            .AddTransient<IKeyValueStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(setup: setup, verifyOptions: (provider, options) =>
-            {
-                if (options.SecretStore == null)
+                    if (options.SecretStore == null)
+                    {
+                        options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
+                    }
+                })
+                .AddTransient<IKeyValueStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(setup: setup, verifyOptions: (provider, options) =>
                 {
-                    options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
-                }
-            });
+                    if (options.SecretStore == null)
+                    {
+                        options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
+                    }
+                });
         }
 
         public static IServiceCollection AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, string configurationSection = "AzureBlobStoragePublicCertificateStore")
@@ -60,15 +62,16 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNullOrEmpty(nameof(configurationSection), configurationSection);
 
-            return services.AddTransient<IPublicCertificateStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(
-                defaultSetup: b => b.WithServerTimeout(TimeSpan.FromSeconds(5)).WithMaximumExecutionTime(TimeSpan.FromSeconds(60)),
-                configurationSection: configurationSection, verifyOptions: (provider, options) =>
-            {
-                if (options.SecretStore == null)
-                {
-                    options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
-                }
-            });
+            return services
+                .AddTransient<IPublicCertificateStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(
+                    defaultSetup: b => b.WithServerTimeout(TimeSpan.FromSeconds(5)).WithMaximumExecutionTime(TimeSpan.FromSeconds(60)),
+                    configurationSection: configurationSection, verifyOptions: (provider, options) =>
+                    {
+                        if (options.SecretStore == null)
+                        {
+                            options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
+                        }
+                    });
         }
 
         public static IServiceCollection AddAzureBlobStoragePublicCertificateStore(this IServiceCollection services, Action<AzureBlobStorageClientOptionsBuilder> setup)
@@ -76,15 +79,16 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(services), services);
             ArgCheck.NotNull(nameof(setup), setup);
 
-            return services.AddTransient<IPublicCertificateStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(
-                defaultSetup: b => b.WithServerTimeout(TimeSpan.FromSeconds(5)).WithMaximumExecutionTime(TimeSpan.FromSeconds(60)),
-                setup: setup, verifyOptions: (provider, options) =>
-            {
-                if (options.SecretStore == null)
-                {
-                    options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
-                }
-            });
+            return services
+                .AddTransient<IPublicCertificateStore, AzureBlobStorageClient, AzureBlobStorageClientOptions, AzureBlobStorageClientOptionsBuilder>(
+                    defaultSetup: b => b.WithServerTimeout(TimeSpan.FromSeconds(5)).WithMaximumExecutionTime(TimeSpan.FromSeconds(60)),
+                    setup: setup, verifyOptions: (provider, options) =>
+                    {
+                        if (options.SecretStore == null)
+                        {
+                            options.SecretStore = provider.GetService<ISecretReadOnlyStore>();
+                        }
+                    });
         }
     }
 }
