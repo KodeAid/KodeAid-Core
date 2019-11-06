@@ -42,6 +42,20 @@ namespace Microsoft.Extensions.DependencyInjection
             });
         }
 
+        public static IServiceCollection AddAzureKeyVaultSecretStore(this IServiceCollection services, Action<IServiceProvider, AzureKeyVaultSecretStoreOptionsBuilder> setupAction)
+        {
+            ArgCheck.NotNull(nameof(services), services);
+            ArgCheck.NotNull(nameof(setupAction), setupAction);
+
+            return services.AddScoped<ISecretReadOnlyStore>(serviceProvider =>
+            {
+                var builder = new AzureKeyVaultSecretStoreOptionsBuilder();
+                setupAction(serviceProvider, builder);
+                var options = builder.Build();
+                return new AzureKeyVaultSecretStore(options);
+            });
+        }
+
         public static IServiceCollection AddAzureKeyVaultPrivateCertificateStore(this IServiceCollection services, string storeConfigurationKey = "AzureKeyVaultPrivateCertificateStore")
         {
             ArgCheck.NotNull(nameof(services), services);
@@ -66,6 +80,20 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var builder = new AzureKeyVaultSecretStoreOptionsBuilder();
                 setupAction(builder);
+                var options = builder.Build();
+                return new AzureKeyVaultSecretStore(options);
+            });
+        }
+
+        public static IServiceCollection AddAzureKeyVaultPrivateCertificateStore(this IServiceCollection services, Action<IServiceProvider, AzureKeyVaultSecretStoreOptionsBuilder> setupAction)
+        {
+            ArgCheck.NotNull(nameof(services), services);
+            ArgCheck.NotNull(nameof(setupAction), setupAction);
+
+            return services.AddScoped<IPrivateCertificateStore>(serviceProvider =>
+            {
+                var builder = new AzureKeyVaultSecretStoreOptionsBuilder();
+                setupAction(serviceProvider, builder);
                 var options = builder.Build();
                 return new AzureKeyVaultSecretStore(options);
             });
