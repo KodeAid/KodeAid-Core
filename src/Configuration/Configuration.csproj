@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-    	<Version>1.2.2</Version>
+        <Version>1.2.3</Version>
         <AssemblyName>KodeAid.Configuration</AssemblyName>
         <RootNamespace>KodeAid.Configuration</RootNamespace>
         <Description>Kode-Aid shared configuration library.</Description>
@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>
