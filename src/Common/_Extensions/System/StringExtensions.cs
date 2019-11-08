@@ -23,14 +23,35 @@ namespace System
             return Encoding.UTF8.GetBytes(str);
         }
 
+        public static byte[] FromBase32String(this string base32String)
+        {
+            return Base32Encoder.DecodeBytes(base32String);
+        }
+
+        public static byte[] FromZBase32String(this string zbase32String)
+        {
+            return ZBase32Encoder.DecodeBytes(zbase32String);
+        }
+
         public static byte[] FromBase64String(this string base64String)
         {
             return Base64Encoder.DecodeBytes(base64String);
         }
 
+        [Obsolete("Use " + nameof(FromBase64String) + "() or " + nameof(FromBase64Url) + "() instead.")]
         public static byte[] FromBase64String(this string base64String, bool urlEncoded)
         {
-            return Base64Encoder.DecodeBytes(base64String, urlEncoded);
+            if (urlEncoded)
+            {
+                return base64String.FromBase64Url();
+            }
+
+            return base64String.FromBase64String();
+        }
+
+        public static byte[] FromBase64Url(this string base64Url)
+        {
+            return Base64UrlEncoder.DecodeBytes(base64Url);
         }
 
         public static int GetBase64DecodedByteCount(this string base64String)
