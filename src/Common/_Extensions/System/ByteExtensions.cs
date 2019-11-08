@@ -9,9 +9,14 @@ namespace System
 {
     public static class ByteExtensions
     {
-        public static string ToUtf8String(this byte[] bytes)
+        public static string ToBase32String(this byte[] bytes)
         {
-            return Encoding.UTF8.GetString(bytes);
+            return Base32Encoder.EncodeBytes(bytes);
+        }
+
+        public static string ToZBase32String(this byte[] bytes)
+        {
+            return ZBase32Encoder.EncodeBytes(bytes);
         }
 
         public static string ToBase64String(this byte[] bytes)
@@ -19,10 +24,25 @@ namespace System
             return Base64Encoder.EncodeBytes(bytes);
         }
 
-        [Obsolete("Use ToBase64Url() instead in KodeAid.Base64Url.dll")]
+        [Obsolete("Use " + nameof(ToBase64String) + "() or " + nameof(ToBase64Url) + "() instead.")]
         public static string ToBase64String(this byte[] bytes, bool urlEncoded)
         {
-            return Base64Encoder.EncodeBytes(bytes, urlEncoded);
+            if (urlEncoded)
+            {
+                return bytes.ToBase64Url();
+            }
+
+            return bytes.ToBase64String();
+        }
+
+        public static string ToBase64Url(this byte[] bytes)
+        {
+            return Base64UrlEncoder.EncodeBytes(bytes);
+        }
+
+        public static string ToUtf8String(this byte[] bytes)
+        {
+            return Encoding.UTF8.GetString(bytes);
         }
 
         internal static string ToBase36String(this byte[] bytes)
