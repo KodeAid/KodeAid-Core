@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.Builder
     {
         /// <summary>
         /// This will affect performance.
+        /// This should be called before anything else, including error handling, as it needs to create a new response stream if response body logging is enabled.
         /// </summary>
         public static IApplicationBuilder UseRequestTracing(this IApplicationBuilder builder, Action<HttpTraceOptions> setupAction = null)
         {
@@ -24,12 +25,12 @@ namespace Microsoft.AspNetCore.Builder
 
             if (options.RequestMode != HttpTraceMode.Disabled)
             {
-                builder.UseRequestLogging(options.RequestMode == HttpTraceMode.IncludeBody, options.LogLevel, options.IgnoredPathPrefixes);
+                builder.UseRequestLogging(options.RequestMode == HttpTraceMode.IncludeBody, options.IgnoredPathPrefixes, options.LogLevel);
             }
 
             if (options.ResponseMode != HttpTraceMode.Disabled)
             {
-                builder.UseResponseLogging(options.ResponseMode == HttpTraceMode.IncludeBody, options.LogLevel, options.IgnoredPathPrefixes);
+                builder.UseResponseLogging(options.ResponseMode == HttpTraceMode.IncludeBody, options.IgnoredPathPrefixes, options.LogLevel);
             }
 
             return builder;
@@ -38,18 +39,18 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// This will affect performance.
         /// </summary>
-        internal static IApplicationBuilder UseRequestLogging(this IApplicationBuilder builder, bool includeBody = false, LogLevel logLevel = LogLevel.Trace, IEnumerable<string> ignoredPathPrefixes = null)
+        public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder builder, bool includeBody = false, IEnumerable<string> ignoredPathPrefixes = null, LogLevel logLevel = LogLevel.Trace)
         {
-            return builder.UseMiddleware<RequestLoggingMiddleware>(includeBody, ignoredPathPrefixes.AsEnumerable(), logLevel);
+            return builder.UseMiddleware<RequestLoggingMiddleware>(includeBody, ignoredPathPrefixes, logLevel);
         }
 
         /// <summary>
-        /// This should be called before anything else, including error handling, as it needs to create a new response stream.
         /// This will affect performance.
+        /// This should be called before anything else, including error handling, as it needs to create a new response stream.
         /// </summary>
-        internal static IApplicationBuilder UseResponseLogging(this IApplicationBuilder builder, bool includeBody = false, LogLevel logLevel = LogLevel.Trace, IEnumerable<string> ignoredPathPrefixes = null)
+        public static IApplicationBuilder UseResponseLogging(this IApplicationBuilder builder, bool includeBody = false, IEnumerable<string> ignoredPathPrefixes = null, LogLevel logLevel = LogLevel.Trace)
         {
-            return builder.UseMiddleware<ResponseLoggingMiddleware>(includeBody, ignoredPathPrefixes.AsEnumerable(), logLevel);
+            return builder.UseMiddleware<ResponseLoggingMiddleware>(includeBody, ignoredPathPrefixes, logLevel);
         }
     }
 }
