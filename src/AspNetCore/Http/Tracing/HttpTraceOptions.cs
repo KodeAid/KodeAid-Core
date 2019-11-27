@@ -9,9 +9,13 @@ namespace KodeAid.AspNetCore.Http.Tracing
 {
     public class HttpTraceOptions
     {
-        public HttpTraceMode RequestMode { get; set; } = HttpTraceMode.Enabled;
+        public bool LogRequest { get; set; } = true;
 
-        public HttpTraceMode ResponseMode { get; set; } = HttpTraceMode.Enabled;
+        public bool LogResponse { get; set; } = true;
+
+        public long MaxRequestBodyByteCount { get; set; } = 0L;
+
+        public long MaxResponseBodyByteCount { get; set; } = 0L;
 
         /// <summary>
         /// URL path prefixes to not log.

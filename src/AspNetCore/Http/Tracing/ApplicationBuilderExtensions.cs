@@ -23,14 +23,14 @@ namespace Microsoft.AspNetCore.Builder
             var options = new HttpTraceOptions();
             setupAction?.Invoke(options);
 
-            if (options.RequestMode != HttpTraceMode.Disabled)
+            if (options.LogRequest)
             {
-                builder.UseRequestLogging(options.RequestMode == HttpTraceMode.IncludeBody, options.IgnoredPathPrefixes, options.LogLevel);
+                builder.UseRequestLogging(options.MaxRequestBodyByteCount, options.IgnoredPathPrefixes, options.LogLevel);
             }
 
-            if (options.ResponseMode != HttpTraceMode.Disabled)
+            if (options.LogResponse)
             {
-                builder.UseResponseLogging(options.ResponseMode == HttpTraceMode.IncludeBody, options.IgnoredPathPrefixes, options.LogLevel);
+                builder.UseResponseLogging(options.MaxResponseBodyByteCount, options.IgnoredPathPrefixes, options.LogLevel);
             }
 
             return builder;
@@ -39,18 +39,18 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// This will affect performance.
         /// </summary>
-        public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder builder, bool includeBody = false, IEnumerable<string> ignoredPathPrefixes = null, LogLevel logLevel = LogLevel.Trace)
+        public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder builder, long maxBodyByteCount = 1024 * 1024, IEnumerable<string> ignoredPathPrefixes = null, LogLevel logLevel = LogLevel.Trace)
         {
-            return builder.UseMiddleware<RequestLoggingMiddleware>(includeBody, ignoredPathPrefixes, logLevel);
+            return builder.UseMiddleware<RequestLoggingMiddleware>(maxBodyByteCount, ignoredPathPrefixes, logLevel);
         }
 
         /// <summary>
         /// This will affect performance.
         /// This should be called before anything else, including error handling, as it needs to create a new response stream.
         /// </summary>
-        public static IApplicationBuilder UseResponseLogging(this IApplicationBuilder builder, bool includeBody = false, IEnumerable<string> ignoredPathPrefixes = null, LogLevel logLevel = LogLevel.Trace)
+        public static IApplicationBuilder UseResponseLogging(this IApplicationBuilder builder, long maxBodyByteCount = 1024 * 1024, IEnumerable<string> ignoredPathPrefixes = null, LogLevel logLevel = LogLevel.Trace)
         {
-            return builder.UseMiddleware<ResponseLoggingMiddleware>(includeBody, ignoredPathPrefixes, logLevel);
+            return builder.UseMiddleware<ResponseLoggingMiddleware>(maxBodyByteCount, ignoredPathPrefixes, logLevel);
         }
     }
 }
