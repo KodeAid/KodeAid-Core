@@ -3,7 +3,6 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,30 +10,32 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 
-namespace KodeAid.AspNetCore.Http.Tracing.Request
+namespace KodeAid.AspNetCore.Http.Logging.Request
 {
     public class RequestLoggingMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly long _maxBodyByteCount;
-        private readonly IEnumerable<string> _ignoredPathPrefixes;
-        private readonly LogLevel _logLevel;
+        private readonly Func<HttpContext, bool> _shouldLog;
+        private readonly ILogger _logger;
 
-        public RequestLoggingMiddleware(RequestDelegate next, long maxBodyByteCount, IEnumerable<string> ignoredPathPrefixes, LogLevel logLevel)
+        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, long maxBodyByteCount, Func<HttpContext, bool> shouldLog)
         {
             ArgCheck.NotNull(nameof(next), next);
+            ArgCheck.NotNull(nameof(logger), logger);
 
             _next = next;
+            _logger = logger;
             _maxBodyByteCount = maxBodyByteCount;
-            _ignoredPathPrefixes = ignoredPathPrefixes?.EmptyIfNull().WhereNotNull().ToList();
-            _logLevel = logLevel;
+            _shouldLog = shouldLog;
         }
 
-        public async Task InvokeAsync(HttpContext context, ILogger<RequestLoggingMiddleware> logger)
+        public async Task InvokeAsync(HttpContext context)
         {
-            if (logger.IsEnabled(_logLevel) && !_ignoredPathPrefixes.Any(p => context.Request.Path.StartsWithSegments(p, StringComparison.OrdinalIgnoreCase)))
+            if (_logger.IsEnabled(LogLevel.Debug) &&
+                (_shouldLog?.Invoke(context)).GetValueOrDefault(true))
             {
-                logger.Log(_logLevel, await FormatRequestAsync(context.Request));
+                _logger.LogDebug(await FormatRequestAsync(context.Request));
             }
 
             await _next(context);
