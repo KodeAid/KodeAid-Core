@@ -9,7 +9,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace KodeAid.Json.Serialization
 {
-    public class ReadWritePredicate : IPredicateConfiguration
+    public class ReadWritePredicate : IPropertyPredicate
     {
         public Predicate<object> GetShouldSerializePredicate(MemberInfo member, JsonProperty property)
         {

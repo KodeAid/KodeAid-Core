@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace KodeAid.Json.Serialization
 {
-    public class EmptyArrayPredicate : PredicateConfiguration
+    public class EmptyArrayPredicate : PropertyPredicate
     {
         public override Predicate<object> GetShouldSerializePredicate(MemberInfo member, JsonProperty property)
         {

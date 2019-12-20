@@ -12,41 +12,35 @@ namespace KodeAid.Json.Serialization
 {
     public class PredicateContractResolver : DefaultContractResolver
     {
-        private readonly IList<IPredicateConfiguration> _predicateConfigurations = new List<IPredicateConfiguration>();
-
         public PredicateContractResolver()
         {
         }
 
-        public PredicateContractResolver(params IPredicateConfiguration[] predicateConfigurations)
-            : this((IEnumerable<IPredicateConfiguration>)predicateConfigurations)
+        public PredicateContractResolver(params IPropertyPredicate[] propertyPredicates)
+            : this((IEnumerable<IPropertyPredicate>)propertyPredicates)
         {
         }
 
-        public PredicateContractResolver(IEnumerable<IPredicateConfiguration> predicateConfigurations)
+        public PredicateContractResolver(IEnumerable<IPropertyPredicate> propertyPredicates)
         {
-            ArgCheck.NotNull(nameof(predicateConfigurations), predicateConfigurations);
-            _predicateConfigurations.AddRange(predicateConfigurations.WhereNotNull());
+            ArgCheck.NotNull(nameof(propertyPredicates), propertyPredicates);
+
+            PropertyPredicates.AddRange(propertyPredicates.WhereNotNull());
         }
 
-        public void Add(IPredicateConfiguration predicateConfiguration)
-        {
-            ArgCheck.NotNull(nameof(predicateConfiguration), predicateConfiguration);
-            _predicateConfigurations.Add(predicateConfiguration);
-        }
+        public List<IPropertyPredicate> PropertyPredicates { get; } = new List<IPropertyPredicate>();
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
 
-            if (_predicateConfigurations.Count == 0)
+            if (PropertyPredicates.Count == 0)
             {
                 return property;
             }
 
             // should serialize
-
-            var predicates = _predicateConfigurations.Select(c => c.GetShouldSerializePredicate(member, property)).WhereNotNull().ToList();
+            var predicates = PropertyPredicates.Select(c => c.GetShouldSerializePredicate(member, property)).WhereNotNull().ToList();
             if (predicates.Count > 0)
             {
                 if (property.ShouldSerialize != null)
@@ -58,7 +52,7 @@ namespace KodeAid.Json.Serialization
             }
 
             // should deserialize
-            predicates = _predicateConfigurations.Select(c => c.GetShouldDeserializePredicate(member, property)).WhereNotNull().ToList();
+            predicates = PropertyPredicates.Select(c => c.GetShouldDeserializePredicate(member, property)).WhereNotNull().ToList();
             if (predicates.Count > 0)
             {
                 if (property.ShouldDeserialize != null)

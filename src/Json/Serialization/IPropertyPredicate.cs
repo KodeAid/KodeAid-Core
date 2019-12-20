@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace KodeAid.Json.Serialization
 {
-    public interface IPredicateConfiguration
+    public interface IPropertyPredicate
     {
         Predicate<object> GetShouldSerializePredicate(MemberInfo member, JsonProperty property);
         Predicate<object> GetShouldDeserializePredicate(MemberInfo member, JsonProperty property);

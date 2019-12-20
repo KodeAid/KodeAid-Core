@@ -11,7 +11,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace KodeAid.Json.Serialization
 {
-    public class VersionedModelPredicate : PredicateConfiguration
+    public class VersionedModelPredicate : PropertyPredicate
     {
         private readonly Func<string> _getCurrentVersion;
         private readonly IEqualityComparer<string> _comparer;
