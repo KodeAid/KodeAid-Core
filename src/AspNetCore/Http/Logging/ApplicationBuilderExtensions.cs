@@ -3,9 +3,6 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using KodeAid;
 using KodeAid.AspNetCore.Http.Logging;
 using KodeAid.AspNetCore.Http.Logging.Request;
 using KodeAid.AspNetCore.Http.Logging.Response;
@@ -66,7 +63,7 @@ namespace Microsoft.AspNetCore.Builder
             if (options.Enabled)
             {
                 var logger = builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger(options.LoggerName ?? typeof(RequestLoggingMiddleware).Namespace);
-                builder.UseMiddleware<RequestLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog);
+                builder.UseMiddleware<RequestLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog ?? (ctx => true));
             }
 
             return builder;
@@ -86,7 +83,7 @@ namespace Microsoft.AspNetCore.Builder
             if (options.Enabled)
             {
                 var logger = builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger(options.LoggerName ?? typeof(ResponseLoggingMiddleware).Namespace);
-                builder.UseMiddleware<ResponseLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog);
+                builder.UseMiddleware<ResponseLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog ?? (ctx => true));
             }
 
             return builder;
