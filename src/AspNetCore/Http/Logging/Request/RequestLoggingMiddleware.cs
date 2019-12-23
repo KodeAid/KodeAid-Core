@@ -32,10 +32,10 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (_logger.IsEnabled(LogLevel.Debug) &&
+            if (_logger.IsEnabled(LogLevel.Trace) &&
                 (_shouldLog?.Invoke(context)).GetValueOrDefault(true))
             {
-                _logger.LogDebug(await FormatRequestAsync(context.Request));
+                _logger.LogTrace(await FormatRequestAsync(context.Request));
             }
 
             await _next(context);
@@ -43,12 +43,12 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
 
         private async Task<string> FormatRequestAsync(HttpRequest request)
         {
-            var headersAsText = string.Join("\n", request.Headers.Select(h => $"{h.Key}: {h.Value}"));
-            var queryAsText = string.Join("\n", request.Query.Select(q => $"{q.Key}={q.Value}"));
+            var headersAsText = string.Join("", request.Headers.Select(h => $"{h.Key}: {h.Value}\n"));
+            var queryAsText = string.Join("", request.Query.Select((q, i) => $"{(i == 0 ? "?" : "&")}{q.Key}={q.Value}\n"));
 
             if (_maxBodyByteCount <= 0)
             {
-                return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}\n{queryAsText}";
+                return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}";
             }
 
             request.EnableRewind();
@@ -58,7 +58,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
 
             var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
 
-            return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}\n{queryAsText}\n{bodyAsText}";
+            return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
         }
     }
 }

@@ -33,7 +33,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (!_logger.IsEnabled(LogLevel.Debug) ||
+            if (!_logger.IsEnabled(LogLevel.Trace) ||
                 !(_shouldLog?.Invoke(context)).GetValueOrDefault(true))
             {
                 await _next(context);
@@ -48,7 +48,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
 
             await _next(context);
 
-            _logger.LogDebug(await FormatResponseAsync(context.Request, context.Response));
+            _logger.LogTrace(await FormatResponseAsync(context.Request, context.Response));
 
             try
             {
@@ -65,7 +65,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
 
         private async Task<string> FormatResponseAsync(HttpRequest request, HttpResponse response)
         {
-            var headersAsText = string.Join("\n", response.Headers.Select(h => $"{h.Key}: {h.Value}"));
+            var headersAsText = string.Join("", response.Headers.Select(h => $"{h.Key}: {h.Value}\n"));
 
             if (_maxBodyByteCount <= 0)
             {
