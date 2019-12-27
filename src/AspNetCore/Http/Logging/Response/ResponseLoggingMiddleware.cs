@@ -40,6 +40,13 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
                 return;
             }
 
+            if (_maxBodyByteCount <= 0)
+            {
+                await _next(context);
+                _logger.LogTrace(await FormatResponseAsync(context.Request, context.Response));
+                return;
+            }
+
             var originalBodyStream = context.Response.Body;
 
             using var responseBody = new MemoryStream();
