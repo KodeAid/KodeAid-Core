@@ -22,7 +22,10 @@ namespace KodeAid.Json.Converters
         public override bool CanConvert(Type objectType)
         {
             if (base.CanConvert(objectType))
+            {
                 return true;
+            }
+            
             var type = Nullable.GetUnderlyingType(objectType) ?? objectType;
             return type.IsEnum && type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 1;
         }
@@ -33,19 +36,21 @@ namespace KodeAid.Json.Converters
 
             // we only care about enums with the flags attribute
             if (!type.IsEnum || type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 0)
+            {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
+            }
 
             // value is not string[], assume underlying enum type (typically int)
             if (reader.TokenType != JsonToken.StartArray)
+            {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
+            }
 
             var value = serializer.Deserialize(reader);
-            using (var sr = new StringReader("\"" + string.Join(", ", ((JArray)value).Values<string>()) + "\""))
-            using (var jr = new JsonTextReader(sr))
-            {
-                jr.Read();
-                return base.ReadJson(jr, type, Activator.CreateInstance(type), serializer);
-            }
+            using var sr = new StringReader("\"" + string.Join(", ", ((JArray)value).Values<string>()) + "\"");
+            using var jr = new JsonTextReader(sr);
+            jr.Read();
+            return base.ReadJson(jr, type, Activator.CreateInstance(type), serializer);
         }
 
         public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
@@ -61,7 +66,9 @@ namespace KodeAid.Json.Converters
                 if (type.IsEnum && type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 1)
                 {
                     if (object.Equals(value, Activator.CreateInstance(type)))
+                    {
                         value = new string[0];
+                    }
                     else
                     {
                         var sb = new StringBuilder();
@@ -76,6 +83,7 @@ namespace KodeAid.Json.Converters
                     }
                 }
             }
+
             serializer.Serialize(writer, value);
         }
     }
