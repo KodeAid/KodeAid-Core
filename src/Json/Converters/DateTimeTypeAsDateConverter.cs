@@ -10,7 +10,7 @@ namespace KodeAid.Json.Converters
     public class DateTimeTypeAsDateConverter : DateTimeConverter
     {
         public DateTimeTypeAsDateConverter()
-            : this("yyyy'-'MM'-'dd'")
+            : this("yyyy-MM-dd")
         {
         }
 

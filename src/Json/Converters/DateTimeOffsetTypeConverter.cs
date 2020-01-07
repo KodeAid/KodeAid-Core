@@ -10,7 +10,7 @@ namespace KodeAid.Json.Converters
     public class DateTimeOffsetTypeConverter : DateTimeConverter
     {
         public DateTimeOffsetTypeConverter()
-            : this("yyyy'-'MM'-'dd'T'HH':'mm':'ssK")
+            : this("yyyy-MM-dd'T'HH:mm:ssK")
         {
         }
 

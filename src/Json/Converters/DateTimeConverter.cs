@@ -15,7 +15,7 @@ namespace KodeAid.Json.Converters
     /// </summary>
     public class DateTimeConverter : DateTimeConverterBase
     {
-        private const string _defaultWriteDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK";
+        private const string _defaultWriteDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.fffffffK";
 
         private string _writeDateTimeFormat;
         private CultureInfo _culture;
