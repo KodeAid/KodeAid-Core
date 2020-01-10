@@ -12,6 +12,9 @@ using Newtonsoft.Json.Linq;
 
 namespace KodeAid.Json.Converters
 {
+    /// <summary>
+    /// Converts an <see cref="Enum"/> to and from its name string value and uses an array of strings for any with the <see cref="FlagsAttribute"/> defined instead of the default comma separated list.
+    /// </summary>
     public class StringArrayEnumConverter : StringEnumConverter
     {
         public StringArrayEnumConverter()
@@ -25,7 +28,7 @@ namespace KodeAid.Json.Converters
             {
                 return true;
             }
-            
+
             var type = Nullable.GetUnderlyingType(objectType) ?? objectType;
             return type.IsEnum && type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 1;
         }
@@ -35,8 +38,9 @@ namespace KodeAid.Json.Converters
             var type = Nullable.GetUnderlyingType(objectType) ?? objectType;
 
             // we only care about enums with the flags attribute
-            if (!type.IsEnum || type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 0)
+            if (type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 0)
             {
+                // read default enum
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             }
 
@@ -55,35 +59,38 @@ namespace KodeAid.Json.Converters
 
         public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
         {
-            if (value == null && serializer.NullValueHandling == NullValueHandling.Include)
+            if (value == null)
             {
-                value = new string[0];
-            }
-            else
-            {
-                var type = value.GetType();
-                type = Nullable.GetUnderlyingType(type) ?? type;
-                if (type.IsEnum && type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 1)
-                {
-                    if (object.Equals(value, Activator.CreateInstance(type)))
-                    {
-                        value = new string[0];
-                    }
-                    else
-                    {
-                        var sb = new StringBuilder();
-                        using (var sw = new StringWriter(sb))
-                        using (var jw = new JsonTextWriter(sw))
-                        {
-                            base.WriteJson(jw, value, serializer);
-                            jw.Flush();
-                            sw.Flush();
-                        }
-                        value = sb.ToString().Trim().Trim('\'', '"').Split(',').Select(s => s.Trim()).ToArray();
-                    }
-                }
+                writer.WriteNull();
+                return;
             }
 
+            var type = value.GetType();
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (type.GetCustomAttributes(typeof(FlagsAttribute), false).Length == 0)
+            {
+                // write default enum
+                base.WriteJson(writer, value, serializer);
+            }
+
+            if (Equals(value, Activator.CreateInstance(type)))
+            {
+                writer.WriteStartArray();
+                writer.WriteEndArray();
+                return;
+            }
+
+            var sb = new StringBuilder();
+            using (var sw = new StringWriter(sb))
+            using (var jw = new JsonTextWriter(sw))
+            {
+                base.WriteJson(jw, value, serializer);
+                jw.Flush();
+                sw.Flush();
+            }
+
+            value = sb.ToString().Trim('\'', '"').Split(',').Select(s => s.Trim()).ToArray();
             serializer.Serialize(writer, value);
         }
     }

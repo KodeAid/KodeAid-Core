@@ -12,6 +12,9 @@ using Newtonsoft.Json.Linq;
 
 namespace KodeAid.Json.Converters
 {
+    /// <summary>
+    /// Converts an <see cref="Enum"/> with the <see cref="FlagsAttribute"/> defined to and from an array of its name string values.
+    /// </summary>
     public class StringArrayEnumFlagsConverter : StringEnumConverter
     {
         public override bool CanConvert(Type objectType)
@@ -25,6 +28,7 @@ namespace KodeAid.Json.Converters
             // if value is not an array (we want string[]) then use base implementation
             if (reader.TokenType != JsonToken.StartArray)
             {
+                // read default enum
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             }
 
