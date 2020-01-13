@@ -32,7 +32,13 @@ namespace KodeAid.AspNetCore.SwaggerGen
             // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/413
             foreach (var parameter in operation.Parameters.OfType<NonBodyParameter>())
             {
-                var description = context.ApiDescription.ParameterDescriptions.First(p => p.Name == parameter.Name);
+                var description = context.ApiDescription.ParameterDescriptions.FirstOrDefault(p => p.Name == parameter.Name);
+
+                if (description == null)
+                {
+                    continue;
+                }
+
                 var routeInfo = description.RouteInfo;
 
                 if (parameter.Description == null)
