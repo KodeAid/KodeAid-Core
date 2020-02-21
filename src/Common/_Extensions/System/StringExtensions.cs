@@ -387,7 +387,7 @@ namespace System
             // remove unwanted characters (replace with underscore)
             str = Regex.Replace(str, "[^a-zA-Z0-9_]", "_", RegexOptions.Compiled);
             // if camel casing, then add underscores between words
-            str = Regex.Replace(str, "(([a-z][A-Z])|([0-9][A-Za-z])|([a-zA-z][0-9]))", m => $"{m.Value[0]}_{m.Value[1]}", RegexOptions.Compiled);
+            str = Regex.Replace(str, "(([a-z][A-Z])|([0-9][A-Za-z])|([a-zA-Z][0-9]))", m => $"{m.Value[0]}_{m.Value[1]}", RegexOptions.Compiled);
 
             // remove excess underscores
             str = str.Trim('_');
