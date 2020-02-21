@@ -156,10 +156,10 @@ namespace KodeAid.Testing.DataGeneration
         {
             if (formatted)
             {
-                return $"{prefix} ({dataGenerator.GetNumber(3)}) {dataGenerator.GetNumber(3)}-{dataGenerator.GetNumber(4)}";
+                return $"{prefix} ({dataGenerator.GetNumber(3)}) {dataGenerator.GetNumber(3)}-{dataGenerator.GetNumber(4, canStartWithZero: true)}";
             }
 
-            return $"{prefix}{dataGenerator.GetNumber(10)}";
+            return $"{prefix}{dataGenerator.GetNumber(3)}{dataGenerator.GetNumber(3)}{dataGenerator.GetNumber(4, canStartWithZero: true)}";
         }
 
         public static string GetDomainName(this IDataGenerator dataGenerator, string companyName = null, int nullOdds = 0)
@@ -277,7 +277,7 @@ namespace KodeAid.Testing.DataGeneration
                 i += 2;
             }
 
-            var checkdigit = (((int)Math.Floor(sum / 10.0) + 1) * 10 - sum) % 10;
+            var checkdigit = ((((int)Math.Floor(sum / 10.0) + 1) * 10) - sum) % 10;
             sin += checkdigit;
 
             if (formatted)
