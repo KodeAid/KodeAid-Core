@@ -301,14 +301,7 @@ namespace KodeAid.Reflection
                         if ((assembliesSearched.Count == 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.StartingDirectory)) ||
                             (assembliesSearched.Count > 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.AssemblyDirectories)))
                         {
-                            var codebaseDirectory = Path.GetDirectoryName(assembly.CodeBase);
-
-                            if (codebaseDirectory.StartsWith(@"file:"))
-                            {
-                                codebaseDirectory = codebaseDirectory.Substring(@"file:".Length);
-                            }
-
-                            codebaseDirectory = codebaseDirectory.Trim('\\', '/');
+                            var codebaseDirectory = Path.GetDirectoryName(new Uri(assembly.CodeBase).AbsolutePath);
 
                             if (assembliesSearched.Add(codebaseDirectory))
                             {
