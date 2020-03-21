@@ -387,7 +387,7 @@ namespace KodeAid.Reflection
                         });
                     }
                 }
-                else if  (s.EndsWith(" -isnull"))
+                else if (s.EndsWith(" -isnull"))
                 {
                     s = s.Substring(0, s.Length - " -isnull".Length);
 

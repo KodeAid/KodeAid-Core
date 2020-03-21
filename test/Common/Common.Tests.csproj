@@ -2,12 +2,12 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
-        <AssemblyName>KodeAid.Json.Tests</AssemblyName>
-        <RootNamespace>KodeAid.Json</RootNamespace>
+        <AssemblyName>KodeAid.Common.Tests</AssemblyName>
+        <RootNamespace>KodeAid</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Json\Json.csproj" />
+        <ProjectReference Include="..\..\src\Common\Common.csproj" />
         <ProjectReference Include="..\..\src\Testing\Testing.csproj" />
         <ProjectReference Include="..\..\src\Xunit\Xunit.csproj" />
     </ItemGroup>
