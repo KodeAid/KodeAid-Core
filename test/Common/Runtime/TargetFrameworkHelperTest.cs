@@ -16,11 +16,12 @@ namespace KodeAid.Json
         [Fact]
         public void ReadValuesCorrectly()
         {
-            _output?.WriteLine($"Name: {TargetFrameworkHelper.Name}");
-            _output?.WriteLine($"Version: {TargetFrameworkHelper.Version}");
-            _output?.WriteLine($"DisplayName: {TargetFrameworkHelper.DisplayName}");
-            _output?.WriteLine($"IsNetCoreApp: {TargetFrameworkHelper.IsNetCoreApp}");
-            _output?.WriteLine($"IsNetFramework: {TargetFrameworkHelper.IsNetFramework}");
+            _output?.WriteLine($"Name: {TargetFramework.Current.Name}");
+            _output?.WriteLine($"Version: {TargetFramework.Current.Version}");
+            _output?.WriteLine($"DisplayName: {TargetFramework.Current.DisplayName}");
+            _output?.WriteLine($"IsNetCoreApp: {TargetFramework.Current.IsNetCoreApp()}");
+            _output?.WriteLine($"IsNetFramework: {TargetFramework.Current.IsNetFramework()}");
+            _output?.WriteLine($"IsNetStandard: {TargetFramework.Current.IsNetStandard()}");
         }
     }
 }
