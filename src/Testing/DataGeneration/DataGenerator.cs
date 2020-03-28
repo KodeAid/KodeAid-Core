@@ -66,8 +66,8 @@ namespace KodeAid.Testing.DataGeneration
         /// 'A' is upper case letter.
         /// 'a' is lower case letter.
         /// '0' is number.
-        /// 'Z' is upper case alphanumeric.
-        /// 'z' is lower case alphanumeric.
+        /// 'X' is upper case alphanumeric.
+        /// 'x' is lower case alphanumeric.
         /// All other characters are copied as is.
         /// </summary>
         public string GetString(string mask)
@@ -81,11 +81,11 @@ namespace KodeAid.Testing.DataGeneration
 
             foreach (var c in mask)
             {
-                if (c == 'Z')
+                if (c == 'X')
                 {
                     sb.Append(GetCharacter("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
                 }
-                else if (c == 'z')
+                else if (c == 'x')
                 {
                     sb.Append(GetCharacter("0123456789abcdefghijklmnopqrstuvwxyz"));
                 }

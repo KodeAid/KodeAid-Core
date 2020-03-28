@@ -35,6 +35,7 @@ namespace KodeAid.EntityFrameworkCore
         public EFRepository(TContext context, bool autoSave = false)
         {
             ArgCheck.NotNull(nameof(context), context);
+
             Context = context;
             _autoSave = autoSave;
         }
@@ -58,9 +59,9 @@ namespace KodeAid.EntityFrameworkCore
             return Context.Set<TEntity>().Find(id);
         }
 
-        public Task<TEntity> GetAsync(object id, CancellationToken cancellationToken = default)
+        public async Task<TEntity> GetAsync(object id, CancellationToken cancellationToken = default)
         {
-            return GetAsync(id, false, cancellationToken);
+            return await GetAsync(id, false, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<TEntity> GetAsync(object id, bool trackChanges, CancellationToken cancellationToken = default)
@@ -79,7 +80,10 @@ namespace KodeAid.EntityFrameworkCore
         public IEnumerable<TEntity> GetAll(bool trackChanges)
         {
             if (trackChanges)
+            {
                 return Context.Set<TEntity>().ToList();
+            }
+
             return Context.Set<TEntity>().AsNoTracking().ToList();
         }
 
@@ -91,7 +95,10 @@ namespace KodeAid.EntityFrameworkCore
         public async Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges, CancellationToken cancellationToken = default)
         {
             if (trackChanges)
+            {
                 return await Context.Set<TEntity>().ToListAsync(cancellationToken).ConfigureAwait(false);
+            }
+
             return await GetAllAsync().ConfigureAwait(false);
         }
 
@@ -103,7 +110,10 @@ namespace KodeAid.EntityFrameworkCore
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate, bool trackChanges)
         {
             if (trackChanges)
+            {
                 return Context.Set<TEntity>().Where(predicate).ToList();
+            }
+
             return Find(predicate);
         }
 
@@ -115,100 +125,143 @@ namespace KodeAid.EntityFrameworkCore
         public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, bool trackChanges, CancellationToken cancellationToken = default)
         {
             if (trackChanges)
+            {
                 return await Context.Set<TEntity>().Where(predicate).ToListAsync(cancellationToken).ConfigureAwait(false);
+            }
+
             return await FindAsync(predicate).ConfigureAwait(false);
         }
 
         public void Add(TEntity entity)
         {
             Context.Set<TEntity>().Add(entity);
+
             if (_autoSave)
+            {
                 Context.SaveChanges(true);
+            }
         }
 
         public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             Context.Set<TEntity>().Add(entity);
+
             if (_autoSave)
+            {
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
+            }
         }
 
         public void AddRange(IEnumerable<TEntity> entities)
         {
             Context.Set<TEntity>().AddRange(entities);
+
             if (_autoSave)
+            {
                 Context.SaveChanges(true);
+            }
         }
 
         public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             Context.Set<TEntity>().AddRange(entities);
+
             if (_autoSave)
+            {
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
+            }
         }
 
         public void Remove(TEntity entity)
         {
             Context.Set<TEntity>().Remove(entity);
+
             if (_autoSave)
+            {
                 Context.SaveChanges(true);
+            }
         }
 
         public async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             Context.Set<TEntity>().Remove(entity);
+
             if (_autoSave)
+            {
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
+            }
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
             Context.Set<TEntity>().RemoveRange(entities);
+
             if (_autoSave)
+            {
                 Context.SaveChanges(true);
+            }
         }
 
         public async Task RemoveRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             Context.Set<TEntity>().RemoveRange(entities);
+
             if (_autoSave)
+            {
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
+            }
         }
 
         public void Update(TEntity entity)
         {
             Context.Set<TEntity>().Update(entity);
+
             if (_autoSave)
+            {
                 Context.SaveChanges(true);
+            }
         }
 
         public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             Context.Set<TEntity>().Update(entity);
+
             if (_autoSave)
+            {
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
+            }
         }
 
         public void UpdateRange(IEnumerable<TEntity> entities)
         {
             Context.Set<TEntity>().UpdateRange(entities);
+
             if (_autoSave)
+            {
                 Context.SaveChanges(true);
+            }
         }
 
         public async Task UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             Context.Set<TEntity>().UpdateRange(entities);
+
             if (_autoSave)
+            {
                 await Context.SaveChangesAsync(true).ConfigureAwait(false);
+            }
         }
 
         public void Track(TEntity entity, bool trackChanges = true)
         {
             if (trackChanges)
+            {
                 Context.Attach(entity);
+            }
             else
+            {
                 Context.Entry(entity).State = EntityState.Detached;
+            }
         }
 
         public Task TrackAsync(TEntity entity, bool trackChanges = true, CancellationToken cancellationToken = default)
@@ -220,10 +273,16 @@ namespace KodeAid.EntityFrameworkCore
         public void TrackRange(IEnumerable<TEntity> entities, bool trackChanges = true)
         {
             if (trackChanges)
+            {
                 Context.AttachRange(entities);
+            }
             else
+            {
                 foreach (var entity in entities)
+                {
                     Context.Entry(entity).State = EntityState.Detached;
+                }
+            }
         }
 
         public Task TrackRangeAsync(IEnumerable<TEntity> entities, bool trackChanges = true, CancellationToken cancellationToken = default)

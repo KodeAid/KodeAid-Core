@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<Version>1.0.4</Version>
-		<AssemblyName>KodeAid.Html</AssemblyName>
-		<RootNamespace>KodeAid.Html</RootNamespace>
-		<Description>Kode-Aid shared HTML utility library.</Description>
-		<PackageTags>helpers extensions utilities html</PackageTags>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Version>1.1.0</Version>
+        <AssemblyName>KodeAid.Html</AssemblyName>
+        <RootNamespace>KodeAid.Html</RootNamespace>
+        <Description>Kode-Aid shared HTML utility library.</Description>
+        <PackageTags>helpers extensions utilities html</PackageTags>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.23" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Common\Common.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
 
 </Project>

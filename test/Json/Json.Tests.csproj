@@ -1,24 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <AssemblyName>KodeAid.Json.Tests</AssemblyName>
         <RootNamespace>KodeAid.Json</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-		<ProjectReference Include="..\..\src\Json\Json.csproj" />
-		<ProjectReference Include="..\..\src\Testing\Testing.csproj" />
-		<ProjectReference Include="..\..\src\Xunit\Xunit.csproj" />
+        <ProjectReference Include="..\..\src\Json\Json.csproj" />
+        <ProjectReference Include="..\..\src\Testing\Testing.csproj" />
+        <ProjectReference Include="..\..\src\Xunit\Xunit.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.0.1" />
-      <PackageReference Update="xunit" Version="2.4.1" />
-      <PackageReference Update="xunit.runner.visualstudio" Version="2.4.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      </PackageReference>
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+        <PackageReference Update="xunit" Version="2.4.1" />
+        <PackageReference Update="xunit.runner.visualstudio" Version="2.4.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

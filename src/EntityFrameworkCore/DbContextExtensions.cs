@@ -45,7 +45,9 @@ namespace Microsoft.EntityFrameworkCore
             ArgCheck.NotNull(nameof(entities), entities);
 
             foreach (var entity in entities)
+            {
                 AddOrUpdate(context, entity);
+            }
         }
 
         public static void AddOrUpdateRange<TEntity>(this DbContext context, params TEntity[] entities)
@@ -61,7 +63,9 @@ namespace Microsoft.EntityFrameworkCore
             ArgCheck.NotNull(nameof(entities), entities);
 
             foreach (var entity in entities)
+            {
                 await AddOrUpdateAsync(context, entity, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         public static Task AddOrUpdateRangeAsync<TEntity>(this DbContext context, params TEntity[] entities)
@@ -80,22 +84,38 @@ namespace Microsoft.EntityFrameworkCore
             where TEntity : class
         {
             var timestamp = DateTimeOffset.UtcNow;
+
             if (existing != null)
             {
                 if (typeof(ICreatedTime).IsAssignableFrom(entity.GetType()))
+                {
                     ((ICreatedTime)entity).CreatedAt = ((ICreatedTime)existing).CreatedAt;
+                }
+
                 if (typeof(IUpdatedTime).IsAssignableFrom(entity.GetType()))
+                {
                     ((IUpdatedTime)entity).UpdatedAt = timestamp;
+                }
+
                 if (typeof(IOptimisticConcurrency).IsAssignableFrom(entity.GetType()))
+                {
                     ((IOptimisticConcurrency)entity).ConcurrencyStamp = ((IOptimisticConcurrency)existing).ConcurrencyStamp;
+                }
+
                 context.Update(entity);
             }
             else
             {
                 if (typeof(ICreatedTime).IsAssignableFrom(entity.GetType()))
+                {
                     ((ICreatedTime)entity).CreatedAt = timestamp;
+                }
+
                 if (typeof(IUpdatedTime).IsAssignableFrom(entity.GetType()))
+                {
                     ((IUpdatedTime)entity).UpdatedAt = timestamp;
+                }
+
                 context.Add(entity);
             }
         }

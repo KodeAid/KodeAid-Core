@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-    	<Version>2.0.0</Version>
+        <Version>2.1.0</Version>
         <AssemblyName>KodeAid.Configuration</AssemblyName>
         <RootNamespace>KodeAid.Configuration</RootNamespace>
         <Description>Kode-Aid shared configuration library.</Description>
@@ -10,13 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.3" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>

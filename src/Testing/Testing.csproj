@@ -4,12 +4,12 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <AssemblyName>KodeAid.Testing</AssemblyName>
         <RootNamespace>KodeAid.Testing</RootNamespace>
-        <Version>1.0.6</Version>
+        <Version>1.1.0</Version>
         <Description>Kode-Aid shared testing helpers library.</Description>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Common\Common.csproj" />
+        <ProjectReference Include="..\..\src\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>

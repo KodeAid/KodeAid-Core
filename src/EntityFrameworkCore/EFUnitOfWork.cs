@@ -23,6 +23,7 @@ namespace KodeAid.EntityFrameworkCore
         public EFUnitOfWork(TContext context)
         {
             ArgCheck.NotNull(nameof(context), context);
+
             Context = context;
         }
 
@@ -61,6 +62,7 @@ namespace KodeAid.EntityFrameworkCore
             where TRepository : EFRepository<TEntity, TContext>
         {
             ArgCheck.NotNull(nameof(ctor), ctor);
+
             return ctor(Context);
         }
     }

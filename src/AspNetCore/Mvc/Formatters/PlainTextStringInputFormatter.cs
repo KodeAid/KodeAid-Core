@@ -44,7 +44,6 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
             {
                 request.EnableBuffering();
                 Debug.Assert(request.Body.CanSeek);
-
                 await request.Body.DrainAsync(CancellationToken.None);
                 request.Body.Seek(0L, SeekOrigin.Begin);
             }

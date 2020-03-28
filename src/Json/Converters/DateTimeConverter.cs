@@ -15,16 +15,37 @@ namespace KodeAid.Json.Converters
     /// </summary>
     public class DateTimeConverter : DateTimeConverterBase
     {
-        private const string _defaultWriteDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK";
+        private const string _defaultWriteDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.fffffffK";
 
         private string _writeDateTimeFormat;
         private CultureInfo _culture;
+
+        public bool AllowDateTime { get; set; } = true;
+
+        public bool AllowDateTimeOffset { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the culture used when converting a date to and from JSON.
+        /// </summary>
+        /// <value>The culture used when converting a date to and from JSON.</value>
+        public CultureInfo Culture
+        {
+            get => _culture ?? CultureInfo.CurrentCulture;
+            set => _culture = value;
+        }
 
         /// <summary>
         /// Gets or sets the date time styles used when converting a date to and from JSON.
         /// </summary>
         /// <value>The date time styles used when converting a date to and from JSON.</value>
         public DateTimeStyles DateTimeStyles { get; set; } = DateTimeStyles.RoundtripKind;
+
+        /// <summary>
+        /// Gets or sets accepted date time formats used when reading a date from JSON.
+        /// To clear, set to an empty array. To reset to default, set to null.
+        /// </summary>
+        /// <value>Accepted date time formats used when reading a date from JSON.</value>
+        public string[] ReadDateTimeFormats { get; set; }
 
         /// <summary>
         /// Gets or sets the date time format used when writing a date to JSON.
@@ -38,21 +59,24 @@ namespace KodeAid.Json.Converters
             set => _writeDateTimeFormat = value;
         }
 
-        /// <summary>
-        /// Gets or sets accepted date time formats used when reading a date from JSON.
-        /// To clear, set to an empty array. To reset to default, set to null.
-        /// </summary>
-        /// <value>Accepted date time formats used when reading a date from JSON.</value>
-        public string[] ReadDateTimeFormats { get; set; }
-
-        /// <summary>
-        /// Gets or sets the culture used when converting a date to and from JSON.
-        /// </summary>
-        /// <value>The culture used when converting a date to and from JSON.</value>
-        public CultureInfo Culture
+        public override bool CanConvert(Type objectType)
         {
-            get => _culture ?? CultureInfo.CurrentCulture;
-            set => _culture = value;
+            if (!base.CanConvert(objectType))
+            {
+                return false;
+            }
+
+            if (AllowDateTime && (objectType == typeof(DateTime) || objectType == typeof(DateTime?)))
+            {
+                return true;
+            }
+
+            if (AllowDateTimeOffset && (objectType == typeof(DateTimeOffset) || objectType == typeof(DateTimeOffset?)))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -85,7 +109,8 @@ namespace KodeAid.Json.Converters
             }
             else
             {
-                throw new JsonSerializationException($"Unexpected value when converting date. Expected DateTime or DateTimeOffset, got {value.GetType().FullName}.");
+                var expectedTypes = $"{(AllowDateTime ? nameof(DateTime) : null)}{((AllowDateTime && AllowDateTimeOffset) ? " or " : null)}{(AllowDateTimeOffset ? nameof(DateTimeOffset) : null)}";
+                throw new JsonSerializationException($"Unexpected value when converting date. Expected {expectedTypes}, got {value.GetType().FullName}.");
             }
 
             writer.WriteValue(text);

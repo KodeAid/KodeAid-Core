@@ -14,14 +14,14 @@ namespace KodeAid.Json.Converters
     /// </summary>
     public class UtcDateTimeConverter : DateTimeConverter
     {
-        private const string _defaultWriteDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK";
+        private const string _defaultWriteDateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.fffffffK";
 
         private static readonly string[] _defaultReadDateTimeFormats = new[]
         {
-            "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK",
-            "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",
-            "yyyy'-'MM'-'dd'T'HH':'mm':'ssK",
-            "yyyy'-'MM'-'dd'T'HH':'mmK",
+            "yyyy-MM-dd'T'HH:mm:ss.fffffffK",
+            "yyyy-MM-dd'T'HH:mm:ss.fffK",
+            "yyyy-MM-dd'T'HH:mm:ssK",
+            "yyyy-MM-dd'T'HH:mmK",
         };
 
         public UtcDateTimeConverter()

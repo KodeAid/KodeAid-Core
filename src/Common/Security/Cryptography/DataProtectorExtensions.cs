@@ -18,6 +18,7 @@ namespace KodeAid.Security.Cryptography
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(unprotectedString), unprotectedString);
+
             return dataProtector.ProtectData((encoding ?? _defaultEncoding).GetBytes(unprotectedString));
         }
 
@@ -25,6 +26,7 @@ namespace KodeAid.Security.Cryptography
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(unprotectedStrings), unprotectedStrings);
+
             return dataProtector.ProtectData(GetBytesFromStrings(unprotectedStrings, encoding ?? _defaultEncoding));
         }
 
@@ -42,6 +44,7 @@ namespace KodeAid.Security.Cryptography
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(protectedData), protectedData);
+
             return (encoding ?? _defaultEncoding).GetString(dataProtector.UnprotectData(protectedData));
         }
 
@@ -49,27 +52,56 @@ namespace KodeAid.Security.Cryptography
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(protectedData), protectedData);
+
             return GetStringsFromBytes(dataProtector.UnprotectData(protectedData), encoding ?? _defaultEncoding);
         }
 
-        public static string ProtectDataToBase64(this IDataProtector dataProtector, byte[] unprotectedData, Encoding encoding = null, bool urlEncoded = false)
+        public static string ProtectDataToBase64(this IDataProtector dataProtector, byte[] unprotectedData, bool urlEncoded = false)
         {
-            return dataProtector.ProtectData(unprotectedData).ToBase64String(urlEncoded);
+            var bytes = dataProtector.ProtectData(unprotectedData);
+
+            if (urlEncoded)
+            {
+                return bytes.ToBase64Url();
+            }
+
+            return bytes.ToBase64String();
         }
 
         public static string ProtectStringToBase64(this IDataProtector dataProtector, string unprotectedString, Encoding encoding = null, bool urlEncoded = false)
         {
-            return dataProtector.ProtectString(unprotectedString, encoding).ToBase64String(urlEncoded);
+            var bytes = dataProtector.ProtectString(unprotectedString, encoding);
+
+            if (urlEncoded)
+            {
+                return bytes.ToBase64Url();
+            }
+
+            return bytes.ToBase64String();
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, string[] unprotectedStrings, Encoding encoding = null, bool urlEncoded = false)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64String(urlEncoded);
+            var bytes = dataProtector.ProtectStrings(unprotectedStrings, encoding);
+
+            if (urlEncoded)
+            {
+                return bytes.ToBase64Url();
+            }
+
+            return bytes.ToBase64String();
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, bool urlEncoded = false, params string[] unprotectedStrings)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, null).ToBase64String(urlEncoded);
+            var bytes = dataProtector.ProtectStrings(unprotectedStrings, null);
+
+            if (urlEncoded)
+            {
+                return bytes.ToBase64Url();
+            }
+
+            return bytes.ToBase64String();
         }
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, Encoding encoding, params string[] unprotectedStrings)
@@ -79,25 +111,38 @@ namespace KodeAid.Security.Cryptography
 
         public static string ProtectStringsToBase64(this IDataProtector dataProtector, Encoding encoding, bool urlEncoded, params string[] unprotectedStrings)
         {
-            return dataProtector.ProtectStrings(unprotectedStrings, encoding).ToBase64String(urlEncoded);
+            var bytes = dataProtector.ProtectStrings(unprotectedStrings, encoding);
+
+            if (urlEncoded)
+            {
+                return bytes.ToBase64Url();
+            }
+
+            return bytes.ToBase64String();
         }
 
-        public static byte[] UnprotectDataFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
+        public static byte[] UnprotectDataFromBase64(this IDataProtector dataProtector, string protectedBase64, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
-            return dataProtector.UnprotectData(protectedBase64.FromBase64String(urlEncoded));
+
+            var bytes = urlEncoded ? protectedBase64.FromBase64Url() : protectedBase64.FromBase64String();
+            return dataProtector.UnprotectData(bytes);
         }
 
         public static string UnprotectStringFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
-            return dataProtector.UnprotectString(protectedBase64.FromBase64String(urlEncoded), encoding);
+
+            var bytes = urlEncoded ? protectedBase64.FromBase64Url() : protectedBase64.FromBase64String();
+            return dataProtector.UnprotectString(bytes, encoding);
         }
 
         public static string[] UnprotectStringsFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
-            return dataProtector.UnprotectStrings(protectedBase64.FromBase64String(urlEncoded), encoding);
+
+            var bytes = urlEncoded ? protectedBase64.FromBase64Url() : protectedBase64.FromBase64String();
+            return dataProtector.UnprotectStrings(bytes, encoding);
         }
 
         private static byte[] GetBytesFromStrings(string[] values, Encoding encoding)
@@ -105,22 +150,26 @@ namespace KodeAid.Security.Cryptography
             ArgCheck.NotNull(nameof(values), values);
             ArgCheck.NotNull(nameof(encoding), encoding);
 
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            using (var w = new BinaryWriter(ms, encoding, true))
             {
-                using (var w = new BinaryWriter(ms, encoding, true))
+                w.Write(values.Count());
+
+                foreach (var v in values)
                 {
-                    w.Write(values.Count());
-                    foreach (var v in values)
+                    w.Write(v != null);
+
+                    if (v != null)
                     {
-                        w.Write(v != null);
-                        if (v != null)
-                            w.Write(v);
+                        w.Write(v);
                     }
-                    w.Flush();
                 }
-                ms.Flush();
-                return ms.ToArray();
+
+                w.Flush();
             }
+
+            ms.Flush();
+            return ms.ToArray();
         }
 
         private static string[] GetStringsFromBytes(byte[] data, Encoding encoding)
@@ -131,17 +180,21 @@ namespace KodeAid.Security.Cryptography
             var values = new List<string>();
             using (var ms = new MemoryStream(data))
             {
-                using (var r = new BinaryReader(ms, encoding, true))
+                using var r = new BinaryReader(ms, encoding, true);
+
+                for (var i = r.ReadInt32(); i > 0; --i)
                 {
-                    for (var i = r.ReadInt32(); i > 0; --i)
+                    if (r.ReadBoolean())
                     {
-                        if (r.ReadBoolean())
-                            values.Add(r.ReadString());
-                        else
-                            values.Add(null);
+                        values.Add(r.ReadString());
+                    }
+                    else
+                    {
+                        values.Add(null);
                     }
                 }
             }
+
             return values.ToArray();
         }
     }

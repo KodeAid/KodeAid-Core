@@ -13,9 +13,9 @@ namespace KodeAid.AspNetCore.Json
         {
             ArgCheck.NotNull(nameof(versionAccessor), versionAccessor);
 
-            Add(new EmptyArrayPredicate());
-            Add(new ReadWritePredicate());
-            Add(new VersionedApiPredicate(versionAccessor));
+            PropertyPredicates.Add(new EmptyArrayPredicate());
+            PropertyPredicates.Add(new ReadWritePredicate());
+            PropertyPredicates.Add(new VersionedApiPredicate(versionAccessor));
         }
     }
 }

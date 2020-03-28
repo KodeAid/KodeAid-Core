@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>2.0.0</Version>
+        <Version>2.1.0</Version>
         <AssemblyName>KodeAid.Data.SqlClient</AssemblyName>
         <RootNamespace>KodeAid.Data.SqlClient</RootNamespace>
         <Description>Kode-Aid shared SQL client data library.</Description>
@@ -10,11 +10,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>
