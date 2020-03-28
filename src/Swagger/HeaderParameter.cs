@@ -2,16 +2,16 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 
 namespace KodeAid.AspNetCore.Swagger
 {
-    public class HeaderParameter : NonBodyParameter
+    public class HeaderParameter : OpenApiParameter
     {
         public HeaderParameter()
         {
-            In = "header";
-            Type = "string";
+            In = ParameterLocation.Header;
+            Schema.Type = "string";
             Required = false;
         }
     }

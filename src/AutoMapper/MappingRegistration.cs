@@ -32,7 +32,7 @@ namespace KodeAid.AutoMapper
 
         protected void AddProfilesFromAssembly()
         {
-            Configuration.AddProfiles(Assembly.GetExecutingAssembly());
+            Configuration.AddMaps(Assembly.GetExecutingAssembly());
         }
 
         void IMappingRegistration.Register(IMapperConfigurationExpression configuration)

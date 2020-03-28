@@ -3,7 +3,7 @@
 
 
 using System.Linq;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace KodeAid.AspNetCore.SwaggerGen
@@ -21,8 +21,12 @@ namespace KodeAid.AspNetCore.SwaggerGen
         /// </summary>
         /// <param name="operation">The operation to apply the filter to.</param>
         /// <param name="context">The current operation filter context.</param>
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
+            var apiDescription = context.ApiDescription;
+
+            //operation.Deprecated |= apiDescription.IsDeprecated();
+
             if (operation.Parameters == null)
             {
                 return;
@@ -30,9 +34,9 @@ namespace KodeAid.AspNetCore.SwaggerGen
 
             // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/412
             // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/413
-            foreach (var parameter in operation.Parameters.OfType<NonBodyParameter>())
+            foreach (var parameter in operation.Parameters)
             {
-                var description = context.ApiDescription.ParameterDescriptions.FirstOrDefault(p => p.Name == parameter.Name);
+                var description = apiDescription.ParameterDescriptions.FirstOrDefault(p => p.Name == parameter.Name);
 
                 if (description == null)
                 {
@@ -51,11 +55,12 @@ namespace KodeAid.AspNetCore.SwaggerGen
                     continue;
                 }
 
-                if (parameter.Default == null)
+                if (parameter.Schema.Default == null)
                 {
-                    parameter.Default = routeInfo.DefaultValue;
+                    parameter.Schema.Default = OpenApiAnyFactory.CreateFor(parameter.Schema, routeInfo.DefaultValue);
                 }
 
+                //parameter.Required |= description.IsRequired;
                 parameter.Required |= !routeInfo.IsOptional;
             }
         }

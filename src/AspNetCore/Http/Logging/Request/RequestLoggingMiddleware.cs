@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace KodeAid.AspNetCore.Http.Logging.Request
@@ -51,7 +50,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
                 return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}";
             }
 
-            request.EnableRewind();
+            request.EnableBuffering();
             var buffer = new byte[Math.Min(Math.Max(request.Body.Length, request.ContentLength.GetValueOrDefault()), _maxBodyByteCount)];
             var read = await request.Body.ReadAsync(buffer, 0, buffer.Length);
             request.Body.Position = 0;
