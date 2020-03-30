@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -7,8 +7,8 @@ using System;
 namespace KodeAid.Text.StringMetrics
 {
     /// <summary>
-    /// Compute the distance between two strings based on the number of 
-    /// individual character insertions, deletions, substitutions or transpositions 
+    /// Compute the distance between two strings based on the number of
+    /// individual character insertions, deletions, substitutions or transpositions
     /// required to change one string into another.
     /// </summary>
     /// <remarks>
@@ -19,8 +19,8 @@ namespace KodeAid.Text.StringMetrics
     public class DamerauLevenshteinDistance : IStringDistanceMetric
     {
         /// <summary>
-        /// Compute the distance between two strings based on the number of 
-        /// individual character insertions, deletions, substitutions or transpositions 
+        /// Compute the distance between two strings based on the number of
+        /// individual character insertions, deletions, substitutions or transpositions
         /// required to change <paramref name="strA"/> into <paramref name="strB"/>.
         /// </summary>
         public int ComputeDistance(string strA, string strB)
@@ -36,7 +36,7 @@ namespace KodeAid.Text.StringMetrics
             var strALength = strA.Length;
             var strBLength = strB.Length;
 
-            // if strA has a length of 0 then the steps required to get to strB is the 
+            // if strA has a length of 0 then the steps required to get to strB is the
             // length of strB as we simply would need to add the entire length of strB to strA
             if (strALength == 0)
             {

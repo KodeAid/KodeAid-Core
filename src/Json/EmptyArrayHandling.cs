@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -20,13 +20,13 @@ namespace KodeAid.Json
         /// Included members are written to JSON. Has no effect when deserializing.
         /// </summary>
         Include = 0,
-        
+
         /// <summary>
         /// Ignore array based members where the array is empty when serializing objects
         /// so that it is not written to JSON.
         /// </summary>
         Ignore = 1,
-        
+
         /// <summary>
         /// Array based members with no JSON will be set to an empty array when deserializing.
         /// </summary>

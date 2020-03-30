@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -140,7 +140,7 @@ namespace System
         /// </summary>
         /// <param name="str">The string to truncate.</param>
         /// <param name="maxLength">The maximum length of the new string.</param>
-        /// <returns>If the length of <paramref name="str"/> is equal to or less than <paramref name="maxLength"/> 
+        /// <returns>If the length of <paramref name="str"/> is equal to or less than <paramref name="maxLength"/>
         /// then the original <paramref name="str"/> is returned; otherwise the excess trailing characters are removed and
         /// the result will be of length <paramref name="maxLength"/>.</returns>
         public static string Truncate(this string str, int maxLength)
@@ -154,7 +154,7 @@ namespace System
         }
 
         /// <summary>
-        /// Concatenates the members of a constructed <seealso cref="IEnumerable{T}"/> collection of type <seealso cref="string"/> 
+        /// Concatenates the members of a constructed <seealso cref="IEnumerable{T}"/> collection of type <seealso cref="string"/>
         /// using the specified <paramref name="separator"/> between each member and escaping any <paramref name="separator"/> characters found in the members.
         /// </summary>
         /// <param name="values">A collection that contains the strings to concatenate.</param>
@@ -270,7 +270,7 @@ namespace System
         /// <param name="value">Replacement value, to be converted to a string formatted with either the format specified by the token
         /// otherwise by <paramref name="defaultFormat"/>.</param>
         /// <param name="defaultFormat">Default format to use on the <paramref name="value"/> if no format is specified on the matched token.</param>
-        /// <param name="formatProvider">The provider to use to format the <paramref name="value"/>. -or- 
+        /// <param name="formatProvider">The provider to use to format the <paramref name="value"/>. -or-
         /// A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
         /// <returns>The result of <paramref name="str"/> with the matching token (if found) replaced with a formatted <paramref name="value"/>.</returns>
         public static string ReplaceToken(this string str, string token, IFormattable value, string defaultFormat = null, IFormatProvider formatProvider = null)
@@ -399,7 +399,7 @@ namespace System
         }
 
         /// <summary>
-        /// Remove all diacritics (such as accents, cedilla and other glyphs) from each 
+        /// Remove all diacritics (such as accents, cedilla and other glyphs) from each
         /// character in the string and normalize as Unicode form C.
         /// </summary>
         public static string RemoveDiacritics(this string str)

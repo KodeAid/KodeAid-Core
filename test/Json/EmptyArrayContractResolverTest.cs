@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using KodeAid.Json.Serialization;
 using Newtonsoft.Json;
 using Xunit;

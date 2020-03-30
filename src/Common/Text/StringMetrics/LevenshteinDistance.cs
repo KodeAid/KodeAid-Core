@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -7,19 +7,19 @@ using System;
 namespace KodeAid.Text.StringMetrics
 {
     /// <summary>
-    /// Compute the distance between two strings based on the number of 
+    /// Compute the distance between two strings based on the number of
     /// individual character insertions, deletions or substitutions required to
     /// change one string into another.
     /// </summary>
     /// <remarks>
     /// The difference between Levenshtein and Damerau-Levenshtein is the exclusion
-    /// of transpositions ('ae' => 'ea') in Levenshtein which count as two edits as 
+    /// of transpositions ('ae' => 'ea') in Levenshtein which count as two edits as
     /// opposed to just one in Damerau-Levenshtein.
     /// </remarks>
     public class LevenshteinDistance : IStringDistanceMetric
     {
         /// <summary>
-        /// Compute the distance between two strings based on the number of 
+        /// Compute the distance between two strings based on the number of
         /// individual character insertions, deletions or substitutions required to
         /// change <paramref name="strA"/> into <paramref name="strB"/>.
         /// </summary>
@@ -36,7 +36,7 @@ namespace KodeAid.Text.StringMetrics
             var strALength = strA.Length;
             var strBLength = strB.Length;
 
-            // if strA has a length of 0 then the steps required to get to strB is the 
+            // if strA has a length of 0 then the steps required to get to strB is the
             // length of strB as we simply would need to add the entire length of strB to strA
             if (strALength == 0)
             {

@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -44,7 +44,7 @@ namespace KodeAid
         }
 
         /// <summary>
-        /// Get a string name of the enum, this will be the serialized name 
+        /// Get a string name of the enum, this will be the serialized name
         /// if one was explicitly set via an <see cref="EnumMemberAttribute"/> attribute,
         /// otherwise it will be the normal enum field name.
         /// </summary>
@@ -59,8 +59,8 @@ namespace KodeAid
         }
 
         /// <summary>
-        /// Converts the string representation of the name, serialized name, or numeric value 
-        /// of one or more enumerated constants to an equivalent enumerated object. 
+        /// Converts the string representation of the name, serialized name, or numeric value
+        /// of one or more enumerated constants to an equivalent enumerated object.
         /// A parameter specifies whether the operation is case-insensitive.
         /// </summary>
         /// <typeparam name="TEnum">The enumeration type to which to convert value.</typeparam>
@@ -80,8 +80,8 @@ namespace KodeAid
         }
 
         /// <summary>
-        /// Converts the string representation of the name, serialized name, or numeric value 
-        /// of one or more enumerated constants to an equivalent enumerated object. 
+        /// Converts the string representation of the name, serialized name, or numeric value
+        /// of one or more enumerated constants to an equivalent enumerated object.
         /// A parameter specifies whether the operation is case-insensitive.
         /// </summary>
         /// <typeparam name="TEnum">The enumeration type to which to convert value.</typeparam>

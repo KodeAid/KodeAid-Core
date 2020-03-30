@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -185,7 +185,7 @@ namespace KodeAid.Caching
                 }
             }
 
-            var items = keyValues.Select(keyValue => 
+            var items = keyValues.Select(keyValue =>
                 new CacheItem<T>()
                 {
                     Key = keyValue.Key,

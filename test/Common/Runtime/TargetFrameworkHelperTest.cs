@@ -1,4 +1,4 @@
-﻿using KodeAid.Runtime;
+using KodeAid.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 

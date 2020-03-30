@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -10,7 +10,7 @@ namespace KodeAid.Text.StringMetrics
     public interface IStringDistanceMetric
     {
         /// <summary>
-        /// Compute the distance between two strings based on the number of 
+        /// Compute the distance between two strings based on the number of
         /// individual character edits required to change <paramref name="strA"/> into <paramref name="strB"/>.
         /// </summary>
         int ComputeDistance(string strA, string strB);

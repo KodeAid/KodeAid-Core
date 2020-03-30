@@ -1,4 +1,4 @@
-﻿// Copyright © Kris Penner. All rights reserved.
+// Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
@@ -29,7 +29,7 @@ namespace System.Collections.Generic
                 v = value;
                 dictionary.Add(key, v);
             }
-            
+
             return v;
         }
 
