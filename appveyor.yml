@@ -1,4 +1,4 @@
-﻿image: Visual Studio 2019
+image: Visual Studio 2019
 configuration: Release
 skip_tags: true
 pull_requests:
@@ -16,4 +16,4 @@ deploy:
   provider: Environment
   name: NuGet KodeAid
   on:
-    branch: v1
+    branch: master
