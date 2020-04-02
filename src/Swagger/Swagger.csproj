@@ -1,17 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>2.1.1</Version>
+        <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
+        <Version>2.1.2</Version>
         <AssemblyName>KodeAid.AspNetCore.Swagger</AssemblyName>
         <RootNamespace>KodeAid.AspNetCore.Swagger</RootNamespace>
         <Description>Kode-Aid shared Swagger library.</Description>
         <PackageTags>helpers extensions utilities swagger swashbuckle aspnetcore aspnet core</PackageTags>
+        <OpenApiGenerateDocumentsOnBuild>false</OpenApiGenerateDocumentsOnBuild>
     </PropertyGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.2.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.0" />
     </ItemGroup>
 
     <ItemGroup>
