@@ -1,14 +1,13 @@
-using KodeAid.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace KodeAid.Json
+namespace KodeAid.Runtime
 {
-    public class TargetFrameworkHelperTest
+    public class TargetFrameworkTest
     {
         private readonly ITestOutputHelper _output;
 
-        public TargetFrameworkHelperTest(ITestOutputHelper output)
+        public TargetFrameworkTest(ITestOutputHelper output)
         {
             _output = output;
         }

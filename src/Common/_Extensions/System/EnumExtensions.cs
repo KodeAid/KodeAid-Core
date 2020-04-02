@@ -64,7 +64,7 @@ namespace System
         {
             if (useEnumMemberAttribute)
             {
-                return EnumHelper.GetSerializedName(value);
+                return EnumHelper.GetSerializationName(value);
             }
 
             return value.ToString(format);

@@ -51,11 +51,26 @@ namespace KodeAid
         /// <typeparam name="TEnum">The enumeration type.</typeparam>
         /// <param name="value">The enumeration constant value.</param>
         /// <returns>The value's serialized name if it has one, otherwise the normal enum field name.</returns>
-        public static string GetSerializedName<TEnum>(TEnum value)
+        public static string GetSerializationName<TEnum>(TEnum value)
             where TEnum : struct, Enum
         {
-            var (Value, Name, SerializedName) = Enum<TEnum>.Info.Names.FirstOrDefault(n => value.CompareTo(n.Value) == 0);
-            return SerializedName ?? Name;
+            var (Value, Name, SerializationName) = Enum<TEnum>.Info.Names.FirstOrDefault(n => value.CompareTo(n.Value) == 0);
+            return SerializationName ?? Name;
+        }
+
+        /// <summary>
+        /// Get a string name of the enum, this will be the serialized name
+        /// if one was explicitly set via an <see cref="EnumMemberAttribute"/> attribute,
+        /// otherwise it will be the normal enum field name.
+        /// </summary>
+        /// <param name="enumType">The enumeration type.</typeparam>
+        /// <param name="value">The enumeration constant value.</param>
+        /// <returns>The value's serialized name if it has one, otherwise the normal enum field name.</returns>
+        public static string GetSerializationName(Type enumType, object value)
+        {
+            var comparable = (IComparable)value;
+            var (Value, Name, SerializationName) = GetEnumInfo(enumType).Names.FirstOrDefault(n => comparable.CompareTo(n.Value) == 0);
+            return SerializationName ?? Name;
         }
 
         /// <summary>
@@ -119,7 +134,7 @@ namespace KodeAid
 
             str = str.Normalize();
 
-            if (enumInfo.HasSerializedNames)
+            if (enumInfo.HasSerializationNames)
             {
                 var hasFlags = enumInfo.EnumType.GetCustomAttribute<FlagsAttribute>() != null;
 
@@ -130,17 +145,17 @@ namespace KodeAid
                         flagsDelimiter = string.Empty;
                     }
 
-                    foreach (var (Value, Name, SerializedName) in enumInfo.Names.Where(n => n.SerializedName != null))
+                    foreach (var (Value, Name, SerializationName) in enumInfo.Names.Where(n => n.SerializationName != null))
                     {
                         if (ignoreWhitespace)
                         {
                             var delimiter = Regex.Escape(flagsDelimiter.Trim());
-                            str = Regex.Replace(str, $@"(^|{delimiter})\s*{Regex.Escape(SerializedName.Trim())}\s*({delimiter}|$)", $"$1{Name}$2", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
+                            str = Regex.Replace(str, $@"(^|{delimiter})\s*{Regex.Escape(SerializationName.Trim())}\s*({delimiter}|$)", $"$1{Name}$2", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
                         }
                         else
                         {
                             var delimiter = Regex.Escape(flagsDelimiter);
-                            str = Regex.Replace(str, $@"(^|{delimiter}){Regex.Escape(SerializedName)}({delimiter}|$)", $"$1{Name}$2", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
+                            str = Regex.Replace(str, $@"(^|{delimiter}){Regex.Escape(SerializationName)}({delimiter}|$)", $"$1{Name}$2", RegexOptions.Compiled | (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None));
                         }
                     }
 
@@ -151,7 +166,7 @@ namespace KodeAid
                 }
                 else
                 {
-                    str = enumInfo.Names.FirstOrDefault(n => string.Equals(str, n.SerializedName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)).Name ?? str;
+                    str = enumInfo.Names.FirstOrDefault(n => string.Equals(str, n.SerializationName, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)).Name ?? str;
                 }
             }
 
@@ -167,8 +182,8 @@ namespace KodeAid
         {
             public Type EnumType;
             public bool HasFlags;
-            public bool HasSerializedNames;
-            public List<(object Value, string Name, string SerializedName)> Names;
+            public bool HasSerializationNames;
+            public List<(object Value, string Name, string SerializationName)> Names;
         }
 
         private static class Enum<TEnum>
@@ -190,7 +205,7 @@ namespace KodeAid
                        .ToList(),
                 };
 
-                Info.HasSerializedNames = Info.Names.Any(n => n.SerializedName != null);
+                Info.HasSerializationNames = Info.Names.Any(n => n.SerializationName != null);
             }
         }
     }
