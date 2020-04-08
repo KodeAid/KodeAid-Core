@@ -14,7 +14,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
         /// 0 by default which disables body logging.
         /// Application Insights allows 32,768 bytes message size.
         /// </summary>
-        public long MaxBodyByteCount { get; set; }
+        public int MaxBodyByteCount { get; set; }
 
         public Func<HttpContext, bool> ShouldLog { get; set; }
 

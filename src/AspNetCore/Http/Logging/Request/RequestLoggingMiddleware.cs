@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Buffers;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,11 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
     public class RequestLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly long _maxBodyByteCount;
+        private readonly int _maxBodyByteCount;
         private readonly Func<HttpContext, bool> _shouldLog;
         private readonly ILogger _logger;
 
-        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, long maxBodyByteCount, Func<HttpContext, bool> shouldLog)
+        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, int maxBodyByteCount, Func<HttpContext, bool> shouldLog)
         {
             ArgCheck.NotNull(nameof(next), next);
             ArgCheck.NotNull(nameof(logger), logger);
@@ -51,13 +52,20 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
             }
 
             request.EnableBuffering();
-            var buffer = new byte[Math.Min(Math.Max(request.Body.Length, request.ContentLength.GetValueOrDefault()), _maxBodyByteCount)];
-            var read = await request.Body.ReadAsync(buffer, 0, buffer.Length);
-            request.Body.Position = 0;
+            var buffer = ArrayPool<byte>.Shared.Rent((int)Math.Min(Math.Max(request.Body.Length, request.ContentLength.GetValueOrDefault()), _maxBodyByteCount));
 
-            var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
+            try
+            {
+                var read = await request.Body.ReadAsync(buffer, 0, buffer.Length);
+                request.Body.Position = 0;
+                var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
 
-            return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
+                return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
     }
 }

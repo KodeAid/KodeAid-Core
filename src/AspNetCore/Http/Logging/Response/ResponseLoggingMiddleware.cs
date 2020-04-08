@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Buffers;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,11 +17,11 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
     public class ResponseLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly long _maxBodyByteCount;
+        private readonly int _maxBodyByteCount;
         private readonly Func<HttpContext, bool> _shouldLog;
         private readonly ILogger _logger;
 
-        public ResponseLoggingMiddleware(RequestDelegate next, ILogger logger, long maxBodyByteCount, Func<HttpContext, bool> shouldLog)
+        public ResponseLoggingMiddleware(RequestDelegate next, ILogger logger, int maxBodyByteCount, Func<HttpContext, bool> shouldLog)
         {
             ArgCheck.NotNull(nameof(next), next);
             ArgCheck.NotNull(nameof(logger), logger);
@@ -76,17 +77,24 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
 
             if (_maxBodyByteCount <= 0)
             {
-                return $"RESPONSE TRACE: {response.StatusCode} {((HttpStatusCode)response.StatusCode).ToString()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}";
+                return $"RESPONSE TRACE: {response.StatusCode} {(HttpStatusCode)response.StatusCode} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}";
             }
 
             response.Body.Seek(0, SeekOrigin.Begin);
-            var buffer = new byte[Math.Min(Math.Max(response.Body.Length, response.ContentLength.GetValueOrDefault()), _maxBodyByteCount)];
-            var read = await response.Body.ReadAsync(buffer, 0, buffer.Length);
-            response.Body.Seek(0, SeekOrigin.Begin);
+            var buffer = ArrayPool<byte>.Shared.Rent((int)Math.Min(Math.Max(response.Body.Length, response.ContentLength.GetValueOrDefault()), _maxBodyByteCount));
 
-            var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
+            try
+            {
+                var read = await response.Body.ReadAsync(buffer, 0, buffer.Length);
+                response.Body.Seek(0, SeekOrigin.Begin);
+                var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
 
-            return $"RESPONSE TRACE: {response.StatusCode}/{((HttpStatusCode)response.StatusCode).ToString()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}\n{bodyAsText}";
+                return $"RESPONSE TRACE: {response.StatusCode}/{(HttpStatusCode)response.StatusCode} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}\n{bodyAsText}";
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
     }
 }
