@@ -54,7 +54,7 @@ namespace KodeAid.Reflection
                 {
                     if (throwOnNullReference)
                     {
-                        throw new NullReferenceException($"Path '{traversed.ToString()}' is null.");
+                        throw new NullReferenceException($"Path '{traversed}' is null.");
                     }
 
                     return null;
@@ -72,7 +72,7 @@ namespace KodeAid.Reflection
                     {
                         if (throwOnPathNotFound)
                         {
-                            throw new InvalidOperationException($"Property {propertyName} not found on {type.FullName} at '{traversed.ToString()}'.");
+                            throw new InvalidOperationException($"Property {propertyName} not found on {type.FullName} at '{traversed}'.");
                         }
 
                         return null;
@@ -115,7 +115,7 @@ namespace KodeAid.Reflection
                     {
                         if (throwOnPathNotFound)
                         {
-                            throw new InvalidOperationException($"Index {index} not found on {type.FullName} at '{traversed.ToString()}'.");
+                            throw new InvalidOperationException($"Index {index} not found on {type.FullName} at '{traversed}'.");
                         }
 
                         return null;
