@@ -6,15 +6,15 @@ namespace AutoMapper
     public static class MappingExpressionExtensions
     {
         /// <summary>
-        /// Skip all source members which have a null value.
+        /// Ignore all source members which have a null value.
         /// </summary>
-        public static void SkipAllNullMembers<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mappingExpression)
+        public static void IgnoreAllNullMembers<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mappingExpression)
             => mappingExpression.ForAllMembers(a => a.MapFrom<IgnoreNullSourceValues<TSource, TDestination>, object>(a.DestinationMember.Name));
 
         /// <summary>
-        /// Skip all source members not previously configured which have a null value.
+        /// Ignore all source members not previously configured which have a null value.
         /// </summary>
-        public static void SkipAllOtherNullMembers<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mappingExpression)
+        public static void IgnoreAllOtherNullMembers<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mappingExpression)
             => mappingExpression.ForAllOtherMembers(a => a.MapFrom<IgnoreNullSourceValues<TSource, TDestination>, object>(a.DestinationMember.Name));
 
         private class IgnoreNullSourceValues<TSource, TDestination> : IMemberValueResolver<TSource, TDestination, object, object>
