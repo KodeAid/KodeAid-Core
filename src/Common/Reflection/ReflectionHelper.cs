@@ -266,7 +266,13 @@ namespace KodeAid.Reflection
             var assembliesSearched = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             var assembliesToSearch = new Queue<Assembly>();
-            assembliesToSearch.Enqueue(startingPoint ?? Assembly.GetEntryAssembly());
+            startingPoint ??= Assembly.GetEntryAssembly();
+            assembliesToSearch.Enqueue(startingPoint);
+
+            if (assemblySearchOptions.HasFlagSet(AssemblySearchOptions.StartingDirectory))
+            {
+                assembliesToSearch.EnqueueRange(FindAssemblies(startingPoint, assemblyNamePrefixes, directorySearchOptions, assembliesSearched, throwOnError));
+            }
 
             while (assembliesToSearch.Count > 0)
             {
@@ -298,56 +304,9 @@ namespace KodeAid.Reflection
                             }).WhereNotNull());
                         }
 
-                        if ((assembliesSearched.Count == 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.StartingDirectory)) ||
-                            (assembliesSearched.Count > 1 && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.AssemblyDirectories)))
+                        if (assembly != startingPoint && assemblySearchOptions.HasFlagSet(AssemblySearchOptions.AssemblyDirectories))
                         {
-                            var codebaseDirectory = Path.GetDirectoryName(new Uri(assembly.CodeBase).AbsolutePath);
-
-                            if (assembliesSearched.Add(codebaseDirectory))
-                            {
-                                var dllFiles = new List<string>();
-
-                                try
-                                {
-                                    if (!assemblyNamePrefixes.Any())
-                                    {
-                                        dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
-                                    }
-                                    else
-                                    {
-                                        dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
-                                    }
-                                }
-                                catch
-                                {
-                                    if (throwOnError)
-                                    {
-                                        throw;
-                                    }
-                                }
-
-                                foreach (var dllFile in dllFiles.Distinct())
-                                {
-                                    try
-                                    {
-                                        assembliesToSearch.Enqueue(Assembly.Load(AssemblyName.GetAssemblyName(dllFile)));
-                                    }
-                                    catch
-                                    {
-                                        try
-                                        {
-                                            assembliesToSearch.Enqueue(Assembly.LoadFrom(dllFile));
-                                        }
-                                        catch
-                                        {
-                                            if (throwOnError)
-                                            {
-                                                throw;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            assembliesToSearch.EnqueueRange(FindAssemblies(assembly, assemblyNamePrefixes, directorySearchOptions, assembliesSearched, throwOnError));
                         }
                     }
                 }
@@ -356,6 +315,60 @@ namespace KodeAid.Reflection
             return matchedAssemblies
                 .Distinct() // shouldn't be required
                 .ToList();
+        }
+
+        private static IEnumerable<Assembly> FindAssemblies(Assembly assembly, IEnumerable<string> assemblyNamePrefixes, SearchOption directorySearchOptions, HashSet<string> assembliesSearched, bool throwOnError)
+        {
+            var assembliesFound = new List<Assembly>();
+            var codebaseDirectory = Path.GetDirectoryName(new Uri(assembly.CodeBase).AbsolutePath);
+
+            if (assembliesSearched.Add(codebaseDirectory))
+            {
+                var dllFiles = new List<string>();
+
+                try
+                {
+                    if (!assemblyNamePrefixes.Any())
+                    {
+                        dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
+                    }
+                    else
+                    {
+                        dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
+                    }
+                }
+                catch
+                {
+                    if (throwOnError)
+                    {
+                        throw;
+                    }
+                }
+
+                foreach (var dllFile in dllFiles.Distinct())
+                {
+                    try
+                    {
+                        assembliesFound.Add(Assembly.Load(AssemblyName.GetAssemblyName(dllFile)));
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            assembliesFound.Add(Assembly.LoadFrom(dllFile));
+                        }
+                        catch
+                        {
+                            if (throwOnError)
+                            {
+                                throw;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return assembliesFound;
         }
 
         private static TValue GetFromDictionary<TKey, TValue>(IDictionary<TKey, TValue> dict, object index)
