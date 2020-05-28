@@ -75,6 +75,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Tests", "test\Common
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Http", "src\Http\Http.csproj", "{CCAF234D-1039-46F8-9874-3D4C258999D4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos", "src\Cosmos\Cosmos.csproj", "{628AD1B4-D837-43BA-A258-E79B767B21B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,10 @@ Global
 		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCAF234D-1039-46F8-9874-3D4C258999D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{628AD1B4-D837-43BA-A258-E79B767B21B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{628AD1B4-D837-43BA-A258-E79B767B21B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{628AD1B4-D837-43BA-A258-E79B767B21B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{628AD1B4-D837-43BA-A258-E79B767B21B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
