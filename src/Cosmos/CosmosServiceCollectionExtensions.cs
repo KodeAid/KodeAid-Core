@@ -11,11 +11,6 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CosmosServiceCollectionExtensions
     {
-        public static CosmosClient CreateClient<T>(this ICosmosClientFactory cosmosClientFactory)
-        {
-            return cosmosClientFactory.CreateClient(typeof(T).FullName);
-        }
-
         public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, string connectionString, CosmosClientOptions options = null)
         {
             return AddCosmosClient(services, typeof(T).FullName, connectionString, options);
