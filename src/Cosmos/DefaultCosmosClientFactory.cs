@@ -28,7 +28,7 @@ namespace KodeAid.Azure.Cosmos
                 r.ConnectionString != null ?
                     new CosmosClient(r.ConnectionString, r.Options) :
                     new CosmosClient(r.AccountEndpoint, r.AuthKeyOrResourceToken, r.Options) :
-                throw new InvalidOperationException($"Cosmos client '{n}' is not registered."));
+                throw new InvalidOperationException(n == CosmosClientRegistration.DefaultName ? "A default Cosmos client is not registered." : $"Cosmos client '{n}' is not registered."));
         }
     }
 }
