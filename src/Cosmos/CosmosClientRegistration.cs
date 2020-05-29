@@ -5,9 +5,9 @@ using Microsoft.Azure.Cosmos;
 
 namespace KodeAid.Azure.Cosmos
 {
-    internal class CosmosClientRegistration
+    public class CosmosClientRegistration
     {
-        public string Name { get; set; }
+        internal string Name { get; set; }
         public string ConnectionString { get; set; }
         public string AccountEndpoint { get; set; }
         public string AuthKeyOrResourceToken { get; set; }
