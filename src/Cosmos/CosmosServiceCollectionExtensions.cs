@@ -11,6 +11,11 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class CosmosServiceCollectionExtensions
     {
+        public static IServiceCollection AddCosmosClientFactory(this IServiceCollection services)
+        {
+            services.TryAddSingleton<ICosmosClientFactory, DefaultCosmosClientFactory>();
+        }
+
         /// <summary>
         /// Adds a typed Cosmos client registration to the service collection.
         /// </summary>
@@ -105,13 +110,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddCosmosClientCore(this IServiceCollection services, Func<IServiceProvider, CosmosClientRegistration> clientRegistrationFactory)
         {
-            services.TryAddSingleton<ICosmosClientFactory, DefaultCosmosClientFactory>();
+            services.TryAddSingleton<ICosmosClientRegistry, DefaultCosmosClientRegistry>();
             return services.AddSingleton(clientRegistrationFactory);
         }
 
         private static IServiceCollection AddCosmosClientCore(this IServiceCollection services, CosmosClientRegistration clientRegistration)
         {
-            services.TryAddSingleton<ICosmosClientFactory, DefaultCosmosClientFactory>();
+            services.TryAddSingleton<ICosmosClientRegistry, DefaultCosmosClientRegistry>();
             return services.AddSingleton(clientRegistration);
         }
     }

@@ -7,9 +7,7 @@ namespace KodeAid.Azure.Cosmos
 {
     public interface ICosmosClientFactory
     {
-        /// <summary>
-        /// Create named client.
-        /// </summary>
-        CosmosClient CreateClient(string name);
+        CosmosClient CreateClient(string connectionString, CosmosClientOptions options);
+        CosmosClient CreateClient(string accountEndpoint, string authKeyOrResourceToken, CosmosClientOptions options);
     }
 }
