@@ -9,7 +9,7 @@ using Microsoft.Azure.Cosmos;
 
 namespace KodeAid.Azure.Cosmos
 {
-    internal class DefaultCosmosClientFactory : ICosmosClientFactory
+    internal class DefaultCosmosClientFactory : ICosmosClientFactory, IDisposable
     {
         private readonly ConcurrentDictionary<string, CosmosClient> _clients = new ConcurrentDictionary<string, CosmosClient>();
         private readonly Dictionary<string, CosmosClientRegistration> _clientRegistrations;
@@ -29,6 +29,21 @@ namespace KodeAid.Azure.Cosmos
                     new CosmosClient(r.ConnectionString, r.Options) :
                     new CosmosClient(r.AccountEndpoint, r.AuthKeyOrResourceToken, r.Options) :
                 throw new InvalidOperationException(n == CosmosClientRegistration.DefaultName ? "A default Cosmos client is not registered." : $"Cosmos client '{n}' is not registered."));
+        }
+
+        public void Dispose()
+        {
+            var clients = _clients.Values.ToList();
+            _clients.Clear();
+
+            foreach (var client in clients)
+            {
+                try
+                {
+                    client.Dispose();
+                }
+                catch { }
+            }
         }
     }
 }
