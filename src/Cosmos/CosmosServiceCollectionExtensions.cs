@@ -14,6 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddCosmosClientFactory(this IServiceCollection services)
         {
             services.TryAddSingleton<ICosmosClientFactory, DefaultCosmosClientFactory>();
+            return services;
         }
 
         /// <summary>
