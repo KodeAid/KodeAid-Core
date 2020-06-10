@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace System.Net.Http
@@ -30,10 +31,10 @@ namespace System.Net.Http
             EnsureContentLength();
         }
 
-        public StringContentWithLength(string content, string unvalidatedContentType)
+        public StringContentWithLength(string content, string contentType)
             : base(content)
         {
-            Headers.TryAddWithoutValidation("Content-Type", unvalidatedContentType);
+            Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
             EnsureContentLength();
         }
 
