@@ -9,32 +9,57 @@ namespace System
 {
     public static class ExceptionExtensions
     {
-        public static string GetCombinedMessage(this Exception ex, string separator = " ")
+        public static string GetCombinedMessage(this Exception exception, string separator = " ")
         {
-            var m = new List<string>();
-            while (ex != null)
+            var messages = new List<string>();
+
+            while (exception != null)
             {
-                if (ex is AggregateException a)
-                    ex = a.InnerExceptions.FirstOrDefault() ?? a.InnerException ?? a.GetBaseException();
-                m.Add(ex.Message.EndsWith(".") ? ex.Message : (ex.Message + "."));
-                ex = ex.InnerException;
+                if (exception is AggregateException aggregateException)
+                {
+                    exception = aggregateException.InnerExceptions.FirstOrDefault() ?? aggregateException.InnerException ?? aggregateException.GetBaseException();
+                }
+
+                var message = exception.Message?.TrimToNull();
+
+                if (message != null && !messages.Any(m => m.Contains(message)))
+                {
+                    var p = message.Last();
+
+                    if (p != '.' && p != '!' && p != '?')
+                    {
+                        message += ".";
+                    }
+
+                    messages.Add(message);
+                }
+
+                exception = exception.InnerException;
             }
-            return string.Join(separator, m);
+
+            return string.Join(separator, messages);
         }
 
         public static bool IsTimeout(this Exception exception)
         {
             if (exception is TimeoutException)
-                return true;
-            if (exception is AggregateException)
             {
-                foreach (var innerException in ((AggregateException)exception).Flatten().InnerExceptions)
+                return true;
+            }
+
+            if (exception is AggregateException aggregateException)
+            {
+                foreach (var innerException in aggregateException.Flatten().InnerExceptions)
                 {
                     var ex = innerException;
+
                     while (ex != null)
                     {
                         if (ex is TimeoutException)
+                        {
                             return true;
+                        }
+
                         ex = ex.InnerException;
                     }
                 }
@@ -45,16 +70,23 @@ namespace System
         public static bool IsCanceled(this Exception exception)
         {
             if (exception is OperationCanceledException)
-                return true;
-            if (exception is AggregateException)
             {
-                foreach (var innerException in ((AggregateException)exception).Flatten().InnerExceptions)
+                return true;
+            }
+
+            if (exception is AggregateException aggregateException)
+            {
+                foreach (var innerException in aggregateException.Flatten().InnerExceptions)
                 {
                     var ex = innerException;
+
                     while (ex != null)
                     {
                         if (ex is OperationCanceledException)
+                        {
                             return true;
+                        }
+
                         ex = ex.InnerException;
                     }
                 }
