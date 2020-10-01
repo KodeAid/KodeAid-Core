@@ -410,5 +410,25 @@ namespace System
                 .Where(ch => CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark))
                 .Normalize(NormalizationForm.FormC);
         }
+
+        public static string EnsureTerminatingPuncuation(this string str, string defaultPuncuation = ".")
+        {
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return str;
+            }
+
+            var endingWhiteSpaceLength = str.Reverse().TakeWhile(char.IsWhiteSpace).Count();
+            var endingChar = str[str.Length - (endingWhiteSpaceLength + 1)];
+
+            if (endingChar == '.' || endingChar == '!' || endingChar == '?')
+            {
+                return str;
+            }
+
+            str = str.Insert(str.Length - endingWhiteSpaceLength, defaultPuncuation);
+
+            return str;
+        }
     }
 }
