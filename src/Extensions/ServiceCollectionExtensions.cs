@@ -11,6 +11,12 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        public static IServiceCollection AddCurrentDateTimeProvider(this IServiceCollection services)
+            => services.AddSingleton(DateTimeProvider.Current);
+
+        public static IServiceCollection AddDefaultDateTimeProvider(this IServiceCollection services)
+            => services.AddSingleton(DefaultDateTimeProvider.Instance);
+
         public static IServiceCollection AddTransient<TService, TImplementation, TOptions>(this IServiceCollection services, TOptions defaultOptions = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
             where TService : class
             where TImplementation : TService
