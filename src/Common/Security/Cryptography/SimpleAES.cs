@@ -17,32 +17,32 @@ namespace KodeAid.Security.Cryptography
         public SimpleAES(byte[] key)
         {
             ArgCheck.NotNull(nameof(key), key);
+
             _key = GetValidKey(key);
         }
 
         public byte[] ProtectData(byte[] unprotectedData)
         {
             ArgCheck.NotNull(nameof(unprotectedData), unprotectedData);
+
             var iv = Guid.NewGuid().ToByteArray();
-            using (var rm = new RijndaelManaged())
-            {
-                return Transform(unprotectedData, rm.CreateEncryptor(_key, iv)).Concat(iv).ToArray();
-            }
+            using var rm = new RijndaelManaged();
+            return Transform(unprotectedData, rm.CreateEncryptor(_key, iv)).Concat(iv).ToArray();
         }
 
         public async Task<byte[]> ProtectDataAsync(byte[] unprotectedData)
         {
             ArgCheck.NotNull(nameof(unprotectedData), unprotectedData);
+
             var iv = Guid.NewGuid().ToByteArray();
-            using (var rm = new RijndaelManaged())
-            {
-                return (await TransformAsync(unprotectedData, rm.CreateEncryptor(_key, iv)).ConfigureAwait(false)).Concat(iv).ToArray();
-            }
+            using var rm = new RijndaelManaged();
+            return (await TransformAsync(unprotectedData, rm.CreateEncryptor(_key, iv)).ConfigureAwait(false)).Concat(iv).ToArray();
         }
 
         public byte[] UnprotectData(byte[] protectedData)
         {
             ArgCheck.NotNull(nameof(protectedData), protectedData);
+
             if (protectedData.Length < 16)
             {
                 throw new ArgumentException($"Parameter {nameof(protectedData)} must be at least 16 bytes long.", nameof(protectedData));
@@ -50,15 +50,14 @@ namespace KodeAid.Security.Cryptography
 
             var iv = protectedData.Skip(protectedData.Length - 16).ToArray();
             protectedData = protectedData.Take(protectedData.Length - 16).ToArray();
-            using (var rm = new RijndaelManaged())
-            {
-                return Transform(protectedData, rm.CreateDecryptor(_key, iv));
-            }
+            using var rm = new RijndaelManaged();
+            return Transform(protectedData, rm.CreateDecryptor(_key, iv));
         }
 
         public async Task<byte[]> UnprotectDataAsync(byte[] protectedData)
         {
             ArgCheck.NotNull(nameof(protectedData), protectedData);
+
             if (protectedData.Length < 16)
             {
                 throw new ArgumentException($"Parameter {nameof(protectedData)} must be at least 16 bytes long.", nameof(protectedData));
@@ -66,15 +65,14 @@ namespace KodeAid.Security.Cryptography
 
             var iv = protectedData.Skip(protectedData.Length - 16).ToArray();
             protectedData = protectedData.Take(protectedData.Length - 16).ToArray();
-            using (var rm = new RijndaelManaged())
-            {
-                return await TransformAsync(protectedData, rm.CreateDecryptor(_key, iv)).ConfigureAwait(false);
-            }
+            using var rm = new RijndaelManaged();
+            return await TransformAsync(protectedData, rm.CreateDecryptor(_key, iv)).ConfigureAwait(false);
         }
 
         private byte[] GetValidKey(byte[] suggestedKey)
         {
             ArgCheck.NotNullOrEmpty(nameof(suggestedKey), suggestedKey);
+
             while (suggestedKey.Length < 32)
             {
                 suggestedKey = suggestedKey.Concat(suggestedKey).ToArray();
@@ -90,30 +88,26 @@ namespace KodeAid.Security.Cryptography
 
         private byte[] Transform(byte[] buffer, ICryptoTransform transform)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
             {
-                using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
-                {
-                    cs.Write(buffer, 0, buffer.Length);
-                    cs.Flush();
-                }
-                ms.Flush();
-                return ms.ToArray();
+                cs.Write(buffer, 0, buffer.Length);
+                cs.Flush();
             }
+            ms.Flush();
+            return ms.ToArray();
         }
 
         private async Task<byte[]> TransformAsync(byte[] buffer, ICryptoTransform transform)
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
             {
-                using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
-                {
-                    await cs.WriteAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
-                    await cs.FlushAsync().ConfigureAwait(false);
-                }
-                await ms.FlushAsync().ConfigureAwait(false);
-                return ms.ToArray();
+                await cs.WriteAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                await cs.FlushAsync().ConfigureAwait(false);
             }
+            await ms.FlushAsync().ConfigureAwait(false);
+            return ms.ToArray();
         }
     }
 }

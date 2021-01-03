@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace KodeAid
 {
@@ -25,7 +26,7 @@ namespace KodeAid
 
             if (value.Equals(default(T)))
             {
-                throw new ArgumentException($"Parameter {paramName} cannot be {default(T).ToString()}.", paramName);
+                throw new ArgumentException($"Parameter {paramName} cannot be {default(T)}.", paramName);
             }
         }
 
@@ -204,7 +205,6 @@ namespace KodeAid
             OfType(paramName, value, typeof(T));
         }
 
-
         public static void OfType(string paramName, object value, Type ofType)
         {
             if (value == null)
@@ -237,6 +237,21 @@ namespace KodeAid
                 }
 
                 throw new ArgumentException($"Parameter {paramName} must be of type {ofType.Name}.", paramName);
+            }
+        }
+
+        public static void RegexMatch(string paramName, string value, string pattern, string formatName = null, RegexOptions options = RegexOptions.Compiled)
+        {
+            NotNull(paramName, value);
+
+            if (!Regex.IsMatch(value, pattern, options))
+            {
+                if (formatName != null)
+                {
+                    throw new ArgumentException($"Parameter {paramName} must match format {formatName}.", paramName);
+                }
+
+                throw new ArgumentException($"Parameter {paramName} must match pattern /{pattern}/.", paramName);
             }
         }
     }
