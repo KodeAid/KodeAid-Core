@@ -6,16 +6,23 @@ using System;
 using System.IO;
 using KodeAid;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddCurrentDateTimeProvider(this IServiceCollection services)
-            => services.AddSingleton(DateTimeProvider.Current);
+        {
+            services.TryAddSingleton(DateTimeProvider.Current);
+            return services;
+        }
 
         public static IServiceCollection AddDefaultDateTimeProvider(this IServiceCollection services)
-            => services.AddSingleton(DefaultDateTimeProvider.Instance);
+        {
+            services.TryAddSingleton(DefaultDateTimeProvider.Instance);
+            return services;
+        }
 
         public static IServiceCollection AddTransient<TService, TImplementation, TOptions>(this IServiceCollection services, TOptions defaultOptions = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
             where TService : class
