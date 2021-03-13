@@ -12,7 +12,7 @@ namespace KodeAid
 {
     public static class ArgCheck
     {
-        public static void NotNull(string paramName, object value)
+        public static void NotNull([ValidatedNotNull] string paramName, object value)
         {
             if (value == null)
             {
@@ -253,6 +253,11 @@ namespace KodeAid
 
                 throw new ArgumentException($"Parameter {paramName} must match pattern /{pattern}/.", paramName);
             }
+        }
+
+        [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
+        private sealed class ValidatedNotNullAttribute : Attribute
+        {
         }
     }
 }
