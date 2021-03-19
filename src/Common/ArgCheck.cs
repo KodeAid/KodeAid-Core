@@ -12,7 +12,7 @@ namespace KodeAid
 {
     public static class ArgCheck
     {
-        public static void NotNull([ValidatedNotNull] string paramName, object value)
+        public static void NotNull(string paramName, [ValidatedNotNull] object value)
         {
             if (value == null)
             {
