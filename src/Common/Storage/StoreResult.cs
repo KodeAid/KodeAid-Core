@@ -39,7 +39,7 @@ namespace KodeAid.Storage
         public DateTimeOffset? CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
         public DateTimeOffset? ExpiresAt { get; set; }
-        public object ConcurrencyStamp { get; set; }
+        public object ConcurrencyToken { get; set; }
 
         string IStringResult.Value => _value;
         byte[] IBytesResult.Data => _bytes;

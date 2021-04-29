@@ -26,6 +26,6 @@ namespace KodeAid.Azure.Storage
         DateTimeOffset? ICreatedTime.CreatedAt { get => Created; set => Created = value; }
         DateTimeOffset? IUpdatedTime.UpdatedAt { get => LastModified; set => LastModified = value; }
         DateTimeOffset? IExpiredTime.ExpiresAt { get => Expires; set => Expires = value; }
-        object IOptimisticConcurrency.ConcurrencyStamp { get => ETag; set => ETag = (string)value; }
+        object IOptimisticConcurrency.ConcurrencyToken { get => ETag; set => ETag = (string)value; }
     }
 }

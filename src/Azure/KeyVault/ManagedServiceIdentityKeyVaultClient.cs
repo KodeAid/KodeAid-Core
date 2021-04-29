@@ -9,7 +9,7 @@ namespace KodeAid.Azure.KeyVault
 {
     public class ManagedServiceIdentityKeyVaultClient : KeyVaultClient
     {
-        private static readonly AzureServiceTokenProvider _tokenProvider = new AzureServiceTokenProvider();
+        private static readonly AzureServiceTokenProvider _tokenProvider = new();
 
         public ManagedServiceIdentityKeyVaultClient()
             : base(new AuthenticationCallback(_tokenProvider.KeyVaultTokenCallback))

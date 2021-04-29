@@ -10,6 +10,6 @@ namespace KodeAid.Storage
 {
     public interface ISharedUriAccessible
     {
-        Task<Uri> GetSharedUri(string name, string partition = null, AccessPermissions permissions = AccessPermissions.Read, DateTimeOffset? startTime = null, DateTimeOffset? expiryTime = null, CancellationToken cancellationToken = default);
+        Task<Uri> GetSharedUriAsync(string name, string partition = null, AccessPermissions permissions = AccessPermissions.Read, DateTimeOffset? startTime = null, DateTimeOffset? expiryTime = null, CancellationToken cancellationToken = default);
     }
 }

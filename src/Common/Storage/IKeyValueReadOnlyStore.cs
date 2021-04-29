@@ -9,8 +9,8 @@ namespace KodeAid.Storage
 {
     public interface IKeyValueReadOnlyStore
     {
-        Task<IStringResult> GetStringAsync(string key, string partition = null, object concurrencyStamp = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
-        Task<IBytesResult> GetBytesAsync(string key, string partition = null, object concurrencyStamp = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
-        Task<IStreamResult> GetStreamAsync(string key, string partition = null, object concurrencyStamp = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
+        Task<IStringResult> GetStringAsync(string key, string partition = null, object concurrencyToken = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
+        Task<IBytesResult> GetBytesAsync(string key, string partition = null, object concurrencyToken = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
+        Task<IStreamResult> GetStreamAsync(string key, string partition = null, object concurrencyToken = null, bool throwOnNotFound = false, CancellationToken cancellationToken = default);
     }
 }

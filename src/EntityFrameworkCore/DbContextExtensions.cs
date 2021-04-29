@@ -99,7 +99,7 @@ namespace Microsoft.EntityFrameworkCore
 
                 if (typeof(IOptimisticConcurrency).IsAssignableFrom(entity.GetType()))
                 {
-                    ((IOptimisticConcurrency)entity).ConcurrencyStamp = ((IOptimisticConcurrency)existing).ConcurrencyStamp;
+                    ((IOptimisticConcurrency)entity).ConcurrencyToken = ((IOptimisticConcurrency)existing).ConcurrencyToken;
                 }
 
                 context.Update(entity);

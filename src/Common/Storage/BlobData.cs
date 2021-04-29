@@ -15,7 +15,7 @@ namespace KodeAid.Storage
         public string Key { get; set; }
         public string Partition { get; set; }
         public DateTimeOffset? ExpiresAt { get; set; }
-        public object ConcurrencyStamp { get; set; }
+        public object ConcurrencyToken { get; set; }
         public Stream Content { get; set; }
         public string ContentType { get; set; }
         public string ContentEncoding { get; set; }
