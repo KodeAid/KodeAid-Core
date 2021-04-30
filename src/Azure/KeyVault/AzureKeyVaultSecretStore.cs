@@ -17,7 +17,7 @@ namespace KodeAid.Azure.KeyVault
     {
         private readonly string _keyVaultBaseUrl;
         private readonly X509KeyStorageFlags _keyStorageFlags = X509KeyStorageFlags.MachineKeySet;
-        private readonly ManagedServiceIdentityKeyVaultClient _client = new();
+        private readonly ManagedServiceIdentityKeyVaultClient _client = new ManagedServiceIdentityKeyVaultClient();
         private bool _disposed = false;
 
         public AzureKeyVaultSecretStore(AzureKeyVaultSecretStoreOptions options)

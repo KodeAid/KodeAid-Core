@@ -20,7 +20,7 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-        <LangVersion>preview</LangVersion>
+        <LangVersion>8.0</LangVersion>
         <NoWarn>1701;1702;1705;1591</NoWarn>
     </PropertyGroup>
 

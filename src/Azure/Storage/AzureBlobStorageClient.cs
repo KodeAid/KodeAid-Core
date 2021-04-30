@@ -34,7 +34,7 @@ namespace KodeAid.Azure.Storage
         private readonly TimeSpan? _leaseDuration;
         private readonly bool _useSnapshots;
         private readonly bool _useManagedIdentity;
-        private readonly BlobClientOptions _clientOptions = new()
+        private readonly BlobClientOptions _clientOptions = new BlobClientOptions()
         {
             Retry =
             {
@@ -249,9 +249,9 @@ namespace KodeAid.Azure.Storage
                     ContentType = blobProperties.ContentType?.TrimToNull(),
                     ContentEncoding = blobProperties.ContentEncoding?.TrimToNull(),
                     ETag = blobProperties.ETag.ToString("G")?.TrimToNull(),
-                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? null : blobProperties.CreatedOn,
-                    LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? null : blobProperties.LastModified,
-                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? null : blobProperties.ExpiresOn,
+                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.CreatedOn,
+                    LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.LastModified,
+                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.ExpiresOn,
                 };
 
                 result.Metadata.AddRange(blobProperties.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
@@ -269,9 +269,9 @@ namespace KodeAid.Azure.Storage
                     ContentType = blobProperties.ContentType?.TrimToNull(),
                     ContentEncoding = blobProperties.ContentEncoding?.TrimToNull(),
                     ETag = blobProperties.ETag.ToString("G")?.TrimToNull(),
-                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? null : blobProperties.CreatedOn,
-                    LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? null : blobProperties.LastModified,
-                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? null : blobProperties.ExpiresOn,
+                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.CreatedOn,
+                    LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.LastModified,
+                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.ExpiresOn,
                 };
 
                 result.Metadata.AddRange(blobProperties.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
@@ -281,7 +281,7 @@ namespace KodeAid.Azure.Storage
 
             try
             {
-                var stream = await blobClient.OpenReadAsync(new BlobOpenReadOptions(true) { Conditions = new BlobRequestConditions() { IfNoneMatch = ifNoneMatchETag != null ? new ETag(ifNoneMatchETag) : null, IfModifiedSince = ifModifiedSinceTime } }, cancellationToken).ConfigureAwait(false);
+                var stream = await blobClient.OpenReadAsync(new BlobOpenReadOptions(true) { Conditions = new BlobRequestConditions() { IfNoneMatch = ifNoneMatchETag != null ? new ETag(ifNoneMatchETag) : (ETag?)null, IfModifiedSince = ifModifiedSinceTime } }, cancellationToken).ConfigureAwait(false);
 
                 var result = new BlobStreamResult(stream)
                 {
@@ -291,9 +291,9 @@ namespace KodeAid.Azure.Storage
                     ContentType = blobProperties.ContentType?.TrimToNull(),
                     ContentEncoding = blobProperties.ContentEncoding?.TrimToNull(),
                     ETag = blobProperties.ETag.ToString("G")?.TrimToNull(),
-                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? null : blobProperties.CreatedOn,
-                    LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? null : blobProperties.LastModified,
-                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? null : blobProperties.ExpiresOn,
+                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.CreatedOn,
+                    LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.LastModified,
+                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.ExpiresOn,
                 };
 
                 result.Metadata.AddRange(blobProperties.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
@@ -325,9 +325,9 @@ namespace KodeAid.Azure.Storage
                         ContentType = blobProperties.ContentType?.TrimToNull(),
                         ContentEncoding = blobProperties.ContentEncoding?.TrimToNull(),
                         ETag = blobProperties.ETag.ToString("G")?.TrimToNull(),
-                        CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? null : blobProperties.CreatedOn,
-                        LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? null : blobProperties.LastModified,
-                        Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? null : blobProperties.ExpiresOn,
+                        CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.CreatedOn,
+                        LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.LastModified,
+                        Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.ExpiresOn,
                     };
 
                     result.Metadata.AddRange(blobProperties.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
@@ -390,7 +390,7 @@ namespace KodeAid.Azure.Storage
 
                     if (_useSnapshots)
                     {
-                        await blobClient.CreateSnapshotAsync(null, new BlobRequestConditions() { LeaseId = leaseId, IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : null, IfUnmodifiedSince = ifNotModifiedSinceTime }, cancellationToken).ConfigureAwait(false);
+                        await blobClient.CreateSnapshotAsync(null, new BlobRequestConditions() { LeaseId = leaseId, IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : (ETag?)null, IfUnmodifiedSince = ifNotModifiedSinceTime }, cancellationToken).ConfigureAwait(false);
                     }
                 }
 
@@ -399,7 +399,7 @@ namespace KodeAid.Azure.Storage
                     Conditions = new BlobRequestConditions()
                     {
                         LeaseId = leaseId,
-                        IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : null,
+                        IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : (ETag?)null,
                         IfUnmodifiedSince = ifNotModifiedSinceTime
                     },
                     HttpHeaders = new BlobHttpHeaders()
@@ -428,9 +428,9 @@ namespace KodeAid.Azure.Storage
                     ContentType = blobProperties.ContentType?.TrimToNull(),
                     ContentEncoding = blobProperties.ContentEncoding?.TrimToNull(),
                     ETag = blobInfo.ETag.ToString("G")?.TrimToNull(),
-                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? null : blobProperties.CreatedOn,
-                    LastModified = blobInfo.LastModified == default || blobInfo.LastModified == DateTimeOffset.MaxValue ? null : blobInfo.LastModified,
-                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? null : blobProperties.ExpiresOn,
+                    CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.CreatedOn,
+                    LastModified = blobInfo.LastModified == default || blobInfo.LastModified == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobInfo.LastModified,
+                    Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.ExpiresOn,
                 };
 
                 result.Metadata.AddRange(blobProperties.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
@@ -450,9 +450,9 @@ namespace KodeAid.Azure.Storage
                         ContentType = blobProperties.ContentType?.TrimToNull(),
                         ContentEncoding = blobProperties.ContentEncoding?.TrimToNull(),
                         ETag = blobProperties.ETag.ToString("G")?.TrimToNull(),
-                        CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? null : blobProperties.CreatedOn,
-                        LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? null : blobProperties.LastModified,
-                        Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? null : blobProperties.ExpiresOn,
+                        CreatedOn = blobProperties.CreatedOn == default || blobProperties.CreatedOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.CreatedOn,
+                        LastModified = blobProperties.LastModified == default || blobProperties.LastModified == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.LastModified,
+                        Expires = blobProperties.ExpiresOn == default || blobProperties.ExpiresOn == DateTimeOffset.MaxValue ? (DateTimeOffset?)null : blobProperties.ExpiresOn,
                     };
 
                     result.Metadata.AddRange(blobProperties.Metadata.Where(p => !string.Equals(p.Key, _expiresMetadataKey, StringComparison.OrdinalIgnoreCase)));
@@ -497,7 +497,7 @@ namespace KodeAid.Azure.Storage
                         leaseId = (await leaseClient.AcquireAsync(_leaseDuration.Value, new RequestConditions(), cancellationToken).ConfigureAwait(false)).Value.LeaseId;
                     }
 
-                    await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, new BlobRequestConditions() { LeaseId = leaseId, IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : null, IfUnmodifiedSince = ifNotModifiedSinceTime }, cancellationToken).ConfigureAwait(false);
+                    await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots, new BlobRequestConditions() { LeaseId = leaseId, IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : (ETag?)null, IfUnmodifiedSince = ifNotModifiedSinceTime }, cancellationToken).ConfigureAwait(false);
                 }
                 catch (RequestFailedException ex)
                 {
@@ -553,7 +553,7 @@ namespace KodeAid.Azure.Storage
                         leaseId = (await leaseClient.AcquireAsync(_leaseDuration.Value, new RequestConditions(), cancellationToken).ConfigureAwait(false)).Value.LeaseId;
                     }
 
-                    await blobClient.CreateSnapshotAsync(null, new BlobRequestConditions() { LeaseId = leaseId, IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : null, IfUnmodifiedSince = ifNotModifiedSinceTime }, cancellationToken).ConfigureAwait(false);
+                    await blobClient.CreateSnapshotAsync(null, new BlobRequestConditions() { LeaseId = leaseId, IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : (ETag?)null, IfUnmodifiedSince = ifNotModifiedSinceTime }, cancellationToken).ConfigureAwait(false);
                 }
                 catch (RequestFailedException ex)
                 {
