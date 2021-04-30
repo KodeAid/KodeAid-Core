@@ -63,26 +63,26 @@ namespace KodeAid.Azure.Storage
                 _clientOptions.Retry.NetworkTimeout = options.NetworkTimeout.Value;
             }
 
-            if (string.IsNullOrEmpty(options.ConnectionString))
+            if (!string.IsNullOrEmpty(options.ConnectionString))
             {
                 _accountClient = new BlobServiceClient(options.ConnectionString, _clientOptions);
             }
-            else if (string.IsNullOrEmpty(options.AccountName))
+            else if (!string.IsNullOrEmpty(options.AccountName))
             {
                 var serviceUri = new Uri($"https://{options.AccountName}.{(options.EndpointSuffix ?? "blob.core.windows.net")}");
 
-                if (string.IsNullOrEmpty(options.AccountKey))
+                if (!string.IsNullOrEmpty(options.AccountKey))
                 {
                     _accountClient = new BlobServiceClient(serviceUri, new StorageSharedKeyCredential(options.AccountName, options.AccountKey), _clientOptions);
-                }
-                else if (string.IsNullOrEmpty(options.SharedAccessSignature))
-                {
-                    throw new NotSupportedException($"{nameof(options.SharedAccessSignature)} is not supported.");
                 }
                 else if (options.UseManagedIdentity)
                 {
                     _useManagedIdentity = true;
                     _accountClient = new BlobServiceClient(serviceUri, new ManagedIdentityCredential(), _clientOptions);
+                }
+                else if (!string.IsNullOrEmpty(options.SharedAccessSignature))
+                {
+                    throw new NotSupportedException($"{nameof(options.SharedAccessSignature)} is not supported.");
                 }
                 else
                 {
