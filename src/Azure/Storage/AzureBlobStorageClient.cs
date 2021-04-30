@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
@@ -786,7 +787,7 @@ namespace KodeAid.Azure.Storage
         private static Uri CleanUpUri(Uri uri)
         {
             var b = new UriBuilder(uri);
-            b.Path = b.Path.Replace("%2f", "/");
+            b.Path = Regex.Replace(b.Path, "%2F", "/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return b.Uri;
         }
     }
