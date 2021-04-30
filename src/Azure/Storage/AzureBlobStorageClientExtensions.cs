@@ -18,7 +18,7 @@ namespace KodeAid.Azure.Storage
                     throw new ArgumentException("Connection string or account name is required.", nameof(options));
                 }
 
-                if (string.IsNullOrEmpty(options.AccountKey) && string.IsNullOrEmpty(options.SharedAccessSignature) && !options.UseManagedIdentity)
+                if (string.IsNullOrEmpty(options.AccountKey) && string.IsNullOrEmpty(options.SharedAccessSignature) && !options.UseDefaultAzureCredential)
                 {
                     throw new ArgumentException("Account key, SAS or managed identity is required.", nameof(options));
                 }

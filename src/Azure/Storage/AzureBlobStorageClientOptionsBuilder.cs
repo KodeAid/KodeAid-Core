@@ -16,7 +16,7 @@ namespace KodeAid.Azure.Storage
         private string _containerName;
         private string _defaultDirectoryRelativeAddress;
         private bool _useSnapshots;
-        private bool _useManagedIdentity;
+        private bool _useDefaultAzureCredential;
         private TimeSpan? _leaseDuration;
         private TimeSpan? _networkTimeout;
 
@@ -33,7 +33,7 @@ namespace KodeAid.Azure.Storage
                 LeaseDuration = _leaseDuration,
                 NetworkTimeout = _networkTimeout,
                 SharedAccessSignature = _sasToken,
-                UseManagedIdentity = _useManagedIdentity,
+                UseDefaultAzureCredential = _useDefaultAzureCredential,
                 UseSnapshots = _useSnapshots,
             };
         }
@@ -72,9 +72,9 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder WithManagedIdentity(bool managedIdentity)
+        public AzureBlobStorageClientOptionsBuilder WithDefaultAzureCredential(bool defaultAzureCredential)
         {
-            _useManagedIdentity = managedIdentity;
+            _useDefaultAzureCredential = defaultAzureCredential;
             return this;
         }
 

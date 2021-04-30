@@ -75,10 +75,10 @@ namespace KodeAid.Azure.Storage
                 {
                     _accountClient = new BlobServiceClient(serviceUri, new StorageSharedKeyCredential(options.AccountName, options.AccountKey), _clientOptions);
                 }
-                else if (options.UseManagedIdentity)
+                else if (options.UseDefaultAzureCredential)
                 {
                     _useManagedIdentity = true;
-                    _accountClient = new BlobServiceClient(serviceUri, new ManagedIdentityCredential(), _clientOptions);
+                    _accountClient = new BlobServiceClient(serviceUri, new DefaultAzureCredential(), _clientOptions);
                 }
                 else if (!string.IsNullOrEmpty(options.SharedAccessSignature))
                 {

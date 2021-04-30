@@ -15,7 +15,7 @@ namespace KodeAid.Azure.Storage
         public string EndpointSuffix { get; set; }
         public string ContainerName { get; set; }
         public string DefaultDirectoryRelativeAddress { get; set; }
-        public bool UseManagedIdentity { get; set; }
+        public bool UseDefaultAzureCredential { get; set; }
         public bool UseSnapshots { get; set; }
         public TimeSpan? LeaseDuration { get; set; }
         public TimeSpan? NetworkTimeout { get; set; }
