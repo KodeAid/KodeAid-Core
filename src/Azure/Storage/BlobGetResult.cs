@@ -19,7 +19,7 @@ namespace KodeAid.Azure.Storage
                 BlobName = copy.BlobName;
                 ContentEncoding = copy.ContentEncoding;
                 ContentType = copy.ContentType;
-                Created = copy.Created;
+                CreatedOn = copy.CreatedOn;
                 DirectoryRelativeAddress = copy.DirectoryRelativeAddress;
                 ETag = copy.ETag;
                 Expires = copy.Expires;

@@ -3,29 +3,22 @@
 
 
 using System;
-using KodeAid.Security.Secrets;
-using Microsoft.WindowsAzure.Storage;
 
 namespace KodeAid.Azure.Storage
 {
     public sealed class AzureBlobStorageClientOptionsBuilder : IBuilder<AzureBlobStorageClientOptions>
     {
-        private CloudStorageAccount _storageAccount;
         private string _connectionString;
         private string _accountKey;
         private string _sasToken;
         private string _accountName;
         private string _endpointSuffix;
-        private ISecretReadOnlyStore _secretStore;
-        private string _connectionStringSecretName;
-        private string _accountKeySecretName;
-        private string _sasTokenSecretName;
         private string _containerName;
         private string _defaultDirectoryRelativeAddress;
         private bool _useSnapshots;
+        private bool _useManagedIdentity;
         private TimeSpan? _leaseDuration;
-        private TimeSpan? _serverTimeout;
-        private TimeSpan? _maximumExecutionTime;
+        private TimeSpan? _networkTimeout;
 
         public AzureBlobStorageClientOptions Build()
         {
@@ -33,27 +26,16 @@ namespace KodeAid.Azure.Storage
             {
                 AccountName = _accountName,
                 AccountKey = _accountKey,
-                AccountKeySecretName = _accountKeySecretName,
                 ConnectionString = _connectionString,
-                ConnectionStringSecretName = _connectionStringSecretName,
                 ContainerName = _containerName,
                 DefaultDirectoryRelativeAddress = _defaultDirectoryRelativeAddress,
                 EndpointSuffix = _endpointSuffix,
                 LeaseDuration = _leaseDuration,
-                MaximumExecutionTime = _maximumExecutionTime,
-                SecretStore = _secretStore,
-                ServerTimeout = _serverTimeout,
+                NetworkTimeout = _networkTimeout,
                 SharedAccessSignature = _sasToken,
-                SharedAccessSignatureSecretName = _sasTokenSecretName,
-                StorageAccount = _storageAccount,
+                UseManagedIdentity = _useManagedIdentity,
                 UseSnapshots = _useSnapshots,
             };
-        }
-
-        public AzureBlobStorageClientOptionsBuilder WithStorageAccount(CloudStorageAccount account)
-        {
-            _storageAccount = account;
-            return this;
         }
 
         public AzureBlobStorageClientOptionsBuilder WithConnectionString(string connectionString)
@@ -78,31 +60,6 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder WithSecretConnectionString(string connectionStringSecretName, ISecretReadOnlyStore secretStore = null)
-        {
-            _connectionStringSecretName = connectionStringSecretName;
-            _secretStore = secretStore;
-            return this;
-        }
-
-        public AzureBlobStorageClientOptionsBuilder WithSecretAccountKey(string accountKeySecretName, string accountName, ISecretReadOnlyStore secretStore = null, string endpointSuffix = null)
-        {
-            _accountKeySecretName = accountKeySecretName;
-            _accountName = accountName;
-            _secretStore = secretStore;
-            _endpointSuffix = endpointSuffix;
-            return this;
-        }
-
-        public AzureBlobStorageClientOptionsBuilder WithSecretSharedAccessSignature(string sasTokenSecretName, string accountName, ISecretReadOnlyStore secretStore = null, string endpointSuffix = null)
-        {
-            _sasTokenSecretName = sasTokenSecretName;
-            _accountName = accountName;
-            _secretStore = secretStore;
-            _endpointSuffix = endpointSuffix;
-            return this;
-        }
-
         public AzureBlobStorageClientOptionsBuilder WithContainer(string containerName)
         {
             _containerName = containerName;
@@ -115,9 +72,15 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder UseSnapshots(bool useSnapshots)
+        public AzureBlobStorageClientOptionsBuilder WithManagedIdentity(bool managedIdentity)
         {
-            _useSnapshots = useSnapshots;
+            _useManagedIdentity = managedIdentity;
+            return this;
+        }
+
+        public AzureBlobStorageClientOptionsBuilder WithSnapshots(bool snapshots)
+        {
+            _useSnapshots = snapshots;
             return this;
         }
 
@@ -133,15 +96,9 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder WithServerTimeout(TimeSpan? timeout)
+        public AzureBlobStorageClientOptionsBuilder WithNetworkTimeout(TimeSpan? timeout)
         {
-            _serverTimeout = timeout;
-            return this;
-        }
-
-        public AzureBlobStorageClientOptionsBuilder WithMaximumExecutionTime(TimeSpan? timeout)
-        {
-            _maximumExecutionTime = timeout;
+            _networkTimeout = timeout;
             return this;
         }
     }

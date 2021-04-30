@@ -13,7 +13,7 @@ namespace KodeAid.Azure.Storage
     {
         public string BlobName { get; set; }
         public string DirectoryRelativeAddress { get; set; }
-        public DateTimeOffset? Created { get; set; }
+        public DateTimeOffset? CreatedOn { get; set; }
         public DateTimeOffset? LastModified { get; set; }
         public DateTimeOffset? Expires { get; set; }
         public string ETag { get; set; }
@@ -23,7 +23,7 @@ namespace KodeAid.Azure.Storage
 
         string IStoreMeta.Partition { get => DirectoryRelativeAddress; set => DirectoryRelativeAddress = value; }
         string IStoreMeta.Key { get => BlobName; set => BlobName = value; }
-        DateTimeOffset? ICreatedTime.CreatedAt { get => Created; set => Created = value; }
+        DateTimeOffset? ICreatedTime.CreatedAt { get => CreatedOn; set => CreatedOn = value; }
         DateTimeOffset? IUpdatedTime.UpdatedAt { get => LastModified; set => LastModified = value; }
         DateTimeOffset? IExpiredTime.ExpiresAt { get => Expires; set => Expires = value; }
         object IOptimisticConcurrency.ConcurrencyToken { get => ETag; set => ETag = (string)value; }

@@ -3,8 +3,6 @@
 
 
 using System;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 
 namespace KodeAid.Azure.Storage
 {
@@ -12,36 +10,23 @@ namespace KodeAid.Azure.Storage
     {
         internal static AzureBlobStorageClientOptions Verify(this AzureBlobStorageClientOptions options)
         {
-            if (options?.StorageAccount == null)
+
+            if (string.IsNullOrEmpty(options.ConnectionString))
             {
-                if (!string.IsNullOrEmpty(options?.ConnectionString))
+                if (string.IsNullOrEmpty(options.AccountName))
                 {
-                    options.StorageAccount = CloudStorageAccount.Parse(options.ConnectionString);
+                    throw new ArgumentException("Connection string or account name is required.", nameof(options));
                 }
-                else if (!string.IsNullOrEmpty(options?.AccountName) && !string.IsNullOrEmpty(options?.AccountKey))
+
+                if (string.IsNullOrEmpty(options.AccountKey) && string.IsNullOrEmpty(options.SharedAccessSignature) && !options.UseManagedIdentity)
                 {
-                    options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.AccountName, options.AccountKey), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
-                }
-                else if (!string.IsNullOrEmpty(options?.AccountName) && !string.IsNullOrEmpty(options?.SharedAccessSignature))
-                {
-                    options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.SharedAccessSignature), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
-                }
-                else if (options.SecretStore != null && (!string.IsNullOrEmpty(options?.ConnectionStringSecretName) || !string.IsNullOrEmpty(options?.AccountKeySecretName) || !string.IsNullOrEmpty(options?.SharedAccessSignatureSecretName)))
-                {
-                    // will load from secret store
-                    //options.StorageAccount = new CloudStorageAccount(new StorageCredentials(options.SharedAccessSignature), options.AccountName, options.EndpointSuffix ?? "core.windows.net", true);
-                }
-                else
-                {
-                    ArgCheck.NotNull(nameof(options.StorageAccount), options?.StorageAccount);
+                    throw new ArgumentException("Account key, SAS or managed identity is required.", nameof(options));
                 }
             }
 
-            ArgCheck.NotNullOrEmpty(nameof(options.ContainerName), options?.ContainerName);
-
             if (options.LeaseDuration.HasValue)
             {
-                // as per Azure storage lease duration constraints
+                // As per Azure storage lease duration constraints.
                 ArgCheck.GreaterThanOrEqualTo(nameof(options.LeaseDuration), options.LeaseDuration, TimeSpan.FromSeconds(15));
                 ArgCheck.LessThanOrEqualTo(nameof(options.LeaseDuration), options.LeaseDuration, TimeSpan.FromSeconds(60));
             }
