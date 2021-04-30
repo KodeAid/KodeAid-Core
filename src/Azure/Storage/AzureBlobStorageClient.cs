@@ -27,12 +27,13 @@ namespace KodeAid.Azure.Storage
     {
         private const string _expiresMetadataKey = "Expires";
         private const string _dateTimeFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
-        private readonly TimeSpan _defaultSharedAccessDuration = TimeSpan.FromSeconds(60);
+        private readonly TimeSpan _defaultSharedAccessDuration = TimeSpan.FromMinutes(60);
         private readonly string _defaultDirectoryRelativeAddress;
         private readonly BlobServiceClient _accountClient;
         private readonly BlobContainerClient _containerClient;
         private readonly TimeSpan? _leaseDuration;
         private readonly bool _useSnapshots;
+        private readonly StorageSharedKeyCredential _storageSharedKeyCredential;
         private readonly bool _useManagedIdentity;
         private readonly BlobClientOptions _clientOptions = new BlobClientOptions()
         {
@@ -73,7 +74,8 @@ namespace KodeAid.Azure.Storage
 
                 if (!string.IsNullOrEmpty(options.AccountKey))
                 {
-                    _accountClient = new BlobServiceClient(serviceUri, new StorageSharedKeyCredential(options.AccountName, options.AccountKey), _clientOptions);
+                    _storageSharedKeyCredential = new StorageSharedKeyCredential(options.AccountName, options.AccountKey);
+                    _accountClient = new BlobServiceClient(serviceUri, _storageSharedKeyCredential, _clientOptions);
                 }
                 else if (options.UseDefaultAzureCredential)
                 {
@@ -596,33 +598,43 @@ namespace KodeAid.Azure.Storage
             ArgCheck.NotNullOrEmpty(nameof(blobName), blobName);
 
             directoryRelativeAddress ??= _defaultDirectoryRelativeAddress;
+            startTime ??= DateTimeOffset.UtcNow.AddMinutes(-5);
             expiryTime ??= DateTimeOffset.UtcNow.Add(_defaultSharedAccessDuration);
             var blobClient = GetBlobClient(blobName, directoryRelativeAddress);
 
-            var sasBuilder = new BlobSasBuilder(permissions, expiryTime.Value)
+            var sasBuilder = new BlobSasBuilder()
             {
+                BlobContainerName = blobClient.BlobContainerName,
                 BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = startTime.Value,
+                ExpiresOn = expiryTime.Value,
                 Protocol = SasProtocol.Https,
             };
 
-            if (startTime.HasValue)
-            {
-                sasBuilder.StartsOn = startTime.Value;
-            }
+            sasBuilder.SetPermissions(permissions);
 
             if (blobClient.CanGenerateSasUri)
             {
-                return blobClient.GenerateSasUri(sasBuilder);
+                return CleanUpUri(blobClient.GenerateSasUri(sasBuilder));
+            }
+
+            if (_storageSharedKeyCredential != null)
+            {
+                return CleanUpUri(new BlobUriBuilder(blobClient.Uri)
+                {
+                    Sas = sasBuilder.ToSasQueryParameters(_storageSharedKeyCredential),
+                }.ToUri());
             }
 
             if (_useManagedIdentity)
             {
                 var userDelegationKey = (await _accountClient.GetUserDelegationKeyAsync(null, expiryTime.Value, cancellationToken).ConfigureAwait(false)).Value;
 
-                return new BlobUriBuilder(blobClient.Uri)
+                return CleanUpUri(new BlobUriBuilder(blobClient.Uri)
                 {
                     Sas = sasBuilder.ToSasQueryParameters(userDelegationKey, blobClient.AccountName),
-                }.ToUri();
+                }.ToUri());
             }
 
             throw new InvalidOperationException("Must use Shared Account Key or Token Credentials (including Managed Identity) assigned the Storage Blob Delegator role to generate a Shared Access Signature (SAS).");
@@ -769,6 +781,13 @@ namespace KodeAid.Azure.Storage
         {
             var result = await GetBytesAsync(name, throwOnNotFound: true, cancellationToken: cancellationToken).ConfigureAwait(false);
             return new X509Certificate2(result.Contents);
+        }
+
+        private static Uri CleanUpUri(Uri uri)
+        {
+            var b = new UriBuilder(uri);
+            b.Path = b.Path.Replace("%2f", "/");
+            return b.Uri;
         }
     }
 }
