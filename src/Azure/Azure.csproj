@@ -2,8 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <VersionPrefix>2.1.4</VersionPrefix>
-        <VersionSuffix>beta-01</VersionSuffix>
+        <Version>2.1.4-beta-01</Version>
         <AssemblyName>KodeAid.Azure</AssemblyName>
         <RootNamespace>KodeAid.Azure</RootNamespace>
         <Description>Kode-Aid Azure library.</Description>
