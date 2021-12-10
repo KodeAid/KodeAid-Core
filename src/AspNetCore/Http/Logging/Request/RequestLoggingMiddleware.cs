@@ -18,8 +18,9 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
         private readonly int _maxBodyByteCount;
         private readonly Func<HttpContext, bool> _shouldLog;
         private readonly ILogger _logger;
+        private readonly string _prefix;
 
-        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, int maxBodyByteCount, Func<HttpContext, bool> shouldLog)
+        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, int maxBodyByteCount, Func<HttpContext, bool> shouldLog, string prefix)
         {
             ArgCheck.NotNull(nameof(next), next);
             ArgCheck.NotNull(nameof(logger), logger);
@@ -28,6 +29,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
             _logger = logger;
             _maxBodyByteCount = maxBodyByteCount;
             _shouldLog = shouldLog;
+            _prefix = prefix ?? "REQUEST TRACE: ";
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -48,7 +50,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
 
             if (_maxBodyByteCount <= 0)
             {
-                return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}";
+                return $"{_prefix}{request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}";
             }
 
             request.EnableBuffering();
@@ -60,7 +62,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
                 request.Body.Position = 0;
                 var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
 
-                return $"REQUEST TRACE: {request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
+                return $"{_prefix}{request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
             }
             finally
             {

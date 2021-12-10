@@ -63,7 +63,7 @@ namespace Microsoft.AspNetCore.Builder
             if (options.Enabled)
             {
                 var logger = builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger(options.LoggerName ?? typeof(RequestLoggingMiddleware).Namespace);
-                builder.UseMiddleware<RequestLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog ?? (ctx => true));
+                builder.UseMiddleware<RequestLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog ?? (ctx => true), options.LogPrefix);
             }
 
             return builder;
@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.Builder
             if (options.Enabled)
             {
                 var logger = builder.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger(options.LoggerName ?? typeof(ResponseLoggingMiddleware).Namespace);
-                builder.UseMiddleware<ResponseLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog ?? (ctx => true));
+                builder.UseMiddleware<ResponseLoggingMiddleware>(logger, options.MaxBodyByteCount, options.ShouldLog ?? (ctx => true), options.LogPrefix);
             }
 
             return builder;

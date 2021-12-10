@@ -23,5 +23,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
         /// Will default to "KodeAid.AspNetCore.Http.Logging.Response" if null.
         /// </summary>
         public string LoggerName { get; set; }
+
+        public string LogPrefix { get; set; } = "RESPONSE TRACE: ";
     }
 }
