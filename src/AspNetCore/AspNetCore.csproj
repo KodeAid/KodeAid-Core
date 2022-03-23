@@ -1,20 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
-        <Version>2.1.5</Version>
+        <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
+        <Version>2.4.0</Version>
         <AssemblyName>KodeAid.AspNetCore</AssemblyName>
         <RootNamespace>KodeAid.AspNetCore</RootNamespace>
         <Description>Kode-Aid shared ASP.NET Core library.</Description>
         <PackageTags>helpers extensions utilities aspnetcore aspnet core</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'netcoreapp3.1'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.*" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.*" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.14" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.*" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     </ItemGroup>
 
