@@ -3,6 +3,7 @@
 
 
 using System.Linq;
+using System.Text.Json;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -57,7 +58,12 @@ namespace KodeAid.AspNetCore.SwaggerGen
 
                 if (parameter.Schema.Default == null)
                 {
+#if NET6_0_OR_GREATER
+                    var json = JsonSerializer.Serialize(routeInfo.DefaultValue, description.ModelMetadata.ModelType);
+                    parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
+#else
                     parameter.Schema.Default = OpenApiAnyFactory.CreateFor(parameter.Schema, routeInfo.DefaultValue);
+#endif
                 }
 
                 //parameter.Required |= description.IsRequired;
