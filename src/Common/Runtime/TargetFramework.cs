@@ -31,10 +31,10 @@ namespace KodeAid.Runtime
                 .Select(v => Version.Parse(v))
                 .FirstOrDefault();
             DisplayName = targetFrameworkAttribute.FrameworkDisplayName?.TrimToNull() ??
-                (this.IsNetCoreApp() ? $".NET Core {Version.ToString()}" :
-                 this.IsNetFramework() ? $".NET Framework {Version.ToString()}" :
-                 this.IsNetStandard() ? $".NET Standard {Version.ToString()}" :
-                 $"{Name} {Version.ToString()}");
+                (this.IsNetCoreApp() ? (Version.Major >= 5 ? $".NET {Version}" : $".NET Core {Version}") :
+                 this.IsNetFramework() ? $".NET Framework {Version}" :
+                 this.IsNetStandard() ? $".NET Standard {Version}" :
+                 $"{Name} {Version}");
         }
 
         /// <summary>
