@@ -31,6 +31,19 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
+        /// Adds the form formatters to MVC.
+        /// </summary>
+        /// <param name="builder">The <see cref="IMvcCoreBuilder"/>.</param>
+        /// <returns>The <see cref="IMvcCoreBuilder"/>.</returns>
+        public static IMvcCoreBuilder AddFormDictionaryFormatters(this IMvcCoreBuilder builder)
+        {
+            ArgCheck.NotNull(nameof(builder), builder);
+
+            AddFormDictionaryFormatterServices(builder.Services);
+            return builder;
+        }
+
+        /// <summary>
         /// Adds the text formatters to MVC.
         /// </summary>
         /// <param name="builder">The <see cref="IMvcCoreBuilder"/>.</param>
@@ -61,6 +74,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, OctetStreamBinaryMvcOptionsSetup>());
+        }
+
+        // Internal for testing.
+        internal static void AddFormDictionaryFormatterServices(IServiceCollection services)
+        {
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, FormDictionaryMvcOptionsSetup>());
         }
 
         // Internal for testing.

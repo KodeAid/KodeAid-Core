@@ -22,5 +22,8 @@ namespace KodeAid.AspNetCore.Mvc.Formatters.Internal
 
         public static readonly MediaTypeHeaderValue ApplicationOctetStream
             = MediaTypeHeaderValue.Parse("application/octet-stream").CopyAsReadOnly();
+
+        public static readonly MediaTypeHeaderValue ApplicationFormUrlEncoded
+            = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded").CopyAsReadOnly();
     }
 }

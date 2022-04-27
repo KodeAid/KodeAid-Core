@@ -4,10 +4,6 @@
 
 using KodeAid;
 using KodeAid.AspNetCore.Mvc.Formatters;
-using KodeAid.AspNetCore.Mvc.Formatters.Internal;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -26,6 +22,19 @@ namespace Microsoft.Extensions.DependencyInjection
             ArgCheck.NotNull(nameof(builder), builder);
 
             MvcCoreBuilderExtensions.AddBinaryFormatterServices(builder.Services);
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds the form dictionary formatters to MVC.
+        /// </summary>
+        /// <param name="builder">The <see cref="IMvcBuilder"/>.</param>
+        /// <returns>The <see cref="IMvcBuilder"/>.</returns>
+        public static IMvcBuilder AddFormDictionaryFormatters(this IMvcBuilder builder)
+        {
+            ArgCheck.NotNull(nameof(builder), builder);
+
+            MvcCoreBuilderExtensions.AddFormDictionaryFormatterServices(builder.Services);
             return builder;
         }
 

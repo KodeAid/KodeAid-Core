@@ -10,17 +10,17 @@ namespace KodeAid.AspNetCore.Mvc.Formatters.Internal
 {
     /// <summary>
     /// A <see cref="IConfigureOptions{TOptions}"/> implementation which will add the
-    /// text formatters to <see cref="MvcOptions"/>.
+    /// form formatters to <see cref="MvcOptions"/>.
     /// </summary>
-    public class PlainTextStringMvcOptionsSetup : IConfigureOptions<MvcOptions>
+    public class FormDictionaryMvcOptionsSetup : IConfigureOptions<MvcOptions>
     {
         private readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="PlainTextStringMvcOptionsSetup"/>.
+        /// Initializes a new instance of <see cref="FormDictionaryMvcOptionsSetup"/>.
         /// </summary>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public PlainTextStringMvcOptionsSetup(ILoggerFactory loggerFactory)
+        public FormDictionaryMvcOptionsSetup(ILoggerFactory loggerFactory)
         {
             ArgCheck.NotNull(nameof(loggerFactory), loggerFactory);
 
@@ -28,22 +28,22 @@ namespace KodeAid.AspNetCore.Mvc.Formatters.Internal
         }
 
         /// <summary>
-        /// Adds the text formatters to <see cref="MvcOptions"/>.
+        /// Adds the form formatters to <see cref="MvcOptions"/>.
         /// </summary>
         /// <param name="options">The <see cref="MvcOptions"/>.</param>
         public void Configure(MvcOptions options)
         {
             // Do not override any user mapping
-            var key = "text";
+            var key = "form";
             var mapping = options.FormatterMappings.GetMediaTypeMappingForFormat(key);
             if (string.IsNullOrEmpty(mapping))
             {
                 options.FormatterMappings.SetMediaTypeMappingForFormat(
                     key,
-                    MediaTypeHeaderValues.TextPlain);
+                    MediaTypeHeaderValues.ApplicationFormUrlEncoded);
             }
 
-            options.InputFormatters.Add(new PlainTextStringInputFormatter(options.SuppressInputFormatterBuffering));
+            options.InputFormatters.Add(new FormDictionaryInputFormatter(options.SuppressInputFormatterBuffering));
         }
     }
 }

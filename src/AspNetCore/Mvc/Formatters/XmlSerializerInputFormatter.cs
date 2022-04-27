@@ -23,10 +23,12 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
         protected override XmlReader CreateXmlReader(Stream readStream, Encoding encoding)
         {
             var reader = base.CreateXmlReader(readStream, encoding);
+
             if (_ignoreNamespaces)
             {
                 reader = new XmlIgnoreNamespaceReader(reader, true);
             }
+
             return reader;
         }
     }
