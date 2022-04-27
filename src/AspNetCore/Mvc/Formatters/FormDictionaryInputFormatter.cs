@@ -50,7 +50,7 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
                 request.Body.Seek(0L, SeekOrigin.Begin);
             }
 
-            using var reader = new StreamReader(request.Body, leaveOpen: true);
+            using var reader = new StreamReader(request.Body, encoding: null, detectEncodingFromByteOrderMarks: true, bufferSize: -1, leaveOpen: true);
             var body = await reader.ReadToEndAsync();
             var form = body.Split('&').Select(x => x.Split('=')).ToDictionary(key => key[0].Trim(), value => Uri.UnescapeDataString(value.Skip(1).FirstOrDefault()?.Trim() ?? string.Empty));
             return await InputFormatterResult.SuccessAsync(form);
