@@ -50,9 +50,9 @@ namespace KodeAid.AspNetCore.Mvc.Formatters
                 request.Body.Seek(0L, SeekOrigin.Begin);
             }
 
-            using var reader = new StreamReader(request.Body);
+            using var reader = new StreamReader(request.Body, leaveOpen: true);
             var body = await reader.ReadToEndAsync();
-            var form = body.Split('&').Select(x => x.Split('=')).ToDictionary(key => key[0].Trim(), value => Uri.UnescapeDataString(value[1].Trim()));
+            var form = body.Split('&').Select(x => x.Split('=')).ToDictionary(key => key[0].Trim(), value => Uri.UnescapeDataString(value.Skip(1).FirstOrDefault()?.Trim() ?? string.Empty));
             return await InputFormatterResult.SuccessAsync(form);
         }
     }
