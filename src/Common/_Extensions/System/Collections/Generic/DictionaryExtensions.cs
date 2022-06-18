@@ -20,6 +20,20 @@ namespace System.Collections.Generic
             return defaultValue;
         }
 
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+            where TValue : new()
+        {
+            ArgCheck.NotNull(nameof(dictionary), dictionary);
+
+            if (!dictionary.TryGetValue(key, out var v))
+            {
+                v = new();
+                dictionary.Add(key, v);
+            }
+
+            return v;
+        }
+
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
         {
             ArgCheck.NotNull(nameof(dictionary), dictionary);
