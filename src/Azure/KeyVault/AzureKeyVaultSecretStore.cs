@@ -7,26 +7,26 @@ using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using KodeAid.Security.Cryptography.X509Certificates;
 using KodeAid.Security.Secrets;
-using Microsoft.Azure.KeyVault;
 
 namespace KodeAid.Azure.KeyVault
 {
-    public class AzureKeyVaultSecretStore : ISecretReadOnlyStore, IPrivateCertificateStore, IDisposable
+    public class AzureKeyVaultSecretStore : ISecretReadOnlyStore, IPrivateCertificateStore
     {
-        private readonly string _keyVaultBaseUrl;
+        private readonly SecretClient _client;
         private readonly X509KeyStorageFlags _keyStorageFlags = X509KeyStorageFlags.MachineKeySet;
-        private readonly ManagedServiceIdentityKeyVaultClient _client = new ManagedServiceIdentityKeyVaultClient();
-        private bool _disposed = false;
 
         public AzureKeyVaultSecretStore(AzureKeyVaultSecretStoreOptions options)
         {
             ArgCheck.NotNull(nameof(options), options);
             options.Verify();
 
-            _keyVaultBaseUrl = options.KeyVaultBaseUrl?.TrimEnd(' ', '/');
+            var keyVaultBaseUrl = options.KeyVaultBaseUrl?.TrimEnd(' ', '/');
             _keyStorageFlags = options.KeyStorageFlags;
+            _client = new SecretClient(new Uri(keyVaultBaseUrl), new DefaultAzureCredential());
         }
 
         public async Task<SecureString> GetSecretAsync(string name, CancellationToken cancellationToken = default)
@@ -52,29 +52,11 @@ namespace KodeAid.Azure.KeyVault
             return new X509Certificate2(keyBytes, (string)null, _keyStorageFlags);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _client.Dispose();
-                }
-
-                _disposed = true;
-            }
-        }
-
         private async Task<string> GetUnsecuredSecretAsync(string name, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(name), name);
 
-            return (await _client.GetSecretAsync(_keyVaultBaseUrl, name, cancellationToken).ConfigureAwait(false)).Value;
+            return (await _client.GetSecretAsync(name).ConfigureAwait(false)).Value.Value;
         }
     }
 }
