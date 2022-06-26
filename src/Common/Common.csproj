@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
-        <Version>1.4.2</Version>
+        <Version>1.4.3</Version>
         <AssemblyName>KodeAid.Common</AssemblyName>
         <RootNamespace>KodeAid</RootNamespace>
         <Description>Kode-Aid shared common library.</Description>

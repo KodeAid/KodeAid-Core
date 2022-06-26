@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.IO;
 using System.Text;
 using KodeAid;
 
@@ -49,5 +50,28 @@ namespace System
         {
             return Base36Encoder.EncodeBytes(bytes);
         }
+
+        /// <summary>
+        /// Writes <paramref name="buffer"/> to a memory stream and returns the memory stream with its position at the beginning.
+        /// </summary>
+        /// <param name="buffer">The buffer of bytes to write to a memory stream.</param>
+        /// <returns>A new memory stream.</returns>
+#if NETSTANDARD
+        public static MemoryStream ToMemoryStream(this byte[] buffer)
+        {
+            var ms = new MemoryStream();
+            ms.Write(buffer, 0, buffer.Length);
+            ms.Position = 0;
+            return ms;
+        }
+#else
+        public static MemoryStream ToMemoryStream(this ReadOnlySpan<byte> buffer)
+        {
+            var ms = new MemoryStream();
+            ms.Write(buffer);
+            ms.Position = 0;
+            return ms;
+        }
+#endif
     }
 }
