@@ -50,7 +50,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
 
             if (_maxBodyByteCount <= 0)
             {
-                return $"{_prefix}{request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}";
+                return $"{_prefix}{request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.PathBase.ToString().ToLower().TrimEnd('/')}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}";
             }
 
             request.EnableBuffering();
@@ -62,7 +62,7 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
                 request.Body.Position = 0;
                 var bodyAsText = Encoding.UTF8.GetString(buffer, 0, read);
 
-                return $"{_prefix}{request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
+                return $"{_prefix}{request.Method.ToString().ToUpper()} {request.Scheme.ToLower()}://{request.Host.ToString().ToLower()}{request.PathBase.ToString().ToLower().TrimEnd('/')}{request.Path.ToString().ToLower()}\n{headersAsText}{queryAsText}\n{bodyAsText}";
             }
             finally
             {
