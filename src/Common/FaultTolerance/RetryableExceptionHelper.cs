@@ -20,8 +20,6 @@ namespace KodeAid.FaultTolerance
 
         public static bool CheckForRetryableException<T>(Exception exception, Func<T, bool> canRetry = null, bool skipAggregateExceptions = false)
         {
-            ArgCheck.NotNull(nameof(canRetry), canRetry);
-
             if (exception == null)
             {
                 return false;
