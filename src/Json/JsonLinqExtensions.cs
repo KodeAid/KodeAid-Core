@@ -2,6 +2,8 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace Newtonsoft.Json.Linq
@@ -68,6 +70,46 @@ namespace Newtonsoft.Json.Linq
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Formats the JSON with indentation of 4 spaces.
+        /// </summary>
+        public static string ToFormattedJson(this JToken token, params JsonConverter[] converters)
+            => ToFormattedJson(token, 4, converters);
+
+        /// <summary>
+        /// Formats the JSON with the specified indentation size.
+        /// </summary>
+        public static string ToFormattedJson(this JToken token, int indentation, params JsonConverter[] converters)
+        {
+            using var sw = new StringWriter(CultureInfo.InvariantCulture);
+            using var jw = new JsonTextWriter(sw)
+            {
+                Formatting = Formatting.Indented,
+                IndentChar = ' ',
+                Indentation = indentation,
+            };
+            token.WriteTo(jw, converters);
+            jw.Flush();
+            sw.Flush();
+            return sw.ToString();
+        }
+
+        /// <summary>
+        /// Generates the JSON in a compact form.
+        /// </summary>
+        public static string ToCompactJson(this JToken token, params JsonConverter[] converters)
+        {
+            using var sw = new StringWriter(CultureInfo.InvariantCulture);
+            using var jw = new JsonTextWriter(sw)
+            {
+                Formatting = Formatting.None,
+            };
+            token.WriteTo(jw, converters);
+            jw.Flush();
+            sw.Flush();
+            return sw.ToString();
         }
     }
 }
