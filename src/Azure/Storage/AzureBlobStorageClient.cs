@@ -403,7 +403,7 @@ namespace KodeAid.Azure.Storage
                     {
                         LeaseId = leaseId,
                         IfMatch = ifMatchETag != null ? new ETag(ifMatchETag) : (ETag?)null,
-                        IfUnmodifiedSince = ifNotModifiedSinceTime
+                        IfUnmodifiedSince = ifNotModifiedSinceTime,
                     },
                     HttpHeaders = new BlobHttpHeaders()
                     {
