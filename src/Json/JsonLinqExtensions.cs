@@ -10,11 +10,15 @@ namespace Newtonsoft.Json.Linq
 {
     public static class JsonLinqExtensions
     {
+        // It is possible to have Type = String and Value = null.
+        public static bool IsNull(this JValue token)
+            => token == null || token.Value == null || token.Type == JTokenType.Null;
+
         public static void Collapse(this JToken token, bool removeNullProperties = true, bool removeNullArrayItems = true, bool removeEmptyObjects = true, bool removeEmptyArrays = true)
         {
             if (token is JValue value)
             {
-                if (value.Type == JTokenType.Null && value.Parent != null)
+                if (value.IsNull() && value.Parent != null)
                 {
                     if (removeNullProperties && value.Parent.Type == JTokenType.Property)
                     {
