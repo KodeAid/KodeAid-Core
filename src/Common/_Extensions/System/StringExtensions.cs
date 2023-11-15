@@ -311,33 +311,35 @@ namespace System
         }
 
         /// <summary>
-        /// Convert from "ResourceNotFound" to "Resource not found"
+        /// Convert from "ResourceNotFound" or "resourceNotFound" to "Resource not found".
         /// </summary>
         public static string ToSentenceCase(this string str)
         {
-            if (str == null)
+            if (string.IsNullOrEmpty(str))
             {
                 return str;
             }
 
-            return Regex.Replace(str, "(([a-z][A-Z])|([0-9][A-Za-z])|([a-zA-z][0-9]))", m => $"{m.Value[0]} {char.ToLower(m.Value[1])}", RegexOptions.Compiled);
+            str = Regex.Replace(str, "(([a-z][A-Z])|([0-9][A-Za-z])|([a-zA-z][0-9]))", m => $"{m.Value[0]} {char.ToLower(m.Value[1])}", RegexOptions.Compiled);
+            return char.ToUpper(str[0]) + str.Substring(1);
         }
 
         /// <summary>
-        /// Convert from "ResourceNotFound" to "Resource Not Found"
+        /// Convert from "ResourceNotFound" or "resourceNotFound" to "Resource Not Found".
         /// </summary>
         public static string ToTitleCase(this string str)
         {
-            if (str == null)
+            if (string.IsNullOrEmpty(str))
             {
                 return str;
             }
 
-            return Regex.Replace(str, "(([a-z][A-Z])|([0-9][A-Za-z])|([a-zA-z][0-9]))", m => $"{m.Value[0]} {char.ToUpper(m.Value[1])}", RegexOptions.Compiled);
+            str = Regex.Replace(str, "(([a-z][A-Z])|([0-9][A-Za-z])|([a-zA-z][0-9]))", m => $"{m.Value[0]} {char.ToUpper(m.Value[1])}", RegexOptions.Compiled);
+            return char.ToUpper(str[0]) + str.Substring(1);
         }
 
         /// <summary>
-        /// Convert from "Resource not found" to "ResourceNotFound"
+        /// Convert from "Resource not found" to "ResourceNotFound".
         /// </summary>
         public static string ToPascalCase(this string str)
         {
@@ -356,7 +358,7 @@ namespace System
         }
 
         /// <summary>
-        /// Convert from "Resource not found" to "resourceNotFound"
+        /// Convert from "Resource not found" to "resourceNotFound".
         /// </summary>
         public static string ToCamelCase(this string str)
         {
