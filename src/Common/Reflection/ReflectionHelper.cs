@@ -320,9 +320,13 @@ namespace KodeAid.Reflection
         private static IEnumerable<Assembly> FindAssemblies(Assembly assembly, IEnumerable<string> assemblyNamePrefixes, SearchOption directorySearchOptions, HashSet<string> assembliesSearched, bool throwOnError)
         {
             var assembliesFound = new List<Assembly>();
-            var codebaseDirectory = Path.GetDirectoryName(new Uri(assembly.CodeBase).AbsolutePath);
+#if NET8_0_OR_GREATER
+            var assemblyLocation = Path.GetDirectoryName(new Uri(assembly.Location).AbsolutePath);
+#else
+            var assemblyLocation = Path.GetDirectoryName(new Uri(assembly.CodeBase).AbsolutePath);
+#endif
 
-            if (assembliesSearched.Add(codebaseDirectory))
+            if (assembliesSearched.Add(assemblyLocation))
             {
                 var dllFiles = new List<string>();
 
@@ -330,11 +334,11 @@ namespace KodeAid.Reflection
                 {
                     if (!assemblyNamePrefixes.Any())
                     {
-                        dllFiles.AddRange(Directory.EnumerateFiles(codebaseDirectory, "*.dll", directorySearchOptions));
+                        dllFiles.AddRange(Directory.EnumerateFiles(assemblyLocation, "*.dll", directorySearchOptions));
                     }
                     else
                     {
-                        dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(codebaseDirectory, $"{n}*.dll", directorySearchOptions)));
+                        dllFiles.AddRange(assemblyNamePrefixes.SelectMany(n => Directory.EnumerateFiles(assemblyLocation, $"{n}*.dll", directorySearchOptions)));
                     }
                 }
                 catch

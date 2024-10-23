@@ -10,7 +10,7 @@ namespace KodeAid
     {
         public static readonly Optional<T> Undefined;
 
-        private T _value;
+        private readonly T _value;
 
         public Optional(T value)
         {

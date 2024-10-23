@@ -14,7 +14,10 @@ namespace KodeAid.IO
         {
             ArgCheck.NotNullOrEmpty(nameof(fileName), fileName);
             if (TryFindFile(fileName, out var foundFileName))
+            {
                 return foundFileName;
+            }
+
             throw new FileNotFoundException($"File '{fileName}' was not found.", fileName);
         }
 
@@ -36,12 +39,22 @@ namespace KodeAid.IO
 
                 if (!Path.IsPathRooted(fileName))
                 {
+#if NET8_0_OR_GREATER
+                    var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#else
                     var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+#endif
                     var fn = exePath;
                     if (fn.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
+                    {
                         fn = fn.Remove(0, "file://".Length);
+                    }
+
                     if (fn.StartsWith("file:\\", StringComparison.OrdinalIgnoreCase))
+                    {
                         fn = fn.Remove(0, "file:\\".Length);
+                    }
+
                     fn = Path.GetFullPath(Path.Combine(fn, fileName));
                     if (File.Exists(fn))
                     {
@@ -49,14 +62,24 @@ namespace KodeAid.IO
                         return true;
                     }
 
+#if NET8_0_OR_GREATER
+                    var entryPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+#else
                     var entryPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().CodeBase);
+#endif
                     if (exePath != entryPath)
                     {
                         fn = entryPath;
                         if (fn.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
+                        {
                             fn = fn.Remove(0, "file://".Length);
+                        }
+
                         if (fn.StartsWith("file:\\", StringComparison.OrdinalIgnoreCase))
+                        {
                             fn = fn.Remove(0, "file:\\".Length);
+                        }
+
                         fn = Path.GetFullPath(Path.Combine(fn, fileName));
                         if (File.Exists(fn))
                         {

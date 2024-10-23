@@ -26,8 +26,12 @@ namespace KodeAid.Security.Cryptography
             ArgCheck.NotNull(nameof(unprotectedData), unprotectedData);
 
             var iv = Guid.NewGuid().ToByteArray();
-            using var rm = new RijndaelManaged();
-            return Transform(unprotectedData, rm.CreateEncryptor(_key, iv)).Concat(iv).ToArray();
+#if NET8_0_OR_GREATER
+            using var aes = Aes.Create();
+#else
+            using var aes = new RijndaelManaged();
+#endif
+            return Transform(unprotectedData, aes.CreateEncryptor(_key, iv)).Concat(iv).ToArray();
         }
 
         public async Task<byte[]> ProtectDataAsync(byte[] unprotectedData)
@@ -35,8 +39,12 @@ namespace KodeAid.Security.Cryptography
             ArgCheck.NotNull(nameof(unprotectedData), unprotectedData);
 
             var iv = Guid.NewGuid().ToByteArray();
-            using var rm = new RijndaelManaged();
-            return (await TransformAsync(unprotectedData, rm.CreateEncryptor(_key, iv)).ConfigureAwait(false)).Concat(iv).ToArray();
+#if NET8_0_OR_GREATER
+            using var aes = Aes.Create();
+#else
+            using var aes = new RijndaelManaged();
+#endif
+            return (await TransformAsync(unprotectedData, aes.CreateEncryptor(_key, iv)).ConfigureAwait(false)).Concat(iv).ToArray();
         }
 
         public byte[] UnprotectData(byte[] protectedData)
@@ -50,8 +58,12 @@ namespace KodeAid.Security.Cryptography
 
             var iv = protectedData.Skip(protectedData.Length - 16).ToArray();
             protectedData = protectedData.Take(protectedData.Length - 16).ToArray();
-            using var rm = new RijndaelManaged();
-            return Transform(protectedData, rm.CreateDecryptor(_key, iv));
+#if NET8_0_OR_GREATER
+            using var aes = Aes.Create();
+#else
+            using var aes = new RijndaelManaged();
+#endif
+            return Transform(protectedData, aes.CreateDecryptor(_key, iv));
         }
 
         public async Task<byte[]> UnprotectDataAsync(byte[] protectedData)
@@ -65,8 +77,12 @@ namespace KodeAid.Security.Cryptography
 
             var iv = protectedData.Skip(protectedData.Length - 16).ToArray();
             protectedData = protectedData.Take(protectedData.Length - 16).ToArray();
-            using var rm = new RijndaelManaged();
-            return await TransformAsync(protectedData, rm.CreateDecryptor(_key, iv)).ConfigureAwait(false);
+#if NET8_0_OR_GREATER
+            using var aes = Aes.Create();
+#else
+            using var aes = new RijndaelManaged();
+#endif
+            return await TransformAsync(protectedData, aes.CreateDecryptor(_key, iv)).ConfigureAwait(false);
         }
 
         private byte[] GetValidKey(byte[] suggestedKey)

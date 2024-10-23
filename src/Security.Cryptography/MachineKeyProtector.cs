@@ -1,6 +1,7 @@
 // Copyright © Kris Penner. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+#if !NET8_0_OR_GREATER
 
 using System.Security.Cryptography;
 
@@ -45,3 +46,4 @@ namespace KodeAid.Security.Cryptography
         }
     }
 }
+#endif
