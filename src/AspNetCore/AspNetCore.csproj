@@ -9,7 +9,7 @@
         <PackageTags>helpers extensions utilities aspnetcore aspnet core</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net6.0'">
+    <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
