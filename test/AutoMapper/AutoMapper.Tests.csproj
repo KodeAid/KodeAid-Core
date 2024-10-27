@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+        <AssemblyName>KodeAid.AutoMapper.Tests</AssemblyName>
+        <RootNamespace>KodeAid.AutoMapper</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\AutoMapper\AutoMapper.csproj" />
+        <ProjectReference Include="..\..\src\Testing\Testing.csproj" />
+        <ProjectReference Include="..\..\src\Xunit\Xunit.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Update="xunit" Version="2.9.2" />
+        <PackageReference Update="xunit.runner.visualstudio" Version="2.8.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+</Project>
