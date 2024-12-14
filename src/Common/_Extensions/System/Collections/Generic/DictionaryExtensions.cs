@@ -8,6 +8,7 @@ namespace System.Collections.Generic
 {
     public static class DictionaryExtensions
     {
+#if !NET8_0_OR_GREATER
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default)
         {
             ArgCheck.NotNull(nameof(dictionary), dictionary);
@@ -19,6 +20,7 @@ namespace System.Collections.Generic
 
             return defaultValue;
         }
+#endif
 
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             where TValue : new()
