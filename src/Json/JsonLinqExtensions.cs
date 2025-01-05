@@ -14,19 +14,42 @@ namespace Newtonsoft.Json.Linq
         public static bool IsNull(this JValue token)
             => token == null || token.Value == null || token.Type == JTokenType.Null;
 
-        public static void Collapse(this JToken token, bool removeNullProperties = true, bool removeNullArrayItems = true, bool removeEmptyObjects = true, bool removeEmptyArrays = true)
+        public static bool IsNumber(this JValue token)
+            => token != null && token.Type is JTokenType.Integer or JTokenType.Float;
+
+        public static void Collapse(this JToken token,
+            bool removeNullProperties = true, bool removeNullArrayItems = true, bool removeEmptyObjects = true, bool removeEmptyArrays = true,
+            bool removeFalseBooleanProperties = false, bool removeZeroedNumberProperties = false, bool removeEmptyStringProperties = false)
         {
             if (token is JValue value)
             {
-                if (value.IsNull() && value.Parent != null)
+                if (value.Parent != null)
                 {
-                    if (removeNullProperties && value.Parent.Type == JTokenType.Property)
+                    if (value.Parent.Type == JTokenType.Property)
                     {
-                        value.Parent.Remove();
+                        if (removeNullProperties && value.IsNull())
+                        {
+                            value.Parent.Remove();
+                        }
+                        else if (removeFalseBooleanProperties && value.Type == JTokenType.Boolean && !(bool)value)
+                        {
+                            value.Parent.Remove();
+                        }
+                        else if (removeZeroedNumberProperties && ((value.Type == JTokenType.Integer && (long)value == 0L) || (value.Type == JTokenType.Float && (double)value == 0.0)))
+                        {
+                            value.Parent.Remove();
+                        }
+                        else if (removeEmptyStringProperties && value.Type == JTokenType.String && ((string)value).Length == 0)
+                        {
+                            value.Parent.Remove();
+                        }
                     }
-                    else if (removeNullArrayItems && value.Parent.Type == JTokenType.Array)
+                    else if (value.Parent.Type == JTokenType.Array)
                     {
-                        value.Remove();
+                        if (removeNullArrayItems && value.IsNull())
+                        {
+                            value.Remove();
+                        }
                     }
                 }
 
