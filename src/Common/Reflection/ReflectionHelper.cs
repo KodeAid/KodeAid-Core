@@ -83,15 +83,21 @@ namespace KodeAid.Reflection
                 else  // get by index
                 {
                     var indexed = false;
+                    var interfaces = type.GetInterfaces().ToList();
 
-                    foreach (var indexerInterface in obj.GetType().GetInterfaces())
+                    if (type.IsInterface)
+                    {
+                        interfaces.Insert(0, type);
+                    }
+
+                    foreach (var indexerInterface in interfaces)
                     {
                         if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                         {
                             indexed = true;
                             obj = typeof(ReflectionHelper).GetMethod(nameof(GetFromDictionary), BindingFlags.Static | BindingFlags.NonPublic)
                                 .MakeGenericMethod(indexerInterface.GetGenericArguments())
-                                .Invoke(null, new object[] { obj, index });
+                                .Invoke(null, [obj, index]);
                             break;
                         }
 
@@ -100,7 +106,7 @@ namespace KodeAid.Reflection
                             indexed = true;
                             obj = typeof(ReflectionHelper).GetMethod(nameof(GetFromList), BindingFlags.Static | BindingFlags.NonPublic)
                                 .MakeGenericMethod(indexerInterface.GetGenericArguments())
-                                .Invoke(null, new object[] { obj, index, ignoreCase, throwOnPathNotFound, throwOnNullReference });
+                                .Invoke(null, [obj, index, ignoreCase, throwOnPathNotFound, throwOnNullReference]);
                             break;
                         }
                     }
@@ -154,7 +160,14 @@ namespace KodeAid.Reflection
                 else  // get by index
                 {
                     var indexed = false;
-                    foreach (var indexerInterface in type.GetInterfaces())
+                    var interfaces = type.GetInterfaces().ToList();
+
+                    if (type.IsInterface)
+                    {
+                        interfaces.Insert(0, type);
+                    }
+
+                    foreach (var indexerInterface in interfaces)
                     {
                         if (indexerInterface.IsGenericType && indexerInterface.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                         {
