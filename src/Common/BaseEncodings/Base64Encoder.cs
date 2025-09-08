@@ -129,6 +129,33 @@ namespace KodeAid
             return Convert.FromBase64String(base64String);
         }
 
+        public static int CalculateDecodedByteLength(string base64String)
+        {
+            if (string.IsNullOrEmpty(base64String))
+            {
+                return 0;
+            }
+
+            // Remove any non-Base64 characters (like newlines) if present.
+            base64String = base64String.Replace("\n", "").Replace("\r", "");
+
+            var characterCount = base64String.Length;
+            var paddingCount = 0;
+
+            // Check for padding characters.
+            if (characterCount > 0 && base64String[characterCount - 1] == '=')
+            {
+                paddingCount++;
+                if (characterCount > 1 && base64String[characterCount - 2] == '=')
+                {
+                    paddingCount++;
+                }
+            }
+
+            // Calculate original byte length.
+            return (3 * (characterCount / 4)) - paddingCount;
+        }
+
         private static byte[] GetBytesFromStrings(Encoding encoding, string[] values)
         {
             ArgCheck.NotNull(nameof(encoding), encoding);
