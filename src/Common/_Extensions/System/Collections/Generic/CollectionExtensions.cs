@@ -35,6 +35,14 @@ namespace System.Collections.Generic
             }
         }
 
+        public static void RemoveAll<T>(this ICollection<T> collection, Predicate<T> match)
+        {
+            ArgCheck.NotNull(nameof(collection), collection);
+            ArgCheck.NotNull(nameof(match), match);
+
+            collection.RemoveRange(collection.Where(item => match(item)).ToList());
+        }
+
         public static void ForEach<T>(this ICollection<T> collection, Action<T> action)
         {
             ArgCheck.NotNull(nameof(collection), collection);
@@ -46,12 +54,15 @@ namespace System.Collections.Generic
             }
         }
 
-        public static void RemoveAll<T>(this ICollection<T> collection, Predicate<T> match)
+        public static void ForEach<T>(this IReadOnlyCollection<T> collection, Action<T> action)
         {
             ArgCheck.NotNull(nameof(collection), collection);
-            ArgCheck.NotNull(nameof(match), match);
+            ArgCheck.NotNull(nameof(action), action);
 
-            collection.RemoveRange(collection.Where(item => match(item)).ToList());
+            foreach (var item in collection)
+            {
+                action(item);
+            }
         }
     }
 }
