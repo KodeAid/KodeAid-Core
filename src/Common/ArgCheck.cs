@@ -9,20 +9,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+#if NETSTANDARD2_0
+using NotNullAttribute = KodeAid.Diagnostics.CodeAnalysis.ValidatedNotNullAttribute;
+#else
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace KodeAid
 {
     [DebuggerStepThrough]
     public static class ArgCheck
     {
-        public static void NotNull(string paramName, [ValidatedNotNull] object value)
+        public static void NotNull(string paramName, [NotNull] object value)
         {
-            if (value == null)
+            if (value is null)
             {
                 throw new ArgumentNullException(paramName);
             }
         }
 
-        public static void NotNullOrDefault<T>(string paramName, [ValidatedNotNull] T value)
+        public static void NotNullOrDefault<T>(string paramName, [NotNull] T value)
         {
             NotNull(paramName, value);
 
@@ -32,7 +38,7 @@ namespace KodeAid
             }
         }
 
-        public static void NotNullOrEmpty(string paramName, [ValidatedNotNull] string value)
+        public static void NotNullOrEmpty(string paramName, [NotNull] string value)
         {
             NotNull(paramName, value);
 
@@ -42,14 +48,9 @@ namespace KodeAid
             }
         }
 
-        public static void NotNullOrWhitespace(string paramName, [ValidatedNotNull] string value)
+        public static void NotNullOrWhitespace(string paramName, [NotNull] string value)
         {
-            NotNull(paramName, value);
-
-            if (value.Length == 0)
-            {
-                throw new ArgumentException($"Parameter {paramName} cannot be an empty string.", paramName);
-            }
+            NotNullOrEmpty(paramName, value);
 
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -57,7 +58,7 @@ namespace KodeAid
             }
         }
 
-        public static void NotNullOrEmpty<T>(string paramName, [ValidatedNotNull] ICollection<T> value)
+        public static void NotNullOrEmpty<T>(string paramName, [NotNull] ICollection<T> value)
         {
             NotNull(paramName, value);
 
@@ -67,7 +68,7 @@ namespace KodeAid
             }
         }
 
-        public static void NotNullOrEmpty<T>(string paramName, [ValidatedNotNull] IEnumerable<T> value)
+        public static void NotNullOrEmpty<T>(string paramName, [NotNull] IEnumerable<T> value)
         {
             NotNull(paramName, value);
 
@@ -77,7 +78,7 @@ namespace KodeAid
             }
         }
 
-        public static void NotNullOrEmpty(string paramName, [ValidatedNotNull] IEnumerable value)
+        public static void NotNullOrEmpty(string paramName, [NotNull] IEnumerable value)
         {
             NotNull(paramName, value);
 
@@ -87,9 +88,12 @@ namespace KodeAid
             }
         }
 
-        public static void NotEqualTo<T>(string paramName, [ValidatedNotNull] IEquatable<T> value, T unequalValue, string unequalValueName = null)
+        public static void NotEqualTo<T>(string paramName, IEquatable<T> value, T unequalValue, string unequalValueName = null)
         {
-            NotNull(paramName, value);
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.Equals(unequalValue))
             {
@@ -97,9 +101,18 @@ namespace KodeAid
             }
         }
 
-        public static void GreaterThan(string paramName, [ValidatedNotNull] IComparable value, object exclusiveMinimum, string exclusiveMinimumName = null)
+        public static void NotNullOrEqualTo<T>(string paramName, [NotNull] IEquatable<T> value, T unequalValue, string unequalValueName = null)
         {
             NotNull(paramName, value);
+            NotEqualTo(paramName, value, unequalValue, unequalValueName);
+        }
+
+        public static void GreaterThan(string paramName, IComparable value, object exclusiveMinimum, string exclusiveMinimumName = null)
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(exclusiveMinimum) <= 0)
             {
@@ -107,9 +120,18 @@ namespace KodeAid
             }
         }
 
-        public static void GreaterThanOrEqualTo(string paramName, [ValidatedNotNull] IComparable value, object inclusiveMinimum, string inclusiveMinimumName = null)
+        public static void NotNullAndGreaterThan(string paramName, [NotNull] IComparable value, object exclusiveMinimum, string exclusiveMinimumName = null)
         {
             NotNull(paramName, value);
+            GreaterThan(paramName, value, exclusiveMinimum, exclusiveMinimumName);
+        }
+
+        public static void GreaterThanOrEqualTo(string paramName, IComparable value, object inclusiveMinimum, string inclusiveMinimumName = null)
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(inclusiveMinimum) < 0)
             {
@@ -117,9 +139,18 @@ namespace KodeAid
             }
         }
 
-        public static void LessThan(string paramName, [ValidatedNotNull] IComparable value, object exclusiveMaximum, string exclusiveMaximumName = null)
+        public static void NotNullAndGreaterThanOrEqualTo(string paramName, [NotNull] IComparable value, object inclusiveMinimum, string inclusiveMinimumName = null)
         {
             NotNull(paramName, value);
+            GreaterThanOrEqualTo(paramName, value, inclusiveMinimum, inclusiveMinimumName);
+        }
+
+        public static void LessThan(string paramName, IComparable value, object exclusiveMaximum, string exclusiveMaximumName = null)
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(exclusiveMaximum) >= 0)
             {
@@ -127,9 +158,18 @@ namespace KodeAid
             }
         }
 
-        public static void LessThanOrEqualTo(string paramName, [ValidatedNotNull] IComparable value, object inclusiveMaximum, string inclusiveMaximumName = null)
+        public static void NotNullAndLessThan(string paramName, [NotNull] IComparable value, object exclusiveMaximum, string exclusiveMaximumName = null)
         {
             NotNull(paramName, value);
+            LessThan(paramName, value, exclusiveMaximum, exclusiveMaximumName);
+        }
+
+        public static void LessThanOrEqualTo(string paramName, IComparable value, object inclusiveMaximum, string inclusiveMaximumName = null)
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(inclusiveMaximum) > 0)
             {
@@ -137,9 +177,18 @@ namespace KodeAid
             }
         }
 
-        public static void NotEqualTo(string paramName, [ValidatedNotNull] IComparable value, object unequalValue, string unequalValueName = null)
+        public static void NotNullAnddLessThanOrEqualTo(string paramName, [NotNull] IComparable value, object inclusiveMaximum, string inclusiveMaximumName = null)
         {
             NotNull(paramName, value);
+            LessThanOrEqualTo(paramName, value, inclusiveMaximum, inclusiveMaximumName);
+        }
+
+        public static void NotEqualTo(string paramName, IComparable value, object unequalValue, string unequalValueName = null)
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(unequalValue) == 0)
             {
@@ -147,10 +196,19 @@ namespace KodeAid
             }
         }
 
-        public static void GreaterThan<T>(string paramName, [ValidatedNotNull] T value, T exclusiveMinimum, string exclusiveMinimumName = null)
-            where T : IComparable<T>
+        public static void NotNullOrEqualTo(string paramName, [NotNull] IComparable value, object unequalValue, string unequalValueName = null)
         {
             NotNull(paramName, value);
+            NotEqualTo(paramName, value, unequalValue, unequalValueName);
+        }
+
+        public static void GreaterThan<T>(string paramName, T value, T exclusiveMinimum, string exclusiveMinimumName = null)
+            where T : IComparable<T>
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(exclusiveMinimum) <= 0)
             {
@@ -158,10 +216,20 @@ namespace KodeAid
             }
         }
 
-        public static void GreaterThanOrEqualTo<T>(string paramName, [ValidatedNotNull] T value, T inclusiveMinimum, string inclusiveMinimumName = null)
+        public static void NotNullAndGreaterThan<T>(string paramName, [NotNull] T value, T exclusiveMinimum, string exclusiveMinimumName = null)
             where T : IComparable<T>
         {
             NotNull(paramName, value);
+            GreaterThan(paramName, value, exclusiveMinimum, exclusiveMinimumName);
+        }
+
+        public static void GreaterThanOrEqualTo<T>(string paramName, T value, T inclusiveMinimum, string inclusiveMinimumName = null)
+            where T : IComparable<T>
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(inclusiveMinimum) < 0)
             {
@@ -169,10 +237,20 @@ namespace KodeAid
             }
         }
 
-        public static void LessThan<T>(string paramName, [ValidatedNotNull] T value, T exclusiveMaximum, string exclusiveMaximumName = null)
+        public static void NotNullAndGreaterThanOrEqualTo<T>(string paramName, [NotNull] T value, T inclusiveMinimum, string inclusiveMinimumName = null)
             where T : IComparable<T>
         {
             NotNull(paramName, value);
+            GreaterThanOrEqualTo(paramName, value, inclusiveMinimum, inclusiveMinimumName);
+        }
+
+        public static void LessThan<T>(string paramName, T value, T exclusiveMaximum, string exclusiveMaximumName = null)
+            where T : IComparable<T>
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(exclusiveMaximum) >= 0)
             {
@@ -180,10 +258,20 @@ namespace KodeAid
             }
         }
 
-        public static void LessThanOrEqualTo<T>(string paramName, [ValidatedNotNull] T value, T inclusiveMaximum, string inclusiveMaximumName = null)
+        public static void NotNullAndLessThan<T>(string paramName, [NotNull] T value, T exclusiveMaximum, string exclusiveMaximumName = null)
             where T : IComparable<T>
         {
             NotNull(paramName, value);
+            LessThan(paramName, value, exclusiveMaximum, exclusiveMaximumName);
+        }
+
+        public static void LessThanOrEqualTo<T>(string paramName, T value, T inclusiveMaximum, string inclusiveMaximumName = null)
+            where T : IComparable<T>
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(inclusiveMaximum) > 0)
             {
@@ -191,10 +279,20 @@ namespace KodeAid
             }
         }
 
-        public static void NotEqualTo<T>(string paramName, [ValidatedNotNull] T value, T unequalValue, string unequalValueName = null)
+        public static void NotNullAndLessThanOrEqualTo<T>(string paramName, [NotNull] T value, T inclusiveMaximum, string inclusiveMaximumName = null)
             where T : IComparable<T>
         {
             NotNull(paramName, value);
+            LessThanOrEqualTo(paramName, value, inclusiveMaximum, inclusiveMaximumName);
+        }
+
+        public static void NotEqualTo<T>(string paramName, T value, T unequalValue, string unequalValueName = null)
+            where T : IComparable<T>
+        {
+            if (value is null)
+            {
+                return;
+            }
 
             if (value.CompareTo(unequalValue) == 0)
             {
@@ -202,19 +300,62 @@ namespace KodeAid
             }
         }
 
+        public static void NotNullOrEqualTo<T>(string paramName, [NotNull] T value, T unequalValue, string unequalValueName = null)
+            where T : IComparable<T>
+        {
+            NotNull(paramName, value);
+            NotEqualTo(paramName, value, unequalValue, unequalValueName);
+        }
+
+        public static void RegexMatch(string paramName, string value, string pattern, string formatName = null, RegexOptions options = RegexOptions.Compiled)
+        {
+            if (value is null)
+            {
+                return;
+            }
+
+            if (!Regex.IsMatch(value, pattern, options))
+            {
+                if (formatName != null)
+                {
+                    throw new ArgumentException($"Parameter {paramName} must match format {formatName}.", paramName);
+                }
+
+                throw new ArgumentException($"Parameter {paramName} must match pattern /{pattern}/.", paramName);
+            }
+        }
+
+        public static void NotNullAndRegexMatch(string paramName, [NotNull] string value, string pattern, string formatName = null, RegexOptions options = RegexOptions.Compiled)
+        {
+            NotNull(paramName, value);
+            RegexMatch(paramName, value, pattern, formatName, options);
+        }
+
         public static void OfType<T>(string paramName, object value)
         {
             OfType(paramName, value, typeof(T));
         }
 
+        public static void NotNullAndOfType<T>(string paramName, [NotNull] object value)
+        {
+            NotNull(paramName, value);
+            OfType<T>(paramName, value);
+        }
+
         public static void OfType(string paramName, object value, Type ofType)
         {
-            if (value == null)
+            if (value is null)
             {
                 return;
             }
 
             OfType(paramName, value.GetType(), ofType);
+        }
+
+        public static void NotNullAndOfType(string paramName, [NotNull] object value, Type ofType)
+        {
+            NotNull(paramName, value);
+            OfType(paramName, value, ofType);
         }
 
         public static void OfType<T>(string paramName, Type type)
@@ -226,7 +367,7 @@ namespace KodeAid
         {
             NotNull(nameof(ofType), ofType);
 
-            if (type == null)
+            if (type is null)
             {
                 return;
             }
@@ -240,26 +381,6 @@ namespace KodeAid
 
                 throw new ArgumentException($"Parameter {paramName} must be of type {ofType.Name}.", paramName);
             }
-        }
-
-        public static void RegexMatch(string paramName, [ValidatedNotNull] string value, string pattern, string formatName = null, RegexOptions options = RegexOptions.Compiled)
-        {
-            NotNull(paramName, value);
-
-            if (!Regex.IsMatch(value, pattern, options))
-            {
-                if (formatName != null)
-                {
-                    throw new ArgumentException($"Parameter {paramName} must match format {formatName}.", paramName);
-                }
-
-                throw new ArgumentException($"Parameter {paramName} must match pattern /{pattern}/.", paramName);
-            }
-        }
-
-        [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
-        private sealed class ValidatedNotNullAttribute : Attribute
-        {
         }
     }
 }
