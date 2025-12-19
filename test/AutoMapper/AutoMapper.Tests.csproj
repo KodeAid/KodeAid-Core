@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>net10.0</TargetFrameworks>
         <AssemblyName>KodeAid.AutoMapper.Tests</AssemblyName>
         <RootNamespace>KodeAid.AutoMapper</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\AutoMapper\AutoMapper.csproj" />
+        <ProjectReference Include="..\..\src\Logging\Logging.csproj" />
         <ProjectReference Include="..\..\src\Testing\Testing.csproj" />
         <ProjectReference Include="..\..\src\Xunit\Xunit.csproj" />
     </ItemGroup>

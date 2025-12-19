@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
-        <Version>1.5.5</Version>
+        <TargetFrameworks>net10.0;net8.0;netstandard2.0</TargetFrameworks>
+        <Version>1.6.0</Version>
         <AssemblyName>KodeAid.Common</AssemblyName>
         <RootNamespace>KodeAid</RootNamespace>
         <Description>Kode-Aid shared common library.</Description>

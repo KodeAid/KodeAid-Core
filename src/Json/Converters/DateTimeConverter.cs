@@ -24,6 +24,8 @@ namespace KodeAid.Json.Converters
 
         public bool AllowDateTimeOffset { get; set; } = true;
 
+        public bool AllowTimestamp { get; set; } = true;
+
         /// <summary>
         /// Gets or sets the culture used when converting a date to and from JSON.
         /// </summary>
@@ -61,17 +63,17 @@ namespace KodeAid.Json.Converters
 
         public override bool CanConvert(Type objectType)
         {
-            if (!base.CanConvert(objectType))
-            {
-                return false;
-            }
-
             if (AllowDateTime && (objectType == typeof(DateTime) || objectType == typeof(DateTime?)))
             {
                 return true;
             }
 
             if (AllowDateTimeOffset && (objectType == typeof(DateTimeOffset) || objectType == typeof(DateTimeOffset?)))
+            {
+                return true;
+            }
+
+            if (AllowTimestamp && (objectType == typeof(Timestamp) || objectType == typeof(Timestamp?)))
             {
                 return true;
             }
@@ -107,10 +109,18 @@ namespace KodeAid.Json.Converters
 
                 text = dateTimeOffset.ToString(WriteDateTimeFormat, Culture);
             }
+            else if (value is Timestamp timestamp)
+            {
+                if (DateTimeStyles.HasFlag(DateTimeStyles.AdjustToUniversal))
+                {
+                    timestamp = timestamp.ToUniversalTime();
+                }
+
+                text = timestamp.ToString(WriteDateTimeFormat, Culture);
+            }
             else
             {
-                var expectedTypes = $"{(AllowDateTime ? nameof(DateTime) : null)}{((AllowDateTime && AllowDateTimeOffset) ? " or " : null)}{(AllowDateTimeOffset ? nameof(DateTimeOffset) : null)}";
-                throw new JsonSerializationException($"Unexpected value when converting date. Expected {expectedTypes}, got {value.GetType().FullName}.");
+                throw new JsonSerializationException($"Unexpected value when converting date. Expected {nameof(DateTime)}, {nameof(DateTimeOffset)} or {nameof(Timestamp)}, but got {value.GetType().Name} instead.");
             }
 
             writer.WriteValue(text);
@@ -149,6 +159,11 @@ namespace KodeAid.Json.Converters
                     return (reader.Value is DateTimeOffset) ? reader.Value : new DateTimeOffset((DateTime)reader.Value);
                 }
 
+                if (t == typeof(Timestamp))
+                {
+                    return (reader.Value is Timestamp) ? reader.Value : new Timestamp((DateTime)reader.Value);
+                }
+
                 // converter is expected to return a DateTime
                 if (reader.Value is DateTimeOffset offset)
                 {
@@ -179,6 +194,18 @@ namespace KodeAid.Json.Converters
                 else
                 {
                     return DateTimeOffset.Parse(dateText, Culture, DateTimeStyles);
+                }
+            }
+
+            if (t == typeof(Timestamp))
+            {
+                if (ReadDateTimeFormats != null && ReadDateTimeFormats.Length > 0)
+                {
+                    return Timestamp.ParseExact(dateText, ReadDateTimeFormats, Culture, DateTimeStyles);
+                }
+                else
+                {
+                    return Timestamp.Parse(dateText, Culture, DateTimeStyles);
                 }
             }
 

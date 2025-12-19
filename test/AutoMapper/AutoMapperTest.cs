@@ -1,4 +1,5 @@
 using AutoMapper;
+using KodeAid.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -19,7 +20,7 @@ namespace KodeAid.AutoMapper
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
-            });
+            }, NopLoggerFactory.Instance);
 
             mapperConfig.AssertConfigurationIsValid();
             var mapper = mapperConfig.CreateMapper();
@@ -42,7 +43,7 @@ namespace KodeAid.AutoMapper
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
-            });
+            }, NopLoggerFactory.Instance);
 
             mapperConfig.AssertConfigurationIsValid();
             var mapper = mapperConfig.CreateMapper();
@@ -66,7 +67,7 @@ namespace KodeAid.AutoMapper
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Property1, o => o.MapFrom(s => s.Property1 + "MapFrom"));
-            });
+            }, NopLoggerFactory.Instance);
 
             mapperConfig.AssertConfigurationIsValid();
             var mapper = mapperConfig.CreateMapper();
@@ -90,7 +91,7 @@ namespace KodeAid.AutoMapper
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Property1, o => o.MapFrom(s => s.Property1 + "MapFrom"));
-            });
+            }, NopLoggerFactory.Instance);
 
             mapperConfig.AssertConfigurationIsValid();
             var mapper = mapperConfig.CreateMapper();
@@ -115,7 +116,7 @@ namespace KodeAid.AutoMapper
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Property1, o => o.MapFrom(s => s.Property1 + "1"))
                     .ForMember(d => d.Property1, o => o.MapFrom(s => s.Property1 + "2"));
-            });
+            }, NopLoggerFactory.Instance);
 
             mapperConfig.AssertConfigurationIsValid();
             var mapper = mapperConfig.CreateMapper();

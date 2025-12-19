@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
-        <Version>2.5.0</Version>
+        <TargetFrameworks>net10.0;net8.0;netstandard2.0</TargetFrameworks>
+        <Version>2.6.0</Version>
         <AssemblyName>KodeAid.Security.Cryptography</AssemblyName>
         <RootNamespace>KodeAid.Security.Cryptography</RootNamespace>
         <Description>Kode-Aid shared cryptography (encryption/decryption) library.</Description>
@@ -10,11 +10,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.*" />
+        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.*" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>

@@ -11,19 +11,11 @@ namespace KodeAid.Logging
     {
         public static readonly ILogger Instance = new NopLogger();
 
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            return Disposable.Nop;
-        }
+        public IDisposable BeginScope<TState>(TState state) => Disposable.Nop;
 
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return false;
-        }
+        public bool IsEnabled(LogLevel logLevel) => false;
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-        }
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { }
     }
 
     public class NopLogger<T> : NopLogger, ILogger<T>

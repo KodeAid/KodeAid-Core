@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net6.0;netstandard2.0</TargetFrameworks>
-        <Version>2.5.0</Version>
+        <TargetFrameworks>net10.0;net8.0;netstandard2.0</TargetFrameworks>
+        <Version>2.6.0</Version>
         <AssemblyName>KodeAid.Configuration</AssemblyName>
         <RootNamespace>KodeAid.Configuration</RootNamespace>
         <Description>Kode-Aid shared configuration library.</Description>
         <PackageTags>helpers extensions utilities configuration</PackageTags>
     </PropertyGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.*" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.*" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.*" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.*" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.*" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.*" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.*" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.*" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.*" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
