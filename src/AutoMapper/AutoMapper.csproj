@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="AutoMapper" Version="9.0.*" />
+        <PackageReference Include="AutoMapper" Version="15.1.*" />
         <PackageReference Include="AutoMapper.Collection" Version="6.0.*" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.*" />
     </ItemGroup>
