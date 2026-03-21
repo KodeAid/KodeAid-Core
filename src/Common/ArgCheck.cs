@@ -28,7 +28,7 @@ namespace KodeAid
             }
         }
 
-        public static void NotNullOrDefault<T>(string paramName, [NotNull] T value)
+        public static void NotNullOrDefault<T>(string paramName, [NotNull] T? value)
         {
             NotNull(paramName, value);
 
