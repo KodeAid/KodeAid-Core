@@ -8,13 +8,13 @@ namespace KodeAid.Azure.Storage
 {
     public sealed class AzureBlobStorageClientOptionsBuilder : IBuilder<AzureBlobStorageClientOptions>
     {
-        private string _connectionString;
-        private string _accountKey;
-        private string _sasToken;
-        private string _accountName;
-        private string _endpointSuffix;
-        private string _containerName;
-        private string _defaultDirectoryRelativeAddress;
+        private string? _connectionString;
+        private string? _accountKey;
+        private string? _sasToken;
+        private string? _accountName;
+        private string? _endpointSuffix;
+        private string? _containerName;
+        private string? _defaultDirectoryRelativeAddress;
         private bool _useSnapshots;
         private bool _useDefaultAzureCredential;
         private TimeSpan? _leaseDuration;
@@ -44,7 +44,7 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder WithAccountKey(string accountKey, string accountName, string endpointSuffix = null)
+        public AzureBlobStorageClientOptionsBuilder WithAccountKey(string accountKey, string accountName, string? endpointSuffix = null)
         {
             _accountKey = accountKey;
             _accountName = accountName;
@@ -52,7 +52,7 @@ namespace KodeAid.Azure.Storage
             return this;
         }
 
-        public AzureBlobStorageClientOptionsBuilder WithSharedAccessSignature(string sasToken, string accountName, string endpointSuffix = null)
+        public AzureBlobStorageClientOptionsBuilder WithSharedAccessSignature(string sasToken, string accountName, string? endpointSuffix = null)
         {
             _sasToken = sasToken;
             _accountName = accountName;

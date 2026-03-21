@@ -8,10 +8,10 @@ namespace KodeAid.Azure.Cosmos
     public class CosmosClientRegistration
     {
         internal static readonly string DefaultName = string.Empty;
-        internal string Name { get; set; }
-        public string ConnectionString { get; set; }
-        public string AccountEndpoint { get; set; }
-        public string AuthKeyOrResourceToken { get; set; }
-        public CosmosClientOptions Options { get; set; }
+        internal string? Name { get; set; }
+        public string? ConnectionString { get; set; }
+        public string? AccountEndpoint { get; set; }
+        public string? AuthKeyOrResourceToken { get; set; }
+        public CosmosClientOptions? Options { get; set; }
     }
 }

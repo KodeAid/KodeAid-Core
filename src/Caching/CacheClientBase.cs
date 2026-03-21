@@ -25,30 +25,30 @@ namespace KodeAid.Caching
         protected bool ThrowOnError { get; }
         protected ILogger Logger { get; }
 
-        public virtual async Task<ICacheResult<T>> GetAsync<T>(string key, string partition = null)
+        public virtual async Task<ICacheResult<T>> GetAsync<T>(string key, string? partition = null)
         {
             ArgCheck.NotNull(nameof(key), key);
-            var results = await GetAsyncHelper<T>(new[] { key }, partition).ConfigureAwait(false);
+            var results = await GetAsyncHelperAsync<T>(new[] { key }, partition).ConfigureAwait(false);
             return results.Single();
         }
 
-        public virtual Task<IEnumerable<ICacheResult<T>>> GetRangeAsync<T>(IEnumerable<string> keys, string partition = null)
+        public virtual Task<IEnumerable<ICacheResult<T>>> GetRangeAsync<T>(IEnumerable<string> keys, string? partition = null)
         {
             ArgCheck.NotNull(nameof(keys), keys);
             if (keys.Any(key => key == null))
             {
                 throw new ArgumentException("Parameter keys must not contain null items.", "keys");
             }
-            return GetAsyncHelper<T>(keys, partition);
+            return GetAsyncHelperAsync<T>(keys, partition);
         }
 
-        public virtual Task SetAsync<T>(string key, T value, DateTimeOffset? absoluteExpiration, string partition = null)
+        public virtual Task SetAsync<T>(string key, T value, DateTimeOffset? absoluteExpiration, string? partition = null)
         {
             ArgCheck.NotNull(nameof(key), key);
             return SetAsyncHelper(new[] { new KeyValuePair<string, T>(key, value) }, absoluteExpiration, partition);
         }
 
-        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string partition = null)
+        public virtual Task SetRangeAsync<T>(IEnumerable<KeyValuePair<string, T>> keyValues, DateTimeOffset? absoluteExpiration, string? partition = null)
         {
             ArgCheck.NotNull(nameof(keyValues), keyValues);
             if (keyValues.Any(keyValue => keyValue.Key == null))
@@ -62,13 +62,13 @@ namespace KodeAid.Caching
             return SetAsyncHelper(keyValues, absoluteExpiration, partition);
         }
 
-        public virtual Task RemoveAsync(string key, string partition = null)
+        public virtual Task RemoveAsync(string key, string? partition = null)
         {
             ArgCheck.NotNull(nameof(key), key);
             return RemoveRangeAsync(EnumerableHelper.From(key), partition);
         }
 
-        public virtual async Task RemoveRangeAsync(IEnumerable<string> keys, string partition = null)
+        public virtual async Task RemoveRangeAsync(IEnumerable<string> keys, string? partition = null)
         {
             ArgCheck.NotNull(nameof(keys), keys);
             keys = keys.Where(key => key != null).ToList();
@@ -88,16 +88,16 @@ namespace KodeAid.Caching
             }
         }
 
-        protected abstract Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition);
+        protected abstract Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string? partition);
 
-        protected abstract Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition);
+        protected abstract Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string? partition);
 
-        protected virtual Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
+        protected virtual Task RemoveKeysAsync(IEnumerable<string> keys, string? partition = null)
         {
             return Task.CompletedTask;
         }
 
-        private async Task<IEnumerable<ICacheResult<T>>> GetAsyncHelper<T>(IEnumerable<string> keys, string partition)
+        private async Task<IEnumerable<ICacheResult<T>>> GetAsyncHelperAsync<T>(IEnumerable<string> keys, string partition)
         {
             try
             {
@@ -242,7 +242,7 @@ namespace KodeAid.Caching
         public class CacheItem<T>
         {
             [DataMember(IsRequired = true, Order = 1, EmitDefaultValue = true)]
-            public string Key { get; set; }
+            public string? Key { get; set; }
 
             [DataMember(IsRequired = true, Order = 2, EmitDefaultValue = true)]
             public T Value { get; set; }

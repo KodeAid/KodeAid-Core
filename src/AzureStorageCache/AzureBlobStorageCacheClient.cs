@@ -48,7 +48,7 @@ namespace KodeAid.Caching.AzureStorage
             _container = _client.GetContainerReference(_containerName);
         }
 
-        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> blobKeys, string partitionDirectory)
+        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> blobKeys, string? partitionDirectory)
         {
             partitionDirectory = partitionDirectory ?? _defaultPartitionDirectory;
             ArgCheck.NotNull(nameof(partitionDirectory), partitionDirectory);
@@ -109,7 +109,7 @@ namespace KodeAid.Caching.AzureStorage
             return items;
         }
 
-        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partitionDirectory)
+        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string? partitionDirectory)
         {
             partitionDirectory = partitionDirectory ?? _defaultPartitionDirectory;
             ArgCheck.NotNull(nameof(partitionDirectory), partitionDirectory);
@@ -137,7 +137,7 @@ namespace KodeAid.Caching.AzureStorage
             }
         }
 
-        protected override async Task RemoveKeysAsync(IEnumerable<string> blobKeys, string partitionDirectory = null)
+        protected override async Task RemoveKeysAsync(IEnumerable<string> blobKeys, string? partitionDirectory = null)
         {
             partitionDirectory = partitionDirectory ?? _defaultPartitionDirectory;
             ArgCheck.NotNull(nameof(partitionDirectory), partitionDirectory);

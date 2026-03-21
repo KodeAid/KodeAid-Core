@@ -11,6 +11,6 @@ namespace KodeAid.Azure.Cosmos.Documents
         public const string DocumentTypeJsonPropertyName = "_type";
 
         [JsonProperty(DocumentTypeJsonPropertyName)]
-        public string Type { get; set; }
+        public string? Type { get; set; }
     }
 }

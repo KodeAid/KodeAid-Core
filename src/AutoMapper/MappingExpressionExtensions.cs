@@ -66,7 +66,7 @@ namespace AutoMapper
 
         private class IgnoreNullSourceValues<TSource, TDestination> : IMemberValueResolver<TSource, TDestination, object, object>
         {
-            public object Resolve(TSource source, TDestination destination, object sourceMember, object destinationMember, ResolutionContext context)
+            public object? Resolve(TSource source, TDestination destination, object? sourceMember, object? destinationMember, ResolutionContext context)
                 => sourceMember ?? destinationMember;
         }
     }

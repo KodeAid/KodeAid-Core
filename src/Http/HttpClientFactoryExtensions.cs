@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.Http
     {
         public static HttpClient CreateClient<TClient>(this IHttpClientFactory httpClientFactory)
         {
-            return httpClientFactory.CreateClient(typeof(TClient).FullName);
+            return httpClientFactory.CreateClient(typeof(TClient).FullName!);
         }
     }
 }

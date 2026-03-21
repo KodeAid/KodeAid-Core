@@ -13,7 +13,7 @@ namespace System.Data
     {
         private static readonly IEnumerable<IDataParameter> _emptyParameters = Enumerable.Empty<IDataParameter>();
 
-        public static IEnumerable<IDataParameter> AutoGenerateParameters(this IDbCommand command, IEnumerable parameterValues, string prefix = "@p")
+        public static IEnumerable<IDataParameter> AutoGenerateParameters(this IDbCommand command, IEnumerable? parameterValues, string prefix = "@p")
         {
             ArgCheck.NotNullOrEmpty("prefix", prefix);
             if (parameterValues == null)
@@ -40,7 +40,7 @@ namespace System.Data
             return ExecuteNonQuery(command, commandText, (IEnumerable)parameterValues);
         }
 
-        public static int ExecuteNonQuery(this IDbCommand command, string commandText, IEnumerable parameterValues)
+        public static int ExecuteNonQuery(this IDbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteNonQuery(command, commandText, AutoGenerateParameters(command, parameterValues));
         }
@@ -75,7 +75,7 @@ namespace System.Data
             return ExecuteScalar<TScalar>(command, commandText, (IEnumerable)parameterValues);
         }
 
-        public static TScalar ExecuteScalar<TScalar>(this IDbCommand command, string commandText, IEnumerable parameterValues)
+        public static TScalar ExecuteScalar<TScalar>(this IDbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteScalar<TScalar>(command, commandText, AutoGenerateParameters(command, parameterValues));
         }
@@ -87,30 +87,30 @@ namespace System.Data
 
         public static TScalar ExecuteScalar<TScalar>(this IDbCommand command, string commandText, IEnumerable<IDataParameter> parameters)
         {
-            return (TScalar)ExecuteScalar(command, commandText, parameters);
+            return (TScalar)ExecuteScalar(command, commandText, parameters)!;
         }
 
-        public static object ExecuteScalar(this IDbCommand command, string commandText)
+        public static object? ExecuteScalar(this IDbCommand command, string commandText)
         {
             return ExecuteScalar(command, commandText, (IEnumerable)null);
         }
 
-        public static object ExecuteScalar(this IDbCommand command, string commandText, params object[] parameterValues)
+        public static object? ExecuteScalar(this IDbCommand command, string commandText, params object[] parameterValues)
         {
             return ExecuteScalar(command, commandText, (IEnumerable)parameterValues);
         }
 
-        public static object ExecuteScalar(this IDbCommand command, string commandText, IEnumerable parameterValues)
+        public static object? ExecuteScalar(this IDbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteScalar(command, commandText, AutoGenerateParameters(command, parameterValues));
         }
 
-        public static object ExecuteScalar(this IDbCommand command, string commandText, params IDataParameter[] parameters)
+        public static object? ExecuteScalar(this IDbCommand command, string commandText, params IDataParameter[] parameters)
         {
             return ExecuteScalar(command, commandText, (IEnumerable<IDataParameter>)parameters);
         }
 
-        public static object ExecuteScalar(this IDbCommand command, string commandText, IEnumerable<IDataParameter> parameters)
+        public static object? ExecuteScalar(this IDbCommand command, string commandText, IEnumerable<IDataParameter> parameters)
         {
             var shouldCloseConnection = false;
             try
@@ -138,7 +138,7 @@ namespace System.Data
             return ExecuteReader(command, commandText, (IEnumerable)parameterValues);
         }
 
-        public static IDataReader ExecuteReader(this IDbCommand command, string commandText, IEnumerable parameterValues)
+        public static IDataReader ExecuteReader(this IDbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteReader(command, commandText, AutoGenerateParameters(command, parameterValues));
         }

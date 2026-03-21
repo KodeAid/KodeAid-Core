@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace KodeAid.Caching
 {
@@ -12,14 +13,14 @@ namespace KodeAid.Caching
         {
         }
 
-        public CacheResult(string key)
+        public CacheResult(string? key)
         {
             Key = key;
         }
 
-        public string Key { get; set; }
+        public string? Key { get; set; }
         public bool IsHit { get; set; }
-        public T Value { get; set; }
+        [MaybeNull] public T Value { get; set; }
         public DateTimeOffset? LastUpdated { get; set; }
 
         public override string ToString()

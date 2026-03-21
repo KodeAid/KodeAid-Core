@@ -9,12 +9,12 @@ namespace KodeAid.Net.Http
 {
     public class HttpOperationManager : OperationManager<int>
     {
-        public HttpOperationManager(IRetryPolicy retryPolicy = null)
+        public HttpOperationManager(IRetryPolicy? retryPolicy = null)
             : base(retryPolicy)
         {
         }
 
-        protected override bool CheckIsSuccess(object state, int statusCode, Exception exception)
+        protected override bool CheckIsSuccess(object? state, int statusCode, Exception? exception)
         {
             if (exception != null)
             {
@@ -36,7 +36,7 @@ namespace KodeAid.Net.Http
             return false;
         }
 
-        protected override bool CheckIsRetryable(object state, int statusCode, Exception exception)
+        protected override bool CheckIsRetryable(object? state, int statusCode, Exception? exception)
         {
             if (statusCode >= 500 && statusCode < 600)
             {

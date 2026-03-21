@@ -43,7 +43,7 @@ namespace HtmlAgilityPack
         /// <param name="newLine">The new line string to use, defaults to <see cref="System.Environment.NewLine"/>, only applicable if <paramref name="multiline"/> is true.</param>
         /// <param name="lineBreakTags">The element tag names that cause a new line to be inserted, defaults to "br" and "p" if none are specified, only applicable if <paramref name="multiline"/> is true.</param>
         /// <returns>The unescaped inner text of a node, optionally with new lines inserted for line-breaking elements.</returns>
-        public static string GetInnerText(this HtmlNode node, bool multiline = false, string newLine = null, params string[] lineBreakTags)
+        public static string GetInnerText(this HtmlNode node, bool multiline = false, string? newLine = null, params string[] lineBreakTags)
         {
             if (multiline)
             {

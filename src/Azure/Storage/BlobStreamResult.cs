@@ -14,7 +14,7 @@ namespace KodeAid.Azure.Storage
         {
         }
 
-        public BlobStreamResult(Stream content)
+        public BlobStreamResult(Stream? content)
         {
             Content = content;
         }
@@ -24,15 +24,15 @@ namespace KodeAid.Azure.Storage
         {
         }
 
-        internal BlobStreamResult(BlobGetResult copy, Stream content)
+        internal BlobStreamResult(BlobGetResult copy, Stream? content)
             : base(copy)
         {
             Content = content;
         }
 
-        public Stream Content { get; set; }
+        public Stream? Content { get; set; }
 
-        Stream IStreamResult.Stream => Content;
+        Stream? IStreamResult.Stream => Content;
 
         public void Dispose()
         {

@@ -7,6 +7,6 @@ namespace KodeAid.Storage
 {
     public interface IStringResult : IStoreResult
     {
-        string Value { get; }
+        string? Value { get; }
     }
 }

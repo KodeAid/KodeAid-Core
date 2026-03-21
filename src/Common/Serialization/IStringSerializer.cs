@@ -10,6 +10,6 @@ namespace KodeAid.Serialization
     public interface IStringSerializer : ISerializer<string>
     {
         void SerializeToWriter(TextWriter writer, object graph);
-        object DeserializeFromReader(Type type, TextReader reader);
+        object? DeserializeFromReader(Type type, TextReader reader);
     }
 }

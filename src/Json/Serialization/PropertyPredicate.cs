@@ -10,12 +10,12 @@ namespace KodeAid.Json.Serialization
 {
     public abstract class PropertyPredicate : IPropertyPredicate
     {
-        public virtual Predicate<object> GetShouldSerializePredicate(MemberInfo member, JsonProperty property)
+        public virtual Predicate<object>? GetShouldSerializePredicate(MemberInfo member, JsonProperty property)
         {
             return null;
         }
 
-        public virtual Predicate<object> GetShouldDeserializePredicate(MemberInfo member, JsonProperty property)
+        public virtual Predicate<object>? GetShouldDeserializePredicate(MemberInfo member, JsonProperty property)
         {
             return null;
         }

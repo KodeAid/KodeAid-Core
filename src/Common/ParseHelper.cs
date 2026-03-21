@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -34,12 +35,12 @@ namespace KodeAid
             throw new ArgumentException($"Parameter {nameof(str)} cannot be parsed as type {targetType.FullName}.", "strValue");
         }
 
-        public static T ParseOrDefault<T>(string str, bool ignoreCase = false, T defaultValue = default)
+        public static T ParseOrDefault<T>(string? str, bool ignoreCase = false, T defaultValue = default)
         {
             return (T)ParseOrDefault(str, typeof(T), ignoreCase, defaultValue);
         }
 
-        public static object ParseOrDefault(string str, Type targetType, bool ignoreCase = false, object defaultValue = null)
+        public static object? ParseOrDefault(string? str, Type targetType, bool ignoreCase = false, object? defaultValue = null)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
             if (defaultValue != null && !targetType.IsAssignableFrom(defaultValue.GetType()))
@@ -55,18 +56,18 @@ namespace KodeAid
             return defaultValue;
         }
 
-        public static bool TryParse<T>(string str, out T value, bool ignoreCase = false)
+        public static bool TryParse<T>(string? str, [MaybeNullWhen(false)] out T value, bool ignoreCase = false)
         {
             if (TryParse(str, typeof(T), out var objValue, ignoreCase: ignoreCase))
             {
-                value = (T)objValue;
+                value = (T)objValue!;
                 return true;
             }
             value = default;
             return false;
         }
 
-        public static bool TryParse(string str, Type targetType, out object value, bool ignoreCase = false)
+        public static bool TryParse(string? str, Type targetType, out object? value, bool ignoreCase = false)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
 

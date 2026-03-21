@@ -15,97 +15,97 @@ namespace Microsoft.Azure.Documents.Client
 {
     public static class TypedDocumentClientExtensions
     {
-        public static Func<Type, string> DocumentTypeResolver { get; set; } = (type) => type?.GetCustomAttributes(typeof(DocumentTypeAttribute), true).OfType<DocumentTypeAttribute>()?.FirstOrDefault()?.Type ?? type?.FullName;
-        public static JsonSerializerSettings SerializerSettings { get; set; }
+        public static Func<Type?, string?> DocumentTypeResolver { get; set; } = (type) => type?.GetCustomAttributes(typeof(DocumentTypeAttribute), true).OfType<DocumentTypeAttribute>()?.FirstOrDefault()?.Type ?? type?.FullName;
+        public static JsonSerializerSettings? SerializerSettings { get; set; }
 
-        public static IQueryable<Document> CreateTypedDocumentQuery(this IDocumentClient client, string collectionLink, string documentType, FeedOptions options = null)
+        public static IQueryable<Document> CreateTypedDocumentQuery(this IDocumentClient client, string collectionLink, string documentType, FeedOptions? options = null)
         {
             return client.CreateDocumentQuery(collectionLink, options).Where(d => ((DocumentType)(object)d).Type == documentType).AsQueryable();
         }
 
-        public static IQueryable<Document> CreateTypedDocumentQuery(this IDocumentClient client, Uri collectionUri, string documentType, FeedOptions options = null)
+        public static IQueryable<Document> CreateTypedDocumentQuery(this IDocumentClient client, Uri collectionUri, string documentType, FeedOptions? options = null)
         {
             return client.CreateDocumentQuery(collectionUri, options).Where(d => ((DocumentType)(object)d).Type == documentType).AsQueryable();
         }
 
-        public static IQueryable<T> CreateTypedDocumentQuery<T>(this IDocumentClient client, string collectionLink, string documentType = null, FeedOptions options = null)
+        public static IQueryable<T> CreateTypedDocumentQuery<T>(this IDocumentClient client, string collectionLink, string? documentType = null, FeedOptions? options = null)
         {
             documentType = GetDocumentType<T>(documentType);
             return client.CreateDocumentQuery<T>(collectionLink, options).Where(d => ((DocumentType)(object)d).Type == documentType).AsQueryable();
         }
 
-        public static IQueryable<T> CreateTypedDocumentQuery<T>(this IDocumentClient client, Uri collectionUri, string documentType = null, FeedOptions options = null)
+        public static IQueryable<T> CreateTypedDocumentQuery<T>(this IDocumentClient client, Uri collectionUri, string? documentType = null, FeedOptions? options = null)
         {
             documentType = GetDocumentType<T>(documentType);
             return client.CreateDocumentQuery<T>(collectionUri, options).Where(d => ((DocumentType)(object)d).Type == documentType).AsQueryable();
         }
 
-        public static Task<ResourceResponse<Document>> CreateTypedDocumentAsync(this IDocumentClient client, string collectionLink, object document, string documentType = null, JsonSerializerSettings serializerSettings = null, RequestOptions options = null, bool disableAutomaticIdGeneration = false)
+        public static Task<ResourceResponse<Document>> CreateTypedDocumentAsync(this IDocumentClient client, string collectionLink, object document, string? documentType = null, JsonSerializerSettings? serializerSettings = null, RequestOptions? options = null, bool disableAutomaticIdGeneration = false)
         {
             document = GetDocumentObject(document, documentType, serializerSettings);
             return client.CreateDocumentAsync(collectionLink, document, options, disableAutomaticIdGeneration);
         }
 
-        public static Task<ResourceResponse<Document>> CreateTypedDocumentAsync(this IDocumentClient client, Uri collectionUri, object document, string documentType = null, JsonSerializerSettings serializerSettings = null, RequestOptions options = null, bool disableAutomaticIdGeneration = false)
+        public static Task<ResourceResponse<Document>> CreateTypedDocumentAsync(this IDocumentClient client, Uri collectionUri, object document, string? documentType = null, JsonSerializerSettings? serializerSettings = null, RequestOptions? options = null, bool disableAutomaticIdGeneration = false)
         {
             document = GetDocumentObject(document, documentType, serializerSettings);
             return client.CreateDocumentAsync(collectionUri, document, options, disableAutomaticIdGeneration);
         }
 
-        public static Task<int> DeleteAllTypedDocumentsAsync(this IDocumentClient client, string collectionLink, string documentType, FeedOptions options = null)
+        public static Task<int> DeleteAllTypedDocumentsAsync(this IDocumentClient client, string collectionLink, string documentType, FeedOptions? options = null)
         {
             var query = client.CreateTypedDocumentQuery(collectionLink, documentType, options).AsDocumentQuery();
             return DeleteDocumentsInQueryAsync(client, query);
         }
 
-        public static Task<int> DeleteAllTypedDocumentsAsync(this IDocumentClient client, Uri collectionUri, string documentType, FeedOptions options = null)
+        public static Task<int> DeleteAllTypedDocumentsAsync(this IDocumentClient client, Uri collectionUri, string documentType, FeedOptions? options = null)
         {
             var query = client.CreateTypedDocumentQuery(collectionUri, documentType, options).AsDocumentQuery();
             return DeleteDocumentsInQueryAsync(client, query);
         }
 
-        public static Task<int> DeleteAllTypedDocumentsAsync<T>(this IDocumentClient client, string collectionLink, FeedOptions options = null)
+        public static Task<int> DeleteAllTypedDocumentsAsync<T>(this IDocumentClient client, string collectionLink, FeedOptions? options = null)
         {
             var query = client.CreateTypedDocumentQuery<T>(collectionLink, options: options).AsDocumentQuery();
             return DeleteDocumentsInQueryAsync(client, query);
         }
 
-        public static Task<int> DeleteAllTypedDocumentsAsync<T>(this IDocumentClient client, Uri collectionUri, FeedOptions options = null)
+        public static Task<int> DeleteAllTypedDocumentsAsync<T>(this IDocumentClient client, Uri collectionUri, FeedOptions? options = null)
         {
             var query = client.CreateTypedDocumentQuery<T>(collectionUri, options: options).AsDocumentQuery();
             return DeleteDocumentsInQueryAsync(client, query);
         }
 
-        public static Task<ResourceResponse<Document>> ReplaceTypedDocumentAsync(this IDocumentClient client, string documentLink, object document, string documentType = null, JsonSerializerSettings serializerSettings = null, RequestOptions options = null)
+        public static Task<ResourceResponse<Document>> ReplaceTypedDocumentAsync(this IDocumentClient client, string documentLink, object document, string? documentType = null, JsonSerializerSettings? serializerSettings = null, RequestOptions? options = null)
         {
             document = GetDocumentObject(document, documentType, serializerSettings);
             return client.ReplaceDocumentAsync(documentLink, document, options);
         }
 
-        public static Task<ResourceResponse<Document>> ReplaceTypedDocumentAsync(this IDocumentClient client, Uri documentUri, object document, string documentType = null, JsonSerializerSettings serializerSettings = null, RequestOptions options = null)
+        public static Task<ResourceResponse<Document>> ReplaceTypedDocumentAsync(this IDocumentClient client, Uri documentUri, object document, string? documentType = null, JsonSerializerSettings? serializerSettings = null, RequestOptions? options = null)
         {
             document = GetDocumentObject(document, documentType, serializerSettings);
             return client.ReplaceDocumentAsync(documentUri, document, options);
         }
 
-        public static Task<ResourceResponse<Document>> UpsertTypedDocumentAsync(this IDocumentClient client, string collectionLink, object document, string documentType = null, JsonSerializerSettings serializerSettings = null, RequestOptions options = null, bool disableAutomaticIdGeneration = false)
+        public static Task<ResourceResponse<Document>> UpsertTypedDocumentAsync(this IDocumentClient client, string collectionLink, object document, string? documentType = null, JsonSerializerSettings? serializerSettings = null, RequestOptions? options = null, bool disableAutomaticIdGeneration = false)
         {
             document = GetDocumentObject(document, documentType, serializerSettings);
             return client.UpsertDocumentAsync(collectionLink, document, options, disableAutomaticIdGeneration);
         }
 
-        public static Task<ResourceResponse<Document>> UpsertTypedDocumentAsync(this IDocumentClient client, Uri collectionUri, object document, string documentType = null, JsonSerializerSettings serializerSettings = null, RequestOptions options = null, bool disableAutomaticIdGeneration = false)
+        public static Task<ResourceResponse<Document>> UpsertTypedDocumentAsync(this IDocumentClient client, Uri collectionUri, object document, string? documentType = null, JsonSerializerSettings? serializerSettings = null, RequestOptions? options = null, bool disableAutomaticIdGeneration = false)
         {
             document = GetDocumentObject(document, documentType, serializerSettings);
             return client.UpsertDocumentAsync(collectionUri, document, options, disableAutomaticIdGeneration);
         }
 
-        private static string GetDocumentType<T>(string documentType)
+        private static string GetDocumentType<T>(string? documentType)
         {
             return documentType ?? DocumentTypeResolver(typeof(T)) ?? throw new InvalidOperationException("Could not resolve document type.");
         }
 
-        private static object GetDocumentObject(object document, string documentType, JsonSerializerSettings serializerSettings)
+        private static object GetDocumentObject(object document, string? documentType, JsonSerializerSettings? serializerSettings)
         {
             documentType = documentType ?? DocumentTypeResolver(document?.GetType()) ?? throw new InvalidOperationException("Could not resolve document type.");
             if (documentType == null)

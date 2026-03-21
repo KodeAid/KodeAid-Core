@@ -66,7 +66,7 @@ namespace KodeAid.Caching.SqlDb
             }
         }
 
-        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string tableName)
+        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string? tableName)
         {
             tableName = tableName ?? _defaultTableName;
             ArgCheck.NotNull(nameof(tableName), tableName);
@@ -113,7 +113,7 @@ namespace KodeAid.Caching.SqlDb
             return items;
         }
 
-        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string tableName)
+        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string? tableName)
         {
             tableName = tableName ?? _defaultTableName;
             ArgCheck.NotNull(nameof(tableName), tableName);
@@ -152,7 +152,7 @@ ELSE
             }
         }
 
-        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string tableName = null)
+        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string? tableName = null)
         {
             tableName = tableName ?? _defaultTableName;
             ArgCheck.NotNull(nameof(tableName), tableName);
@@ -195,7 +195,7 @@ BEGIN
 END";
         }
 
-        private object SerializeValue<T>(T value)
+        private object? SerializeValue<T>(T value)
         {
             if (value == null)
             {

@@ -15,9 +15,9 @@ namespace KodeAid.ComponentModel
     {
         private const string _errorPropertyName = "Error";
         private const string _hasErrorsPropertyName = "HasErrors";
-        private string _error;
+        private string? _error;
 
-        private event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        private event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         protected bool ValidateObject()
         {
@@ -34,7 +34,7 @@ namespace KodeAid.ComponentModel
             return true;
         }
 
-        protected virtual string ValidateProperty(string propertyName)
+        protected virtual string? ValidateProperty(string propertyName)
         {
             return null;
         }
@@ -44,7 +44,7 @@ namespace KodeAid.ComponentModel
             ErrorsChanged?.Invoke(this, e);
         }
 
-        private void SetObjectError(string error, string propertyName = null)
+        private void SetObjectError(string? error, string? propertyName = null)
         {
             if (ChangeProperty(_errorPropertyName, ref _error, error, _hasErrorsPropertyName) && propertyName != null)
                 OnErrorsChanged(new DataErrorsChangedEventArgs(propertyName));

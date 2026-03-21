@@ -18,7 +18,7 @@ namespace KodeAid.Json
         {
         }
 
-        public JsonSerializerImmutable(JsonSerializerSettings settings)
+        public JsonSerializerImmutable(JsonSerializerSettings? settings)
         {
             _innerSerializer = settings != null ? Newtonsoft.Json.JsonSerializer.Create(settings) : Newtonsoft.Json.JsonSerializer.CreateDefault();
         }

@@ -9,13 +9,13 @@ namespace KodeAid.Serialization
     public interface ISerializer<TSerialized>
     {
         TSerialized Serialize(object graph);
-        object Deserialize(Type type, TSerialized serialized);
+        object? Deserialize(Type type, TSerialized serialized);
     }
 
     public interface ISerializer
     {
         Type SerializedType { get; }
         object Serialize(object graph);
-        object Deserialize(Type type, object serialized);
+        object? Deserialize(Type type, object serialized);
     }
 }

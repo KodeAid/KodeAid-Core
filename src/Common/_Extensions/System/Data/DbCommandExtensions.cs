@@ -34,7 +34,7 @@ namespace System.Data
             return ExecuteNonQueryAsync(command, commandText, parameterValues, cancellationToken);
         }
 
-        public static Task<int> ExecuteNonQueryAsync(this DbCommand command, string commandText, IEnumerable parameterValues)
+        public static Task<int> ExecuteNonQueryAsync(this DbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteNonQueryAsync(command, commandText, parameterValues, CancellationToken.None);
         }
@@ -94,7 +94,7 @@ namespace System.Data
             return ExecuteScalarAsync<TScalar>(command, commandText, parameterValues, cancellationToken);
         }
 
-        public static Task<TScalar> ExecuteScalarAsync<TScalar>(this DbCommand command, string commandText, IEnumerable parameterValues)
+        public static Task<TScalar> ExecuteScalarAsync<TScalar>(this DbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteScalarAsync<TScalar>(command, commandText, parameterValues, CancellationToken.None);
         }
@@ -121,55 +121,55 @@ namespace System.Data
 
         public static async Task<TScalar> ExecuteScalarAsync<TScalar>(this DbCommand command, string commandText, IEnumerable<IDataParameter> parameters, CancellationToken cancellationToken)
         {
-            return (TScalar)await ExecuteScalarAsync(command, commandText, parameters, cancellationToken).ConfigureAwait(false);
+            return (TScalar)(await ExecuteScalarAsync(command, commandText, parameters, cancellationToken).ConfigureAwait(false))!;
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText)
         {
             return ExecuteScalarAsync(command, commandText, CancellationToken.None);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, CancellationToken cancellationToken)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, CancellationToken cancellationToken)
         {
             return ExecuteScalarAsync(command, commandText, (IEnumerable)null, cancellationToken);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, params object[] parameterValues)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, params object[] parameterValues)
         {
             return ExecuteScalarAsync(command, commandText, CancellationToken.None, parameterValues);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, CancellationToken cancellationToken, params object[] parameterValues)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, CancellationToken cancellationToken, params object[] parameterValues)
         {
             return ExecuteScalarAsync(command, commandText, parameterValues, cancellationToken);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable parameterValues)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteScalarAsync(command, commandText, parameterValues, CancellationToken.None);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable parameterValues, CancellationToken cancellationToken)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable parameterValues, CancellationToken cancellationToken)
         {
             return ExecuteScalarAsync(command, commandText, command.AutoGenerateParameters(parameterValues), cancellationToken);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, params IDataParameter[] parameters)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, params IDataParameter[] parameters)
         {
             return ExecuteScalarAsync(command, commandText, CancellationToken.None, parameters);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, CancellationToken cancellationToken, params IDataParameter[] parameters)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, CancellationToken cancellationToken, params IDataParameter[] parameters)
         {
             return ExecuteScalarAsync(command, commandText, parameters, cancellationToken);
         }
 
-        public static Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable<IDataParameter> parameters)
+        public static Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable<IDataParameter> parameters)
         {
             return ExecuteScalarAsync(command, commandText, parameters, CancellationToken.None);
         }
 
-        public static async Task<object> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable<IDataParameter> parameters, CancellationToken cancellationToken)
+        public static async Task<object?> ExecuteScalarAsync(this DbCommand command, string commandText, IEnumerable<IDataParameter> parameters, CancellationToken cancellationToken)
         {
             var shouldCloseConnection = false;
             try
@@ -207,7 +207,7 @@ namespace System.Data
             return ExecuteReaderAsync(command, commandText, parameterValues, cancellationToken);
         }
 
-        public static Task<DbDataReader> ExecuteReaderAsync(this DbCommand command, string commandText, IEnumerable parameterValues)
+        public static Task<DbDataReader> ExecuteReaderAsync(this DbCommand command, string commandText, IEnumerable? parameterValues)
         {
             return ExecuteReaderAsync(command, commandText, parameterValues, CancellationToken.None);
         }

@@ -10,9 +10,9 @@ namespace KodeAid.Storage
     public class StoreResult : IStringResult, IBytesResult, IStreamResult, IDisposable
     {
         private bool _disposed = false;
-        private readonly string _value;
-        private readonly byte[] _bytes;
-        private readonly Stream _stream;
+        private readonly string? _value;
+        private readonly byte[]? _bytes;
+        private readonly Stream? _stream;
 
         public StoreResult()
         {
@@ -33,13 +33,13 @@ namespace KodeAid.Storage
             _value = value;
         }
 
-        public string Key { get; set; }
-        public string Partition { get; set; }
+        public string? Key { get; set; }
+        public string? Partition { get; set; }
         public StoreResultStatus Status { get; set; }
         public DateTimeOffset? CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
         public DateTimeOffset? ExpiresAt { get; set; }
-        public object ConcurrencyToken { get; set; }
+        public object? ConcurrencyToken { get; set; }
 
         string IStringResult.Value => _value;
         byte[] IBytesResult.Data => _bytes;

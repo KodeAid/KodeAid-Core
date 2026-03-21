@@ -9,12 +9,12 @@ namespace System.Linq
 {
     public static class EnumerableExtensions
     {
-        public static IEnumerable<TSource> EmptyIfNull<TSource>(this IEnumerable<TSource> source)
+        public static IEnumerable<TSource> EmptyIfNull<TSource>(this IEnumerable<TSource>? source)
         {
             return source ?? Enumerable.Empty<TSource>();
         }
 
-        public static IEnumerable<TSource> NullIfEmpty<TSource>(this IEnumerable<TSource> source)
+        public static IEnumerable<TSource>? NullIfEmpty<TSource>(this IEnumerable<TSource>? source)
         {
             if (source == null || !source.Any())
             {
@@ -66,7 +66,7 @@ namespace System.Linq
                 source.Skip(i + 1).Combinations(size - 1).Select(c => (new[] { e }).Concat(c)));
         }
 
-        public static ISet<T> ToSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer = null)
+        public static ISet<T> ToSet<T>(this IEnumerable<T> source, IEqualityComparer<T>? comparer = null)
         {
             return new HashSet<T>(source, comparer);
         }

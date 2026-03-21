@@ -8,12 +8,12 @@ namespace KodeAid.FaultTolerance
 {
     public class OperationContext
     {
-        protected internal OperationContext(object state, RetryContext retryContext)
+        protected internal OperationContext(object? state, RetryContext? retryContext)
             : this(Guid.NewGuid().ToString("D"), state, retryContext)
         {
         }
 
-        protected internal OperationContext(string operationId, object state, RetryContext retryContext)
+        protected internal OperationContext(string operationId, object? state, RetryContext? retryContext)
         {
             OperationId = operationId;
             State = state;
@@ -25,8 +25,8 @@ namespace KodeAid.FaultTolerance
         public DateTimeOffset StartTime { get; } = DateTimeOffset.Now;
         public DateTimeOffset? CompletedTime { get; private set; }
         public TimeSpan Duration => (CompletedTime ?? DateTimeOffset.Now) - StartTime;
-        public object State { get; }
-        public RetryContext RetryContext { get; }
+        public object? State { get; }
+        public RetryContext? RetryContext { get; }
 
         protected internal void SetCompleted(bool succeeded)
         {

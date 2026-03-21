@@ -8,6 +8,6 @@ namespace KodeAid.Data
     public interface IOptimisticConcurrency
     {
         // ConcurrencyToken, Timestamp, Version, RowVersion, ETag
-        object ConcurrencyToken { get; set; }
+        object? ConcurrencyToken { get; set; }
     }
 }

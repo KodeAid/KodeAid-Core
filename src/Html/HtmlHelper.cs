@@ -8,7 +8,7 @@ namespace KodeAid.Html
 {
     public static class HtmlHelper
     {
-        public static string GetInnerText(string html, bool multiline = false, string newLine = null, params string[] lineBreakTags)
+        public static string? GetInnerText(string? html, bool multiline = false, string? newLine = null, params string[] lineBreakTags)
         {
             if (html == null)
                 return null;

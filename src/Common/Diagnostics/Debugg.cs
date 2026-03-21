@@ -13,30 +13,30 @@ namespace KodeAid.Diagnostics
     public static class Debugg
     {
         [Conditional("DEBUG")]
-        public static void WriteLine(object source, string message = null, Exception ex = null, [CallerMemberName] string methodName = null)
+        public static void WriteLine(object source, string? message = null, Exception? ex = null, [CallerMemberName] string? methodName = null)
         {
             WriteLine(source.GetType(), methodName, message, ex);
         }
 
         [Conditional("DEBUG")]
-        public static void WriteLine(object source, Exception ex, [CallerMemberName] string methodName = null)
+        public static void WriteLine(object source, Exception ex, [CallerMemberName] string? methodName = null)
         {
             WriteLine(source.GetType(), methodName, null, ex);
         }
 
         [Conditional("DEBUG")]
-        public static void WriteLine(Type type, string message = null, Exception ex = null, [CallerMemberName] string methodName = null)
+        public static void WriteLine(Type type, string? message = null, Exception? ex = null, [CallerMemberName] string? methodName = null)
         {
             WriteLine(type, methodName, message, ex);
         }
 
         [Conditional("DEBUG")]
-        public static void WriteLine(Type type, Exception ex, [CallerMemberName] string methodName = null)
+        public static void WriteLine(Type type, Exception ex, [CallerMemberName] string? methodName = null)
         {
             WriteLine(type, methodName, null, ex);
         }
 
-        private static void WriteLine(Type type, string methodName, string message, Exception ex)
+        private static void WriteLine(Type? type, string? methodName, string? message, Exception? ex)
         {
             var typeName = string.Empty;
             methodName = methodName ?? string.Empty;

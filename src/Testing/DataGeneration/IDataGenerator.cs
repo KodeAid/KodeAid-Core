@@ -16,7 +16,7 @@ namespace KodeAid.Testing.DataGeneration
         DateTime GetDate(DateTime minimum, DateTime maximum);
         decimal GetDecimal(decimal minimum, decimal maximum, int precision = 2);
         int GetInteger(int minimum, int maximum);
-        string GetString(int minimumLength, int maximumLength, string characterSet = null);
+        string GetString(int minimumLength, int maximumLength, string? characterSet = null);
 
         /// <summary>
         /// Gets a string from a mask.
@@ -27,6 +27,6 @@ namespace KodeAid.Testing.DataGeneration
         /// 'z' is lower case alphanumeric.
         /// All other characters are copied as is.
         /// </summary>
-        string GetString(string mask);
+        string? GetString(string? mask);
     }
 }

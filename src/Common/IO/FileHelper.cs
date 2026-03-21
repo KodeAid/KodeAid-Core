@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 
@@ -21,7 +22,7 @@ namespace KodeAid.IO
             throw new FileNotFoundException($"File '{fileName}' was not found.", fileName);
         }
 
-        public static bool TryFindFile(string fileName, out string foundFileName)
+        public static bool TryFindFile(string fileName, [NotNullWhen(true)] out string? foundFileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -92,7 +93,7 @@ namespace KodeAid.IO
             catch { }
 
             foundFileName = null;
-            return true;
+            return false;
         }
     }
 }

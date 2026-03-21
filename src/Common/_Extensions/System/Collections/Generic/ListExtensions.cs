@@ -8,7 +8,7 @@ namespace System.Collections.Generic
 {
     public static class ListExtensions
     {
-        public static void InsertRange<T>(this IList<T> list, int index, IEnumerable<T> items)
+        public static void InsertRange<T>(this IList<T> list, int index, IEnumerable<T>? items)
         {
             ArgCheck.NotNull(nameof(list), list);
 
@@ -24,7 +24,7 @@ namespace System.Collections.Generic
         /// <summary>
         /// Clears the list and then adds the specificed items.
         /// </summary>
-        public static void Replace<T>(this IList<T> list, IEnumerable<T> items)
+        public static void Replace<T>(this IList<T> list, IEnumerable<T>? items)
         {
             ArgCheck.NotNull(nameof(list), list);
 

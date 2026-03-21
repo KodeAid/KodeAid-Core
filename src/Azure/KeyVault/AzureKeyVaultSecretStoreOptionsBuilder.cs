@@ -8,9 +8,9 @@ namespace KodeAid.Azure.KeyVault
 {
     public sealed class AzureKeyVaultSecretStoreOptionsBuilder
     {
-        private string _keyVaultName;
-        private string _endpointSuffix;
-        private string _keyVaultBaseUrl;
+        private string? _keyVaultName;
+        private string? _endpointSuffix;
+        private string? _keyVaultBaseUrl;
         private X509KeyStorageFlags _keyStorageFlags = X509KeyStorageFlags.MachineKeySet;
 
         public AzureKeyVaultSecretStoreOptions Build()
@@ -27,7 +27,7 @@ namespace KodeAid.Azure.KeyVault
         /// <summary>
         /// Sets the name of the Azure key vault (eg. "MyKeyVault") and optionally the endpoint suffix which by default is ("vault.azure.net").
         /// </summary>
-        public AzureKeyVaultSecretStoreOptionsBuilder WithKeyVault(string keyVaultName, string endpointSuffix = null)
+        public AzureKeyVaultSecretStoreOptionsBuilder WithKeyVault(string keyVaultName, string? endpointSuffix = null)
         {
             _keyVaultName = keyVaultName;
             _endpointSuffix = endpointSuffix;

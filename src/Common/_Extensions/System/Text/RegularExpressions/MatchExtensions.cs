@@ -9,7 +9,7 @@ namespace System.Text.RegularExpressions
 {
     public static class MatchExtensions
     {
-        public static string GetFirstInnerMostGroupCapture(this Match match)
+        public static string? GetFirstInnerMostGroupCapture(this Match match)
         {
             ArgCheck.NotNull(nameof(match), match);
             if (match.Success && match.Groups != null)

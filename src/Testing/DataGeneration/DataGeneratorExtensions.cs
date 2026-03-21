@@ -45,7 +45,7 @@ namespace KodeAid.Testing.DataGeneration
             return dataGenerator.ChooseString(values, nullOdds);
         }
 
-        public static string ChooseString(this IDataGenerator dataGenerator, IEnumerable<string> values, int nullOdds = 0)
+        public static string? ChooseString(this IDataGenerator dataGenerator, IEnumerable<string> values, int nullOdds = 0)
         {
             if (dataGenerator.IsNull(nullOdds))
             {
@@ -117,22 +117,22 @@ namespace KodeAid.Testing.DataGeneration
             return char.ToUpper(words[0]).ToString() + words.Substring(1);
         }
 
-        public static string GetFirstName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetFirstName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.FirstNames, nullOdds);
         }
 
-        public static string GetMiddleName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetMiddleName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.MiddleNames, nullOdds);
         }
 
-        public static string GetLastName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetLastName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.LastNames, nullOdds);
         }
 
-        public static string GetFullName(this IDataGenerator dataGenerator, bool withMiddleName = false, int nullOdds = 0)
+        public static string? GetFullName(this IDataGenerator dataGenerator, bool withMiddleName = false, int nullOdds = 0)
         {
             if (dataGenerator.IsNull(nullOdds))
             {
@@ -147,7 +147,7 @@ namespace KodeAid.Testing.DataGeneration
             return $"{dataGenerator.GetFirstName()} {dataGenerator.GetLastName()}";
         }
 
-        public static string GetCompanyName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetCompanyName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.CompanyNames, nullOdds);
         }
@@ -162,7 +162,7 @@ namespace KodeAid.Testing.DataGeneration
             return $"{prefix}{dataGenerator.GetNumber(3)}{dataGenerator.GetNumber(3)}{dataGenerator.GetNumber(4, canStartWithZero: true)}";
         }
 
-        public static string GetDomainName(this IDataGenerator dataGenerator, string companyName = null, int nullOdds = 0)
+        public static string? GetDomainName(this IDataGenerator dataGenerator, string? companyName = null, int nullOdds = 0)
         {
             if (dataGenerator.IsNull(nullOdds))
             {
@@ -179,7 +179,7 @@ namespace KodeAid.Testing.DataGeneration
             return dataGenerator.ChooseString(DataGenerationSets.DomainNames);
         }
 
-        public static string GetWebsite(this IDataGenerator dataGenerator, string companyName = null, int nullOdds = 0)
+        public static string? GetWebsite(this IDataGenerator dataGenerator, string? companyName = null, int nullOdds = 0)
         {
             var domainName = dataGenerator.GetDomainName(companyName, nullOdds);
 
@@ -191,7 +191,7 @@ namespace KodeAid.Testing.DataGeneration
             return $"www.{domainName}";
         }
 
-        public static string GetEmail(this IDataGenerator dataGenerator, string firstName = null, string lastName = null, string companyName = null, int nullOdds = 0)
+        public static string? GetEmail(this IDataGenerator dataGenerator, string? firstName = null, string? lastName = null, string? companyName = null, int nullOdds = 0)
         {
             var domainName = dataGenerator.GetDomainName(companyName, nullOdds);
 
@@ -210,7 +210,7 @@ namespace KodeAid.Testing.DataGeneration
             return $"{dataGenerator.GetInteger(1, 9999)} {dataGenerator.GetStreetName()}";
         }
 
-        public static string GetStreetName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetStreetName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             var streetName = dataGenerator.ChooseString(DataGenerationSets.StreetNames, nullOdds);
 
@@ -222,17 +222,17 @@ namespace KodeAid.Testing.DataGeneration
             return streetName;
         }
 
-        public static string GetCityName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetCityName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.CityNames, nullOdds);
         }
 
-        public static string GetProvinceCode(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetProvinceCode(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.ProvinceCodes, nullOdds);
         }
 
-        public static string GetProvinceName(this IDataGenerator dataGenerator, int nullOdds = 0)
+        public static string? GetProvinceName(this IDataGenerator dataGenerator, int nullOdds = 0)
         {
             return dataGenerator.ChooseString(DataGenerationSets.ProvinceNames, nullOdds);
         }
@@ -308,7 +308,7 @@ namespace KodeAid.Testing.DataGeneration
             return dataGenerator.GetInteger(1, nullOdds) == nullOdds;
         }
 
-        private static string LowercaseLettersOnly(string str)
+        private static string? LowercaseLettersOnly(string? str)
         {
             return Regex.Replace(str?.ToLowerInvariant() ?? string.Empty, @"[^a-z]", string.Empty, RegexOptions.Compiled).TrimToNull();
         }

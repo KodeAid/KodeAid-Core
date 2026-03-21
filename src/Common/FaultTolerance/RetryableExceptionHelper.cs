@@ -13,12 +13,12 @@ namespace KodeAid.FaultTolerance
 {
     public static class RetryableExceptionHelper
     {
-        public static bool CheckForRetryableException(Exception exception)
+        public static bool CheckForRetryableException(Exception? exception)
         {
             return CheckForRetryableException<IRetryable>(exception, retryable => retryable.CanRetry);
         }
 
-        public static bool CheckForRetryableException<T>(Exception exception, Func<T, bool> canRetry = null, bool skipAggregateExceptions = false)
+        public static bool CheckForRetryableException<T>(Exception? exception, Func<T, bool>? canRetry = null, bool skipAggregateExceptions = false)
         {
             if (exception == null)
             {
@@ -63,17 +63,17 @@ namespace KodeAid.FaultTolerance
             return false;
         }
 
-        public static bool CheckForRetryableHttpRequestException(Exception exception)
+        public static bool CheckForRetryableHttpRequestException(Exception? exception)
         {
             return CheckForRetryableException<HttpRequestException>(exception, IsHttpRequestExceptionRetryable);
         }
 
-        public static bool CheckForRetryableSocketException(Exception exception)
+        public static bool CheckForRetryableSocketException(Exception? exception)
         {
             return CheckForRetryableException<SocketException>(exception, IsSocketExceptionRetryable);
         }
 
-        public static bool CheckForRetryableTimeoutException(Exception exception)
+        public static bool CheckForRetryableTimeoutException(Exception? exception)
         {
             return CheckForRetryableException<TimeoutException>(exception);
         }

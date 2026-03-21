@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Diagnostics.CodeAnalysis;
 using KodeAid;
 
 namespace System.Xml.Linq
@@ -21,17 +22,18 @@ namespace System.Xml.Linq
             }
         }
 
-        public static string GetChildElementValue(this XElement element, XName childElementName)
+        public static string? GetChildElementValue(this XElement element, XName childElementName)
         {
             return GetChildElementValue<string>(element, childElementName);
         }
 
+        [return: MaybeNull]
         public static T GetChildElementValue<T>(this XElement element, XName childElementName, T defaultValue = default)
         {
-            return (T)GetChildElementValue(element, childElementName, typeof(T), defaultValue);
+            return (T)GetChildElementValue(element, childElementName, typeof(T), defaultValue)!;
         }
 
-        public static object GetChildElementValue(this XElement element, XName childElementName, Type type, object defaultValue = null)
+        public static object? GetChildElementValue(this XElement element, XName childElementName, Type type, object? defaultValue = null)
         {
             ArgCheck.NotNull(nameof(type), type);
             try
@@ -49,17 +51,18 @@ namespace System.Xml.Linq
             return ParseValue(null, type, defaultValue);
         }
 
-        public static string GetAttributeValue(this XElement element, XName attributeName)
+        public static string? GetAttributeValue(this XElement element, XName attributeName)
         {
             return GetAttributeValue(element, attributeName, default(string));
         }
 
+        [return: MaybeNull]
         public static T GetAttributeValue<T>(this XElement element, XName attributeName, T defaultValue = default)
         {
-            return (T)GetAttributeValue(element, attributeName, typeof(T), defaultValue);
+            return (T)GetAttributeValue(element, attributeName, typeof(T), defaultValue)!;
         }
 
-        public static object GetAttributeValue(this XElement element, XName attributeName, Type type, object defaultValue = null)
+        public static object? GetAttributeValue(this XElement element, XName attributeName, Type type, object? defaultValue = null)
         {
             ArgCheck.NotNull(nameof(type), type);
             try
@@ -77,7 +80,7 @@ namespace System.Xml.Linq
             return ParseValue(null, type, defaultValue);
         }
 
-        public static XElement ToXElement(this XmlNode node)
+        public static XElement? ToXElement(this XmlNode? node)
         {
             if (node == null)
             {
@@ -93,7 +96,7 @@ namespace System.Xml.Linq
             return doc.Root;
         }
 
-        public static XmlDocument ToXmlDocument(this XElement element)
+        public static XmlDocument? ToXmlDocument(this XElement? element)
         {
             if (element == null)
             {
@@ -108,17 +111,17 @@ namespace System.Xml.Linq
             }
         }
 
-        public static XmlElement ToXmlElement(this XElement element)
+        public static XmlElement? ToXmlElement(this XElement? element)
         {
             if (element == null)
             {
                 return null;
             }
 
-            return ToXmlDocument(element).DocumentElement;
+            return ToXmlDocument(element)!.DocumentElement;
         }
 
-        private static object ParseValue(string value, Type type, object defaultValue = null)
+        private static object? ParseValue(string? value, Type type, object? defaultValue = null)
         {
             return ParseHelper.ParseOrDefault(value, type, false, defaultValue);
         }

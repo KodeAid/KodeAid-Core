@@ -10,6 +10,6 @@ namespace KodeAid.Storage
 {
     public interface IStreamResult : IStoreResult, IDisposable
     {
-        Stream Stream { get; }
+        Stream? Stream { get; }
     }
 }

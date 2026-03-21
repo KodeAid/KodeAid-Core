@@ -8,6 +8,6 @@ namespace KodeAid.Storage
 {
     public interface IBlobResult : IBlobMeta, IStoreResult
     {
-        Stream Content { get; set; }
+        Stream? Content { get; set; }
     }
 }

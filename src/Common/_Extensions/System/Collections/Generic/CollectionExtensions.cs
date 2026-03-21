@@ -9,7 +9,7 @@ namespace System.Collections.Generic
 {
     public static class CollectionExtensions
     {
-        public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+        public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T>? items)
         {
             ArgCheck.NotNull(nameof(collection), collection);
 
@@ -22,7 +22,7 @@ namespace System.Collections.Generic
             }
         }
 
-        public static void RemoveRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+        public static void RemoveRange<T>(this ICollection<T> collection, IEnumerable<T>? items)
         {
             ArgCheck.NotNull(nameof(collection), collection);
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -19,7 +20,7 @@ namespace KodeAid
             return (T)Convert(value, typeof(T));
         }
 
-        public static object Convert(object value, Type targetType)
+        public static object? Convert(object? value, Type targetType)
         {
             if (TryConvert(value, targetType, out var result))
             {
@@ -35,7 +36,7 @@ namespace KodeAid
             return (T)ConvertOrDefault(value, typeof(T), defaultValue);
         }
 
-        public static object ConvertOrDefault(object value, Type targetType, object defaultValue = null)
+        public static object? ConvertOrDefault(object? value, Type targetType, object? defaultValue = null)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
 
@@ -52,11 +53,11 @@ namespace KodeAid
             return defaultValue;
         }
 
-        public static bool TryConvert<T>(object value, out T result)
+        public static bool TryConvert<T>(object? value, [MaybeNullWhen(false)] out T result)
         {
             if (TryConvert(value, typeof(T), out var r))
             {
-                result = (T)r;
+                result = (T)r!;
                 return true;
             }
 
@@ -64,12 +65,12 @@ namespace KodeAid
             return false;
         }
 
-        public static bool TryConvert(ref object value, Type targetType)
+        public static bool TryConvert(ref object? value, Type targetType)
         {
             return TryConvert(value, targetType, out value);
         }
 
-        public static bool TryConvert(object value, Type targetType, out object result)
+        public static bool TryConvert(object? value, Type targetType, out object? result)
         {
             ArgCheck.NotNull(nameof(targetType), targetType);
 

@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="init">The intialization to perform on the activated object.</param>
         /// <param name="parameters">Constructor arguments not provided by the provider.</param>
         /// <returns>An activated object of type T and initialized via <paramref name="init"/>.</returns>
-        public static T CreateInstance<T>(this IServiceProvider provider, object[] parameters, Action<T> init)
+        public static T CreateInstance<T>(this IServiceProvider provider, object[] parameters, Action<T>? init)
         {
             var instance = provider.CreateInstance<T>(parameters);
 
@@ -63,7 +63,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="init">The intialization to perform on the resolved service or created instance, where the first argument is True if an instance was created.</param>
         /// <param name="parameters">Constructor arguments not provided by the provider.</param>
         /// <returns>The resolved service or created instance of type T, and initialized via <paramref name="init"/>.</returns>
-        public static T GetServiceOrCreateInstance<T>(this IServiceProvider provider, object[] parameters, Action<bool, T> init)
+        public static T GetServiceOrCreateInstance<T>(this IServiceProvider provider, object[] parameters, Action<bool, T>? init)
         {
             var created = false;
             var service = provider.GetService<T>();
@@ -90,7 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="init">The intialization to perform on the service object.</param>
         /// <returns>A service object of type T.</returns>
         /// <exception cref="InvalidOperationException">There is no service of type T.</exception>
-        public static T GetRequiredService<T>(this IServiceProvider provider, Action<T> init)
+        public static T GetRequiredService<T>(this IServiceProvider provider, Action<T>? init)
         {
             var service = provider.GetRequiredService<T>();
 
@@ -109,7 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="provider">The System.IServiceProvider to retrieve the service object from.</param>
         /// <param name="init">The intialization to perform on the service object.</param>
         /// <returns>A service object of type T or null if there is no such service.</returns>
-        public static T GetService<T>(this IServiceProvider provider, Action<T> init)
+        public static T GetService<T>(this IServiceProvider provider, Action<T>? init)
         {
             var service = provider.GetService<T>();
 

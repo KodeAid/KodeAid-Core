@@ -11,7 +11,7 @@ namespace KodeAid.Json
     /// </summary>
     public class JsonSerializer : JsonSerializerBase
     {
-        public JsonSerializerSettings Settings { get; set; }
+        public JsonSerializerSettings? Settings { get; set; }
 
         protected override Newtonsoft.Json.JsonSerializer GetInnerSerializer()
         {

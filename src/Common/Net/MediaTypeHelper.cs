@@ -21,7 +21,7 @@ namespace KodeAid.Net
             throw new NotSupportedException("File type is not supported.");
         }
 
-        public static string GetMediaTypeFromFileNameOrDefault(string fileName, string defaultMediaType = null)
+        public static string? GetMediaTypeFromFileNameOrDefault(string fileName, string? defaultMediaType = null)
         {
             if (TryGetMediaTypeFromFileName(fileName, out var mediaType))
             {
@@ -31,7 +31,7 @@ namespace KodeAid.Net
             return defaultMediaType;
         }
 
-        public static bool TryGetMediaTypeFromFileName(string fileName, out string mediaType)
+        public static bool TryGetMediaTypeFromFileName(string fileName, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? mediaType)
         {
             var ext = (fileName.Contains(".") ? Path.GetExtension(fileName) : fileName).Trim('.', ' ');
             return _extensionToMediaTypeMappings.TryGetValue(ext, out mediaType);

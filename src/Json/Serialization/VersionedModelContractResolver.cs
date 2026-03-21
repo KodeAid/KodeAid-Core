@@ -15,9 +15,9 @@ namespace KodeAid.Json.Serialization
     public class VersionedModelContractResolver : DefaultContractResolver
     {
         private readonly Func<Version> _getCurrentVersion;
-        private readonly IEqualityComparer<Version> _comparer;
+        private readonly IEqualityComparer<Version>? _comparer;
 
-        public VersionedModelContractResolver(Func<Version> getCurrentVersion, IEqualityComparer<Version> comparer = null)
+        public VersionedModelContractResolver(Func<Version> getCurrentVersion, IEqualityComparer<Version>? comparer = null)
         {
             ArgCheck.NotNull(nameof(getCurrentVersion), getCurrentVersion);
             _getCurrentVersion = getCurrentVersion;

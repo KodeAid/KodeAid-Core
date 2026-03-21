@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -29,7 +30,8 @@ namespace KodeAid
         /// <summary>
         /// Normalizes an string representation of an enumeration by replacing any occurences of <see cref="EnumMemberAttribute"/> with their corresponding constant name.
         /// </summary>
-        public static string NormalizeName<TEnum>(string value, bool ignoreCase = false, bool ignoreWhitespace = false, string flagsDelimiter = ", ")
+        [return: NotNullIfNotNull(nameof(value))]
+        public static string? NormalizeName<TEnum>(string? value, bool ignoreCase = false, bool ignoreWhitespace = false, string flagsDelimiter = ", ")
             where TEnum : struct, Enum
         {
             return NormalizeName(Enum<TEnum>.Info, value, ignoreCase, ignoreWhitespace, flagsDelimiter);
@@ -38,7 +40,8 @@ namespace KodeAid
         /// <summary>
         /// Normalizes an string representation of an enumeration by replacing any occurences of <see cref="EnumMemberAttribute"/> with their corresponding constant name.
         /// </summary>
-        public static string NormalizeName(Type enumType, string value, bool ignoreCase = false, bool ignoreWhitespace = false, string flagsDelimiter = ", ")
+        [return: NotNullIfNotNull(nameof(value))]
+        public static string? NormalizeName(Type enumType, string? value, bool ignoreCase = false, bool ignoreWhitespace = false, string flagsDelimiter = ", ")
         {
             return NormalizeName(GetEnumInfo(enumType), value, ignoreCase, ignoreWhitespace, flagsDelimiter);
         }
@@ -120,7 +123,8 @@ namespace KodeAid
             return Enum.TryParse(value, ignoreCase, out result);
         }
 
-        private static string NormalizeName(EnumInfo enumInfo, string str, bool ignoreCase, bool ignoreWhitespace, string flagsDelimiter)
+        [return: NotNullIfNotNull(nameof(str))]
+        private static string? NormalizeName(EnumInfo enumInfo, string? str, bool ignoreCase, bool ignoreWhitespace, string flagsDelimiter)
         {
             if (str == null)
             {
@@ -175,7 +179,7 @@ namespace KodeAid
 
         private static EnumInfo GetEnumInfo(Type enumType)
         {
-            return (EnumInfo)typeof(Enum<>).MakeGenericType(enumType).GetField(nameof(Enum<TypeCode>.Info), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            return (EnumInfo)typeof(Enum<>).MakeGenericType(enumType).GetField(nameof(Enum<TypeCode>.Info), BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!;
         }
 
         private struct EnumInfo
@@ -183,7 +187,7 @@ namespace KodeAid
             public Type EnumType;
             public bool HasFlags;
             public bool HasSerializationNames;
-            public List<(object Value, string Name, string SerializationName)> Names;
+            public List<(object Value, string Name, string? SerializationName)> Names;
         }
 
         private static class Enum<TEnum>

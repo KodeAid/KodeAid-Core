@@ -16,13 +16,13 @@ namespace KodeAid.AspNetCore.Http.Logging.Response
         /// </summary>
         public int MaxBodyByteCount { get; set; }
 
-        public Func<HttpContext, bool> ShouldLog { get; set; }
+        public Func<HttpContext, bool>? ShouldLog { get; set; }
 
         /// <summary>
         /// The name of the logger category.
         /// Will default to "KodeAid.AspNetCore.Http.Logging.Response" if null.
         /// </summary>
-        public string LoggerName { get; set; }
+        public string? LoggerName { get; set; }
 
         public string LogPrefix { get; set; } = "RESPONSE TRACE: ";
     }

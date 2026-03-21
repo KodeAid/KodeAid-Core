@@ -14,7 +14,7 @@ namespace KodeAid.Security.Cryptography
     {
         private static readonly Encoding _defaultEncoding = Encoding.UTF8;
 
-        public static byte[] ProtectString(this IDataProtector dataProtector, string unprotectedString, Encoding encoding = null)
+        public static byte[] ProtectString(this IDataProtector dataProtector, string unprotectedString, Encoding? encoding = null)
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(unprotectedString), unprotectedString);
@@ -22,7 +22,7 @@ namespace KodeAid.Security.Cryptography
             return dataProtector.ProtectData((encoding ?? _defaultEncoding).GetBytes(unprotectedString));
         }
 
-        public static byte[] ProtectStrings(this IDataProtector dataProtector, string[] unprotectedStrings, Encoding encoding = null)
+        public static byte[] ProtectStrings(this IDataProtector dataProtector, string[] unprotectedStrings, Encoding? encoding = null)
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(unprotectedStrings), unprotectedStrings);
@@ -40,7 +40,7 @@ namespace KodeAid.Security.Cryptography
             return dataProtector.ProtectStrings(unprotectedStrings, encoding);
         }
 
-        public static string UnprotectString(this IDataProtector dataProtector, byte[] protectedData, Encoding encoding = null)
+        public static string UnprotectString(this IDataProtector dataProtector, byte[] protectedData, Encoding? encoding = null)
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(protectedData), protectedData);
@@ -48,7 +48,7 @@ namespace KodeAid.Security.Cryptography
             return (encoding ?? _defaultEncoding).GetString(dataProtector.UnprotectData(protectedData));
         }
 
-        public static string[] UnprotectStrings(this IDataProtector dataProtector, byte[] protectedData, Encoding encoding = null)
+        public static string[] UnprotectStrings(this IDataProtector dataProtector, byte[] protectedData, Encoding? encoding = null)
         {
             ArgCheck.NotNull(nameof(dataProtector), dataProtector);
             ArgCheck.NotNull(nameof(protectedData), protectedData);
@@ -68,7 +68,7 @@ namespace KodeAid.Security.Cryptography
             return bytes.ToBase64String();
         }
 
-        public static string ProtectStringToBase64(this IDataProtector dataProtector, string unprotectedString, Encoding encoding = null, bool urlEncoded = false)
+        public static string ProtectStringToBase64(this IDataProtector dataProtector, string unprotectedString, Encoding? encoding = null, bool urlEncoded = false)
         {
             var bytes = dataProtector.ProtectString(unprotectedString, encoding);
 
@@ -80,7 +80,7 @@ namespace KodeAid.Security.Cryptography
             return bytes.ToBase64String();
         }
 
-        public static string ProtectStringsToBase64(this IDataProtector dataProtector, string[] unprotectedStrings, Encoding encoding = null, bool urlEncoded = false)
+        public static string ProtectStringsToBase64(this IDataProtector dataProtector, string[] unprotectedStrings, Encoding? encoding = null, bool urlEncoded = false)
         {
             var bytes = dataProtector.ProtectStrings(unprotectedStrings, encoding);
 
@@ -129,7 +129,7 @@ namespace KodeAid.Security.Cryptography
             return dataProtector.UnprotectData(bytes);
         }
 
-        public static string UnprotectStringFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
+        public static string UnprotectStringFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding? encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
 
@@ -137,7 +137,7 @@ namespace KodeAid.Security.Cryptography
             return dataProtector.UnprotectString(bytes, encoding);
         }
 
-        public static string[] UnprotectStringsFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding encoding = null, bool urlEncoded = false)
+        public static string[] UnprotectStringsFromBase64(this IDataProtector dataProtector, string protectedBase64, Encoding? encoding = null, bool urlEncoded = false)
         {
             ArgCheck.NotNull(nameof(protectedBase64), protectedBase64);
 

@@ -23,14 +23,14 @@ namespace KodeAid.Caching.MemoryCache
             _client = new MSMemoryCache(name);
         }
 
-        protected override Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition)
+        protected override Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string? partition)
         {
             if (!string.IsNullOrEmpty(partition))
                 keys = keys.Select(key => $"${partition}$|{key}").ToList();
             return Task.FromResult(_client.GetValues(keys, null).Select(pair => (CacheItem<T>)pair.Value).ToList().AsEnumerable());
         }
 
-        protected override Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition)
+        protected override Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string? partition)
         {
             var utcNow = DateTimeOffset.UtcNow;
             foreach (var item in items)
@@ -52,7 +52,7 @@ namespace KodeAid.Caching.MemoryCache
             return Task.CompletedTask;
         }
 
-        protected override Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
+        protected override Task RemoveKeysAsync(IEnumerable<string> keys, string? partition = null)
         {
             if (!string.IsNullOrEmpty(partition))
                 keys = keys.Select(key => $"${partition}$|{key}").ToList();

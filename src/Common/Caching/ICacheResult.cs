@@ -3,13 +3,14 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace KodeAid.Caching
 {
     public interface ICacheResult<T>
     {
-        string Key { get; }
-        T Value { get; }
+        string? Key { get; }
+        [MaybeNull] T Value { get; }
         bool IsHit { get; }
         DateTimeOffset? LastUpdated { get; }
     }

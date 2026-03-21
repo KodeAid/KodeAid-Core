@@ -25,14 +25,14 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
         private readonly IDocumentClient _client;
         private readonly string _databaseName;
         private readonly string _collectionName;
-        private readonly string _documentTypeName;
+        private readonly string? _documentTypeName;
         private readonly Uri _collectionUri;
-        private readonly JsonSerializerSettings _serializerSettings;
+        private readonly JsonSerializerSettings? _serializerSettings;
 
         public DocumentRepository(
             IDocumentClient client,
-            string databaseName, string collectionName, string documentTypeName = null,
-            JsonSerializerSettings serializerSettings = null)
+            string databaseName, string collectionName, string? documentTypeName = null,
+            JsonSerializerSettings? serializerSettings = null)
         {
             ArgCheck.NotNull(nameof(client), client);
             ArgCheck.NotNullOrEmpty(nameof(databaseName), databaseName);
@@ -50,7 +50,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             string endpoint, string accessKeyOrResourceToken,
             string databaseName, string collectionName, string documentTypeName = null,
             JsonSerializerSettings serializerSettings = null,
-            ConnectionPolicy connectionPolicy = null, ConsistencyLevel? consistencyLevel = null)
+            ConnectionPolicy? connectionPolicy = null, ConsistencyLevel? consistencyLevel = null)
         {
             ArgCheck.NotNullOrEmpty(nameof(endpoint), endpoint);
             ArgCheck.NotNullOrEmpty(nameof(accessKeyOrResourceToken), accessKeyOrResourceToken);
@@ -71,7 +71,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             string endpoint, SecureString accessKey,
             string databaseName, string collectionName, string documentTypeName = null,
             JsonSerializerSettings serializerSettings = null,
-            ConnectionPolicy connectionPolicy = null, ConsistencyLevel? consistencyLevel = null)
+            ConnectionPolicy? connectionPolicy = null, ConsistencyLevel? consistencyLevel = null)
         {
             ArgCheck.NotNullOrEmpty(nameof(endpoint), endpoint);
             ArgCheck.NotNull(nameof(accessKey), accessKey);
@@ -86,7 +86,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             _collectionUri = UriFactory.CreateDocumentCollectionUri(_databaseName, _collectionName);
         }
 
-        public async Task<TDocument> GetAsync(string id, string partitionKey = null, CancellationToken cancellationToken = default)
+        public async Task<TDocument> GetAsync(string id, string? partitionKey = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(id), id);
             cancellationToken.ThrowIfCancellationRequested();
@@ -107,12 +107,12 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             }
         }
 
-        public Task<IEnumerable<TDocument>> GetAllAsync(object partitionKey = null, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<TDocument>> GetAllAsync(object? partitionKey = null, CancellationToken cancellationToken = default)
         {
             return FindAsync(null, partitionKey, cancellationToken);
         }
 
-        public async Task<IEnumerable<TDocument>> FindAsync(Expression<Func<TDocument, bool>> predicate, object partitionKey = null, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TDocument>> FindAsync(Expression<Func<TDocument, bool>>? predicate, object? partitionKey = null, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -138,7 +138,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return results;
         }
 
-        public async Task<string> AddAsync(TDocument document, object partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+        public async Task<string> AddAsync(TDocument document, object? partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(document), document);
             cancellationToken.ThrowIfCancellationRequested();
@@ -152,7 +152,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return (await _client.CreateDocumentAsync(_collectionUri, document, options).ConfigureAwait(false)).Resource.Id;
         }
 
-        public async Task<IEnumerable<string>> AddRangeAsync(IEnumerable<TDocument> documents, object partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<string>> AddRangeAsync(IEnumerable<TDocument> documents, object? partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
@@ -160,7 +160,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return (await Task.WhenAll(documents.Select(document => AddAsync(document, partitionKey, ttl, cancellationToken)).ToList()).ConfigureAwait(false)).ToList();
         }
 
-        public Task UpdateAsync(TDocument document, object partitionKey = null, string eTag = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+        public Task UpdateAsync(TDocument document, object? partitionKey = null, string? eTag = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(document), document);
             cancellationToken.ThrowIfCancellationRequested();
@@ -175,7 +175,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return _client.ReplaceDocumentAsync(GetDocumentUri(document), document, options);
         }
 
-        public Task UpdateRangeAsync(IEnumerable<TDocument> documents, object partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+        public Task UpdateRangeAsync(IEnumerable<TDocument> documents, object? partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
@@ -183,7 +183,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return Task.WhenAll(documents.Select(document => UpdateAsync(document, partitionKey, null, ttl, cancellationToken)).ToList());
         }
 
-        public async Task<string> SaveAsync(TDocument document, string documentType = null, object partitionKey = null, string eTag = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+        public async Task<string> SaveAsync(TDocument document, string? documentType = null, object? partitionKey = null, string? eTag = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(document), document);
             cancellationToken.ThrowIfCancellationRequested();
@@ -198,7 +198,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return (await _client.UpsertDocumentAsync(_collectionUri, document, options).ConfigureAwait(false)).Resource.Id;
         }
 
-        public async Task<IEnumerable<string>> SaveRangeAsync(IEnumerable<TDocument> documents, string documentType = null, object partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<string>> SaveRangeAsync(IEnumerable<TDocument> documents, string? documentType = null, object? partitionKey = null, TimeSpan? ttl = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
@@ -206,7 +206,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return (await Task.WhenAll(documents.Select(document => SaveAsync(document, documentType, partitionKey, null, ttl, cancellationToken)).ToList()).ConfigureAwait(false)).ToList();
         }
 
-        public Task RemoveAsync(TDocument document, object partitionKey = null, CancellationToken cancellationToken = default)
+        public Task RemoveAsync(TDocument document, object? partitionKey = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(document), document);
             cancellationToken.ThrowIfCancellationRequested();
@@ -215,7 +215,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return _client.DeleteDocumentAsync(GetDocumentUri(GetIdFromDocument(document)), options);
         }
 
-        public Task RemoveRangeAsync(IEnumerable<TDocument> documents, object partitionKey = null, CancellationToken cancellationToken = default)
+        public Task RemoveRangeAsync(IEnumerable<TDocument> documents, object? partitionKey = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(documents), documents);
             cancellationToken.ThrowIfCancellationRequested();
@@ -223,7 +223,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return Task.WhenAll(documents.Select(document => RemoveAsync(document, partitionKey, cancellationToken)).ToList());
         }
 
-        public Task RemoveAsync(string id, object partitionKey = null, CancellationToken cancellationToken = default)
+        public Task RemoveAsync(string id, object? partitionKey = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNullOrEmpty(nameof(id), id);
             cancellationToken.ThrowIfCancellationRequested();
@@ -232,7 +232,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return _client.DeleteDocumentAsync(GetDocumentUri(id), options);
         }
 
-        public Task RemoveRangeAsync(IEnumerable<string> ids, object partitionKey = null, CancellationToken cancellationToken = default)
+        public Task RemoveRangeAsync(IEnumerable<string> ids, object? partitionKey = null, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(ids), ids);
             cancellationToken.ThrowIfCancellationRequested();
@@ -248,7 +248,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             await RemoveRangeAsync(documents, cancellationToken).ConfigureAwait(false);
         }
 
-        public Task ClearAsync(object partitionKey, CancellationToken cancellationToken = default)
+        public Task ClearAsync(object? partitionKey, CancellationToken cancellationToken = default)
         {
             if (partitionKey == null)
                 return ClearAsync(cancellationToken);
@@ -287,7 +287,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return GetAllAsync(null, cancellationToken);
         }
 
-        Task<IEnumerable<TDocument>> IReadRepositoryAsync<TDocument>.FindAsync(Expression<Func<TDocument, bool>> predicate, CancellationToken cancellationToken)
+        Task<IEnumerable<TDocument>> IReadRepositoryAsync<TDocument>.FindAsync(Expression<Func<TDocument, bool>>? predicate, CancellationToken cancellationToken)
         {
             return FindAsync(predicate, null, cancellationToken);
         }
@@ -332,7 +332,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return GetDocumentUri(GetIdFromDocument(document));
         }
 
-        private FeedOptions SetPartitionKeyForFeed(object partitionKey, FeedOptions options = null)
+        private FeedOptions? SetPartitionKeyForFeed(object? partitionKey, FeedOptions? options = null)
         {
             if (partitionKey == null)
             {
@@ -346,7 +346,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return options;
         }
 
-        private RequestOptions SetPartitionKey(object partitionKey, RequestOptions options = null)
+        private RequestOptions? SetPartitionKey(object? partitionKey, RequestOptions? options = null)
         {
             if (partitionKey == null)
             {
@@ -360,7 +360,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return options;
         }
 
-        private RequestOptions SetETag(string eTag, RequestOptions options = null)
+        private RequestOptions? SetETag(string? eTag, RequestOptions? options = null)
         {
             if (eTag == null)
             {
@@ -374,7 +374,7 @@ namespace KodeAid.Azure.Cosmos.Documents.Repositories
             return options;
         }
 
-        private RequestOptions SetTimeToLive(TimeSpan? ttl, RequestOptions options = null)
+        private RequestOptions? SetTimeToLive(TimeSpan? ttl, RequestOptions? options = null)
         {
             if (!ttl.HasValue)
             {

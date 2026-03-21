@@ -40,7 +40,7 @@ namespace KodeAid.Testing
         {
         }
 
-        private TestDateTimeProvider(DateTimeOffset? dateTime, TimeSpan? utcOffset, TimeZoneInfo timeZone)
+        private TestDateTimeProvider(DateTimeOffset? dateTime, TimeSpan? utcOffset, TimeZoneInfo? timeZone)
         {
             _dateTime = dateTime;
             UtcOffset = utcOffset;
@@ -66,7 +66,7 @@ namespace KodeAid.Testing
             }
         }
 
-        public TimeZoneInfo TimeZone { get; set; }
+        public TimeZoneInfo? TimeZone { get; set; }
 
         public DateTimeOffset UtcNow => Now.ToUniversalTime();
 

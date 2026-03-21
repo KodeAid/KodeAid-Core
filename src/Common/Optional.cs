@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace KodeAid
 {
@@ -10,9 +11,9 @@ namespace KodeAid
     {
         public static readonly Optional<T> Undefined;
 
-        private readonly T _value;
+        [AllowNull] private readonly T _value;
 
-        public Optional(T value)
+        public Optional([AllowNull] T value)
         {
             _value = value;
             IsDefined = true;
@@ -42,7 +43,7 @@ namespace KodeAid
             return IsDefined ? _value : defaultValue;
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (!IsDefined)
             {

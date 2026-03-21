@@ -86,7 +86,7 @@ namespace KodeAid.ComponentModel
         /// <param name="value">The new value for the property to be assigned to the backing field <paramref name="propertyField"/> if they are considered to be unequal.</param>
         /// <param name="propertyName">The name of the property, defaults to null which will be populated by the calling member's name.</param>
         /// <returns>True if the property was changed; otherwise, false.</returns>
-        protected bool ChangeProperty<T>(ref T propertyField, T value, [CallerMemberName]string propertyName = null)
+        protected bool ChangeProperty<T>(ref T propertyField, T value, [CallerMemberName]string? propertyName = null)
         {
             return ChangeProperty(propertyName, ref propertyField, value);
         }

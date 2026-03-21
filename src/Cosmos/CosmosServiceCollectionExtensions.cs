@@ -20,15 +20,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a typed Cosmos client registration to the service collection.
         /// </summary>
-        public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, string connectionString, CosmosClientOptions options = null)
+        public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, string connectionString, CosmosClientOptions? options = null)
         {
-            return AddCosmosClient(services, typeof(T).FullName, connectionString, options);
+            return AddCosmosClient(services, typeof(T).FullName!, connectionString, options);
         }
 
         /// <summary>
         /// Adds a named Cosmos client registration to the service collection.
         /// </summary>
-        public static IServiceCollection AddCosmosClient(this IServiceCollection services, string name, string connectionString, CosmosClientOptions options = null)
+        public static IServiceCollection AddCosmosClient(this IServiceCollection services, string name, string connectionString, CosmosClientOptions? options = null)
         {
             return AddCosmosClient(services, name, new CosmosClientRegistration() { ConnectionString = connectionString, Options = options });
         }
@@ -36,15 +36,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a typed Cosmos client registration to the service collection.
         /// </summary>
-        public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, string accountEndpoint, string authKeyOrResourceToken, CosmosClientOptions options = null)
+        public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, string accountEndpoint, string authKeyOrResourceToken, CosmosClientOptions? options = null)
         {
-            return AddCosmosClient(services, typeof(T).FullName, accountEndpoint, authKeyOrResourceToken, options);
+            return AddCosmosClient(services, typeof(T).FullName!, accountEndpoint, authKeyOrResourceToken, options);
         }
 
         /// <summary>
         /// Adds a named Cosmos client registration to the service collection.
         /// </summary>
-        public static IServiceCollection AddCosmosClient(this IServiceCollection services, string name, string accountEndpoint, string authKeyOrResourceToken, CosmosClientOptions options = null)
+        public static IServiceCollection AddCosmosClient(this IServiceCollection services, string name, string accountEndpoint, string authKeyOrResourceToken, CosmosClientOptions? options = null)
         {
             return AddCosmosClient(services, name, new CosmosClientRegistration() { AccountEndpoint = accountEndpoint, AuthKeyOrResourceToken = authKeyOrResourceToken, Options = options });
         }
@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, Func<IServiceProvider, CosmosClientRegistration> clientRegistrationFactory)
         {
-            return AddCosmosClient(services, typeof(T).FullName, clientRegistrationFactory);
+            return AddCosmosClient(services, typeof(T).FullName!, clientRegistrationFactory);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCosmosClient<T>(this IServiceCollection services, CosmosClientRegistration clientRegistration)
         {
-            return AddCosmosClient(services, typeof(T).FullName, clientRegistration);
+            return AddCosmosClient(services, typeof(T).FullName!, clientRegistration);
         }
 
         /// <summary>

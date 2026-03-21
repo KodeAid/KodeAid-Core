@@ -40,7 +40,7 @@ namespace KodeAid.Testing.DataGeneration
             return _random.Next(minimum, maximum + 1);
         }
 
-        public string GetString(int minimumLength, int maximumLength, string characterSet = null)
+        public string GetString(int minimumLength, int maximumLength, string? characterSet = null)
         {
             var sb = new StringBuilder();
 
@@ -70,7 +70,7 @@ namespace KodeAid.Testing.DataGeneration
         /// 'x' is lower case alphanumeric.
         /// All other characters are copied as is.
         /// </summary>
-        public string GetString(string mask)
+        public string? GetString(string? mask)
         {
             if (mask == null)
             {

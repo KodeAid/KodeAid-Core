@@ -18,7 +18,7 @@ namespace System.Diagnostics
         /// <param name="tags">Tags of the new activity.</param>
         /// <param name="baggage">Baggage of the new activity.</param>
         /// <returns>The newly created but unstarted <see cref="Activity"/>, or null if <paramref name="operationName"/> is not enabled on <paramref name="diagnosticListener"/>.</returns>
-        public static Activity CreateActivity(this DiagnosticListener diagnosticListener, string operationName, string parentId = null, IEnumerable<KeyValuePair<string, string>> tags = null, IEnumerable<KeyValuePair<string, string>> baggage = null)
+        public static Activity? CreateActivity(this DiagnosticListener diagnosticListener, string operationName, string? parentId = null, IEnumerable<KeyValuePair<string, string>>? tags = null, IEnumerable<KeyValuePair<string, string>>? baggage = null)
         {
             if (!diagnosticListener.IsEnabled(operationName))
             {
@@ -62,7 +62,7 @@ namespace System.Diagnostics
         /// <param name="baggage">Baggage of the new activity.</param>
         /// <param name="startArgs">Arguments passed through to <see cref="DiagnosticSource.StartActivity(Activity, object)"/>.</param>
         /// <returns>The newly created and started <see cref="Activity"/>, or null if <paramref name="operationName"/> is not enabled on <paramref name="diagnosticListener"/>.</returns>
-        public static Activity StartActivity(this DiagnosticListener diagnosticListener, string operationName, string parentId = null, IEnumerable<KeyValuePair<string, string>> tags = null, IEnumerable<KeyValuePair<string, string>> baggage = null, object startArgs = null)
+        public static Activity? StartActivity(this DiagnosticListener diagnosticListener, string operationName, string? parentId = null, IEnumerable<KeyValuePair<string, string>>? tags = null, IEnumerable<KeyValuePair<string, string>>? baggage = null, object? startArgs = null)
         {
             var activity = diagnosticListener.CreateActivity(operationName, parentId, tags, baggage);
 

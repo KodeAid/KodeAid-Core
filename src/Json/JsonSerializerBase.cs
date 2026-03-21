@@ -27,7 +27,7 @@ namespace KodeAid.Json
             return sb.ToString();
         }
 
-        public object Deserialize(Type type, string json)
+        public object? Deserialize(Type type, string json)
         {
             ArgCheck.NotNull(nameof(type), type);
 
@@ -56,7 +56,7 @@ namespace KodeAid.Json
             await writer.FlushAsync().ConfigureAwait(false);
         }
 
-        public object DeserializeFromStream(Type type, Stream stream)
+        public object? DeserializeFromStream(Type type, Stream stream)
         {
             ArgCheck.NotNull(nameof(stream), stream);
 
@@ -64,7 +64,7 @@ namespace KodeAid.Json
             return DeserializeFromReader(type, reader);
         }
 
-        public Task<object> DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
+        public Task<object?> DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(stream), stream);
 
@@ -82,7 +82,7 @@ namespace KodeAid.Json
             jw.Flush();
         }
 
-        public object DeserializeFromReader(Type type, TextReader reader)
+        public object? DeserializeFromReader(Type type, TextReader reader)
         {
             ArgCheck.NotNull(nameof(reader), reader);
 
@@ -92,12 +92,12 @@ namespace KodeAid.Json
 
         Type ISerializer.SerializedType => typeof(string);
 
-        object ISerializer.Serialize(object value)
+        object ISerializer.Serialize(object graph)
         {
-            return Serialize(value);
+            return Serialize(graph);
         }
 
-        object ISerializer.Deserialize(Type type, object data)
+        object? ISerializer.Deserialize(Type type, object data)
         {
             return Deserialize(type, (string)data);
         }

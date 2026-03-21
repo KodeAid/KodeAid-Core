@@ -8,7 +8,7 @@ namespace KodeAid.Storage
 {
     public interface IStoreMeta : ICreatedTime, IUpdatedTime, IExpiredTime, IOptimisticConcurrency
     {
-        string Key { get; set; }
-        string Partition { get; set; }
+        string? Key { get; set; }
+        string? Partition { get; set; }
     }
 }

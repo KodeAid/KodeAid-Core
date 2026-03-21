@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddTransient<TService, TImplementation, TOptions>(this IServiceCollection services, TOptions defaultOptions = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
+        public static IServiceCollection AddTransient<TService, TImplementation, TOptions>(this IServiceCollection services, TOptions defaultOptions = default, string? configurationSection = default, Action<IServiceProvider, TOptions>? verifyOptions = default)
             where TService : class
             where TImplementation : TService
         {
@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services.AddTransient(CreateImplementationFactory<TService, TImplementation, TOptions>(defaultOptions, configurationSection, verifyOptions));
         }
 
-        public static IServiceCollection AddTransient<TService, TImplementation, TOptions, TOptionsBuilder>(this IServiceCollection services, Action<TOptionsBuilder> defaultSetup = default, Action<TOptionsBuilder> setup = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
+        public static IServiceCollection AddTransient<TService, TImplementation, TOptions, TOptionsBuilder>(this IServiceCollection services, Action<TOptionsBuilder>? defaultSetup = default, Action<TOptionsBuilder>? setup = default, string? configurationSection = default, Action<IServiceProvider, TOptions>? verifyOptions = default)
             where TService : class
             where TImplementation : TService
             where TOptionsBuilder : IBuilder<TOptions>
@@ -43,7 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services.AddTransient(CreateImplementationFactory<TService, TImplementation, TOptions, TOptionsBuilder>(defaultSetup, setup, configurationSection, verifyOptions));
         }
 
-        public static IServiceCollection AddScoped<TService, TImplementation, TOptions>(this IServiceCollection services, TOptions defaultOptions = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
+        public static IServiceCollection AddScoped<TService, TImplementation, TOptions>(this IServiceCollection services, TOptions defaultOptions = default, string? configurationSection = default, Action<IServiceProvider, TOptions>? verifyOptions = default)
             where TService : class
             where TImplementation : TService
         {
@@ -52,7 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services.AddScoped(CreateImplementationFactory<TService, TImplementation, TOptions>(defaultOptions, configurationSection, verifyOptions));
         }
 
-        public static IServiceCollection AddScoped<TService, TImplementation, TOptions, TOptionsBuilder>(this IServiceCollection services, Action<TOptionsBuilder> defaultSetup = default, Action<TOptionsBuilder> setup = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
+        public static IServiceCollection AddScoped<TService, TImplementation, TOptions, TOptionsBuilder>(this IServiceCollection services, Action<TOptionsBuilder>? defaultSetup = default, Action<TOptionsBuilder>? setup = default, string? configurationSection = default, Action<IServiceProvider, TOptions>? verifyOptions = default)
             where TService : class
             where TImplementation : TService
             where TOptionsBuilder : IBuilder<TOptions>
@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services.AddScoped(CreateImplementationFactory<TService, TImplementation, TOptions, TOptionsBuilder>(defaultSetup, setup, configurationSection, verifyOptions));
         }
 
-        private static Func<IServiceProvider, TService> CreateImplementationFactory<TService, TImplementation, TOptions>(TOptions defaultOptions = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
+        private static Func<IServiceProvider, TService> CreateImplementationFactory<TService, TImplementation, TOptions>(TOptions defaultOptions = default, string? configurationSection = default, Action<IServiceProvider, TOptions>? verifyOptions = default)
             where TService : class
             where TImplementation : TService
         {
@@ -88,7 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
             };
         }
 
-        private static Func<IServiceProvider, TService> CreateImplementationFactory<TService, TImplementation, TOptions, TOptionsBuilder>(Action<TOptionsBuilder> defaultSetup = default, Action<TOptionsBuilder> setup = default, string configurationSection = default, Action<IServiceProvider, TOptions> verifyOptions = default)
+        private static Func<IServiceProvider, TService> CreateImplementationFactory<TService, TImplementation, TOptions, TOptionsBuilder>(Action<TOptionsBuilder>? defaultSetup = default, Action<TOptionsBuilder>? setup = default, string? configurationSection = default, Action<IServiceProvider, TOptions>? verifyOptions = default)
             where TService : class
             where TImplementation : TService
             where TOptionsBuilder : IBuilder<TOptions>
@@ -124,7 +124,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
-            string environment = null, string basePath = null,
+            string? environment = null, string? basePath = null,
             bool isJsonFileRequired = false, string jsonFileName = "appsettings.json")
         {
             return AddConfiguration(serviceCollection, out var configuration, environment, basePath, isJsonFileRequired, jsonFileName);
@@ -132,7 +132,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
             out IConfiguration configuration,
-            string environment = null, string basePath = null,
+            string? environment = null, string? basePath = null,
             bool isJsonFileRequired = false, string jsonFileName = "appsettings.json")
         {
             var builder = new ConfigurationBuilder()

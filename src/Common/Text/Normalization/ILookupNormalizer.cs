@@ -14,6 +14,6 @@ namespace KodeAid.Text.Normalization
         /// </summary>
         /// <param name="key">The key to normalize.</param>
         /// <returns>A normalized representation of the specified <paramref name="key"/>.</returns>
-        string Normalize(string key);
+        string? Normalize(string? key);
     }
 }

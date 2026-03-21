@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="includeNonPublic">True to include non-public types in the search, otherwise false to search only public types.</param>
         /// <param name="assemblySearchOptions">How to search for additional assemblies to include.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
-        public static IServiceCollection AddRegisteredServices(this IServiceCollection services, Assembly startingPoint = null, bool includeNonPublic = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
+        public static IServiceCollection AddRegisteredServices(this IServiceCollection services, Assembly? startingPoint = null, bool includeNonPublic = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
             static bool nonPublicTypeFilter(Type t) => (t.IsClass || t.IsValueType) && !t.IsAbstract && !t.IsGenericType;
             static bool publicTypeFilter(Type t) => (t.IsClass || t.IsValueType) && t.IsPublic && !t.IsAbstract && !t.IsGenericType;
@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             foreach (var registrationType in registrationTypes)
             {
-                var registration = (IServiceRegistration)Activator.CreateInstance(registrationType);
+                var registration = (IServiceRegistration)Activator.CreateInstance(registrationType)!;
                 registration.Register(services);
             }
 

@@ -10,7 +10,7 @@ namespace KodeAid.FaultTolerance
 {
     public abstract class OperationManager : OperationManager<object>
     {
-        public OperationManager(IRetryPolicy retryPolicy = null)
+        public OperationManager(IRetryPolicy? retryPolicy = null)
             : base(retryPolicy)
         {
         }
@@ -18,14 +18,14 @@ namespace KodeAid.FaultTolerance
 
     public abstract class OperationManager<TStatusCode>
     {
-        public OperationManager(IRetryPolicy retryPolicy = null)
+        public OperationManager(IRetryPolicy? retryPolicy = null)
         {
             RetryPolicy = retryPolicy;
         }
 
-        public IRetryPolicy RetryPolicy { get; }
+        public IRetryPolicy? RetryPolicy { get; }
 
-        public virtual OperationContext CreateOperationContext(object state = null)
+        public virtual OperationContext CreateOperationContext(object? state = null)
         {
             return new OperationContext(state, RetryPolicy?.CreateRetryContext());
         }
@@ -35,7 +35,7 @@ namespace KodeAid.FaultTolerance
             return ExecuteOperationAsync(operation, null, cancellationToken);
         }
 
-        public async virtual Task ExecuteOperationAsync(Func<Task> operation, object state, CancellationToken cancellationToken = default)
+        public async virtual Task ExecuteOperationAsync(Func<Task> operation, object? state, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(operation), operation);
 
@@ -72,7 +72,7 @@ namespace KodeAid.FaultTolerance
             return ExecuteOperationAsync(operation, null, cancellationToken);
         }
 
-        public async virtual Task<TResult> ExecuteOperationAsync<TResult>(Func<Task<TResult>> operation, object state, CancellationToken cancellationToken = default)
+        public async virtual Task<TResult> ExecuteOperationAsync<TResult>(Func<Task<TResult>> operation, object? state, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(operation), operation);
 
@@ -113,7 +113,7 @@ namespace KodeAid.FaultTolerance
         {
         }
 
-        public async virtual Task<RetryStatus> ProcessOperationAsync(OperationContext context, TStatusCode statusCode, Exception exception, CancellationToken cancellationToken = default)
+        public async virtual Task<RetryStatus> ProcessOperationAsync(OperationContext context, TStatusCode statusCode, Exception? exception, CancellationToken cancellationToken = default)
         {
             ArgCheck.NotNull(nameof(context), context);
 
@@ -141,12 +141,12 @@ namespace KodeAid.FaultTolerance
             return RetryStatus.RetryExhausted;
         }
 
-        protected virtual bool CheckIsSuccess(object state, TStatusCode statusCode, Exception exception)
+        protected virtual bool CheckIsSuccess(object? state, TStatusCode statusCode, Exception? exception)
         {
             return exception == null;
         }
 
-        protected virtual bool CheckIsRetryable(object state, TStatusCode statusCode, Exception exception)
+        protected virtual bool CheckIsRetryable(object? state, TStatusCode statusCode, Exception? exception)
         {
             if (statusCode is IRetryable retryableStatusCode)
             {
@@ -161,7 +161,7 @@ namespace KodeAid.FaultTolerance
             return false;
         }
 
-        protected virtual TStatusCode GetStatusCodeFromResult(object result)
+        protected virtual TStatusCode GetStatusCodeFromResult(object? result)
         {
             return result is TStatusCode ? (TStatusCode)result : default;
         }

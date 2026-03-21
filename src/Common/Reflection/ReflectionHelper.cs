@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -42,7 +43,7 @@ namespace KodeAid.Reflection
         /// <param name="throwOnPathNotFound">True to throw InvalidOperationException when a property or index was not found, otherwise false.</param>
         /// <param name="throwOnNullReference">True to throw NullReferenceException when path cannot be fully traversed due to a null segment along the way, otherwise false.</param>
         /// <returns></returns>
-        public static object FollowPropertyPath(object obj, string path, bool ignoreCase = false, bool throwOnPathNotFound = false, bool throwOnNullReference = false)
+        public static object? FollowPropertyPath(object? obj, string path, bool ignoreCase = false, bool throwOnPathNotFound = false, bool throwOnNullReference = false)
         {
             ArgCheck.NotNull(nameof(path), path);
 
@@ -65,7 +66,7 @@ namespace KodeAid.Reflection
 
                 if (index == null)  // get by property
                 {
-                    PropertyInfo property = null;
+                    PropertyInfo? property = null;
                     property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
 
                     if (property == null)
@@ -147,7 +148,7 @@ namespace KodeAid.Reflection
 
                 if (index == null)  // get by property
                 {
-                    PropertyInfo property = null;
+                    PropertyInfo? property = null;
                     property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | (ignoreCase ? BindingFlags.IgnoreCase : BindingFlags.Default));
 
                     if (property == null)
@@ -187,7 +188,7 @@ namespace KodeAid.Reflection
                     if (!indexed && type.IsArray)
                     {
                         indexed = true;
-                        type = type.GetElementType();
+                        type = type.GetElementType()!;
                     }
 
                     if (!indexed)
@@ -213,7 +214,7 @@ namespace KodeAid.Reflection
         /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly? startingPoint = null, Predicate<Type>? typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string>? assemblyNamePrefixes = null)
         {
             return FindAllTypes(startingPoint, typeof(T), typeFilter, mustHavePublicDefaultCtor, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
         }
@@ -229,7 +230,7 @@ namespace KodeAid.Reflection
         /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes<T>(Assembly startingPoint = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes<T>(Assembly? startingPoint = null, Predicate<Type>? typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
             return FindAllTypes(startingPoint, typeof(T), typeFilter, mustHavePublicDefaultCtor, assemblySearchOptions, throwOnError, assemblyNamePrefixes);
         }
@@ -245,7 +246,7 @@ namespace KodeAid.Reflection
         /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
+        public static IEnumerable<Type> FindAllTypes(Assembly? startingPoint = null, Type? ofType = null, Predicate<Type>? typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, params string[] assemblyNamePrefixes)
         {
             return FindAllTypes(startingPoint, ofType, typeFilter, mustHavePublicDefaultCtor, assemblySearchOptions, throwOnError, (IEnumerable<string>)assemblyNamePrefixes);
         }
@@ -261,7 +262,7 @@ namespace KodeAid.Reflection
         /// <param name="throwOnError">True to throw on any assembly load errors, otherwise false.</param>
         /// <param name="assemblyNamePrefixes">Case insensitive prefixes of assembly names and file names (*.dlls) to include in search, null/empty to include all.</param>
         /// <returns></returns>
-        public static IEnumerable<Type> FindAllTypes(Assembly startingPoint = null, Type ofType = null, Predicate<Type> typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        public static IEnumerable<Type> FindAllTypes(Assembly? startingPoint = null, Type? ofType = null, Predicate<Type>? typeFilter = null, bool mustHavePublicDefaultCtor = false, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string>? assemblyNamePrefixes = null)
         {
             return FindAssemblies(startingPoint, assemblySearchOptions, throwOnError, assemblyNamePrefixes)
                 .SelectMany(a => a.GetLoadableTypes())
@@ -272,7 +273,7 @@ namespace KodeAid.Reflection
                 .ToList();
         }
 
-        public static IEnumerable<Assembly> FindAssemblies(Assembly startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string> assemblyNamePrefixes = null)
+        public static IEnumerable<Assembly> FindAssemblies(Assembly? startingPoint = null, AssemblySearchOptions assemblySearchOptions = AssemblySearchOptions.Default, bool throwOnError = false, IEnumerable<string>? assemblyNamePrefixes = null)
         {
             var directorySearchOptions = assemblySearchOptions.HasFlagSet(AssemblySearchOptions.IncludeSubdirectories) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var matchedAssemblies = new List<Assembly>();
@@ -293,7 +294,7 @@ namespace KodeAid.Reflection
 
                 if (assembliesSearched.Add(assembly.FullName))
                 {
-                    if (!assemblyNamePrefixes.Any() || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
+                    if (assemblyNamePrefixes?.Any() != true || assemblyNamePrefixes.Any(n => assembly.FullName.StartsWith(n, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         matchedAssemblies.Add(assembly);
 
@@ -330,7 +331,7 @@ namespace KodeAid.Reflection
                 .ToList();
         }
 
-        private static IEnumerable<Assembly> FindAssemblies(Assembly assembly, IEnumerable<string> assemblyNamePrefixes, SearchOption directorySearchOptions, HashSet<string> assembliesSearched, bool throwOnError)
+        private static IEnumerable<Assembly> FindAssemblies(Assembly assembly, IEnumerable<string>? assemblyNamePrefixes, SearchOption directorySearchOptions, HashSet<string> assembliesSearched, bool throwOnError)
         {
             var assembliesFound = new List<Assembly>();
 #if NET8_0_OR_GREATER
@@ -339,13 +340,13 @@ namespace KodeAid.Reflection
             var assemblyLocation = Path.GetDirectoryName(new Uri(assembly.CodeBase).AbsolutePath);
 #endif
 
-            if (assembliesSearched.Add(assemblyLocation))
+            if (assemblyLocation != null && assembliesSearched.Add(assemblyLocation))
             {
                 var dllFiles = new List<string>();
 
                 try
                 {
-                    if (!assemblyNamePrefixes.Any())
+                    if (assemblyNamePrefixes?.Any() != true)
                     {
                         dllFiles.AddRange(Directory.EnumerateFiles(assemblyLocation, "*.dll", directorySearchOptions));
                     }

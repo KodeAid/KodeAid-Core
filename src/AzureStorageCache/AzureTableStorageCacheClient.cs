@@ -84,7 +84,7 @@ namespace KodeAid.Caching.AzureStorage
             _table = _client.GetTableReference(_tableName);
         }
 
-        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> rowKeys, string partitionKey)
+        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> rowKeys, string? partitionKey)
         {
             partitionKey = partitionKey ?? _defaultPartitionKey;
             ArgCheck.NotNull(nameof(partitionKey), partitionKey);
@@ -145,7 +145,7 @@ namespace KodeAid.Caching.AzureStorage
             return items;
         }
 
-        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partitionKey)
+        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string? partitionKey)
         {
             partitionKey = partitionKey ?? _defaultPartitionKey;
             ArgCheck.NotNull(nameof(partitionKey), partitionKey);
@@ -171,7 +171,7 @@ namespace KodeAid.Caching.AzureStorage
             }
         }
 
-        protected override async Task RemoveKeysAsync(IEnumerable<string> rowKeys, string partitionKey = null)
+        protected override async Task RemoveKeysAsync(IEnumerable<string> rowKeys, string? partitionKey = null)
         {
             partitionKey = partitionKey ?? _defaultPartitionKey;
             ArgCheck.NotNull(nameof(partitionKey), partitionKey);
@@ -285,7 +285,7 @@ namespace KodeAid.Caching.AzureStorage
         private sealed class AzureTableStorageCacheEntry : TableEntity
         {
             public DateTimeOffset? Expiration { get; set; }
-            public string Value { get; set; }
+            public string? Value { get; set; }
         }
     }
 }

@@ -16,11 +16,11 @@ namespace KodeAid.AspNetCore.Http.Logging.Request
     {
         private readonly RequestDelegate _next;
         private readonly int _maxBodyByteCount;
-        private readonly Func<HttpContext, bool> _shouldLog;
+        private readonly Func<HttpContext, bool>? _shouldLog;
         private readonly ILogger _logger;
         private readonly string _prefix;
 
-        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, int maxBodyByteCount, Func<HttpContext, bool> shouldLog, string prefix)
+        public RequestLoggingMiddleware(RequestDelegate next, ILogger logger, int maxBodyByteCount, Func<HttpContext, bool>? shouldLog, string? prefix)
         {
             ArgCheck.NotNull(nameof(next), next);
             ArgCheck.NotNull(nameof(logger), logger);

@@ -10,6 +10,6 @@ namespace KodeAid.Serialization
     public interface IStreamSerializer
     {
         void SerializeToStream(Stream stream, object graph);
-        object DeserializeFromStream(Type type, Stream stream);
+        object? DeserializeFromStream(Type type, Stream stream);
     }
 }

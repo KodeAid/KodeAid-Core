@@ -34,7 +34,7 @@ namespace KodeAid.Caching.Redis
             _serializer = serializer;
         }
 
-        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string partition)
+        protected override async Task<IEnumerable<CacheItem<T>>> GetItemsAsync<T>(IEnumerable<string> keys, string? partition)
         {
             if (!string.IsNullOrEmpty(partition))
             {
@@ -48,7 +48,7 @@ namespace KodeAid.Caching.Redis
             return hits.Where(hit => !hit.IsNull && hit.HasValue).Select(value => DeserializeItem<T>(value)).ToList();
         }
 
-        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string partition)
+        protected override async Task SetItemsAsync<T>(IEnumerable<CacheItem<T>> items, string? partition)
         {
             var utcNow = DateTime.UtcNow;
             foreach (var groupOfExpiries in items.GroupBy(item => item.Expiration))
@@ -79,7 +79,7 @@ namespace KodeAid.Caching.Redis
             }
         }
 
-        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string partition = null)
+        protected override async Task RemoveKeysAsync(IEnumerable<string> keys, string? partition = null)
         {
             if (!string.IsNullOrEmpty(partition))
                 keys = keys.Select(key => $"${partition}$|{key}");

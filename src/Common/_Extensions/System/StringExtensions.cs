@@ -13,7 +13,7 @@ namespace System
 {
     public static class StringExtensions
     {
-        public static string Intern(this string str)
+        public static string? Intern(this string? str)
         {
             return str != null ? string.Intern(str) : null;
         }
@@ -76,7 +76,7 @@ namespace System
         /// </summary>
         /// <param name="str">The string to be trimmed.</param>
         /// <returns>A non whitespace-only string; or null if the result would be an empty string.</returns>
-        public static string TrimToNull(this string str)
+        public static string? TrimToNull(this string? str)
         {
             if (str == null)
             {
@@ -99,7 +99,7 @@ namespace System
         /// <param name="multiline">If true, lines will be kept but runs of multiple blank lines will be collasped into a single <paramref name="newLine"/> string</param>
         /// <param name="newLine">The new line string to use for new-lines, if null will default to <seealso cref="Environment.NewLine"/>.</param>
         /// <returns>A string that has all white space collapsed.</returns>
-        public static string Collapse(this string str, bool multiline = false, string newLine = null)
+        public static string Collapse(this string str, bool multiline = false, string? newLine = null)
         {
             if (multiline)
             {
@@ -117,7 +117,7 @@ namespace System
         /// all leading and trailing new-lines however will be trimmed.</param>
         /// <param name="newLine">The new line string to use for new-lines, if null will default to <seealso cref="Environment.NewLine"/>.</param>
         /// <returns>A string that has all white space collapsed and all leading and trailing whitespace trimmed.</returns>
-        public static string CollapseAndTrim(this string str, bool multiline = false, string newLine = null)
+        public static string CollapseAndTrim(this string str, bool multiline = false, string? newLine = null)
         {
             return Collapse(str, multiline, newLine).Trim();
         }
@@ -130,7 +130,7 @@ namespace System
         /// all leading and trailing new-lines however will be trimmed.</param>
         /// <param name="newLine">The new line string to use for new-lines, if null will default to <seealso cref="Environment.NewLine"/>.</param>
         /// <returns>A non whitespace-only string that has all white space collapsed and all leading and trailing whitespace trimmed; or null if the result would be an empty string.</returns>
-        public static string CollapseAndTrimToNull(this string str, bool multiline = false, string newLine = null)
+        public static string? CollapseAndTrimToNull(this string str, bool multiline = false, string? newLine = null)
         {
             return Collapse(str, multiline, newLine).TrimToNull();
         }
@@ -273,7 +273,7 @@ namespace System
         /// <param name="formatProvider">The provider to use to format the <paramref name="value"/>. -or-
         /// A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
         /// <returns>The result of <paramref name="str"/> with the matching token (if found) replaced with a formatted <paramref name="value"/>.</returns>
-        public static string ReplaceToken(this string str, string token, IFormattable value, string defaultFormat = null, IFormatProvider formatProvider = null)
+        public static string ReplaceToken(this string str, string token, IFormattable value, string? defaultFormat = null, IFormatProvider? formatProvider = null)
         {
             ArgCheck.NotNull(nameof(str), str);
             ArgCheck.NotNullOrEmpty(nameof(token), token);
@@ -286,7 +286,7 @@ namespace System
             return str;
         }
 
-        public static string Pluralize(this string str)
+        public static string? Pluralize(this string? str)
         {
             if (str == null)
             {
@@ -341,7 +341,7 @@ namespace System
         /// <summary>
         /// Convert from "Resource not found" to "ResourceNotFound".
         /// </summary>
-        public static string ToPascalCase(this string str)
+        public static string? ToPascalCase(this string? str)
         {
             if (str == null)
             {
@@ -360,7 +360,7 @@ namespace System
         /// <summary>
         /// Convert from "Resource not found" to "resourceNotFound".
         /// </summary>
-        public static string ToCamelCase(this string str)
+        public static string? ToCamelCase(this string? str)
         {
             if (str == null)
             {
@@ -379,7 +379,7 @@ namespace System
         /// <summary>
         /// Convert from "ResourceNotFound" or "Resource NOT found!" to "RESOURCE_NOT_FOUND"
         /// </summary>
-        public static string ToMacroConstantCase(this string str)
+        public static string? ToMacroConstantCase(this string? str)
         {
             if (str == null)
             {

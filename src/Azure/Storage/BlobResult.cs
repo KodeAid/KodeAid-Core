@@ -11,14 +11,14 @@ namespace KodeAid.Azure.Storage
 {
     public class BlobResult : IBlobMeta
     {
-        public string BlobName { get; set; }
-        public string DirectoryRelativeAddress { get; set; }
+        public string? BlobName { get; set; }
+        public string? DirectoryRelativeAddress { get; set; }
         public DateTimeOffset? CreatedOn { get; set; }
         public DateTimeOffset? LastModified { get; set; }
         public DateTimeOffset? Expires { get; set; }
-        public string ETag { get; set; }
-        public string ContentEncoding { get; set; }
-        public string ContentType { get; set; }
+        public string? ETag { get; set; }
+        public string? ContentEncoding { get; set; }
+        public string? ContentType { get; set; }
         public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
 
         string IStoreMeta.Partition { get => DirectoryRelativeAddress; set => DirectoryRelativeAddress = value; }

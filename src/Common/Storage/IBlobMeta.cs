@@ -8,8 +8,8 @@ namespace KodeAid.Storage
 {
     public interface IBlobMeta : IStoreMeta
     {
-        string ContentType { get; set; }
-        string ContentEncoding { get; set; }
+        string? ContentType { get; set; }
+        string? ContentEncoding { get; set; }
         IDictionary<string, string> Metadata { get; }
     }
 }

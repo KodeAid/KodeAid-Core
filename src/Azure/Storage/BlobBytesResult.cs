@@ -12,7 +12,7 @@ namespace KodeAid.Azure.Storage
         {
         }
 
-        public BlobBytesResult(byte[] contents)
+        public BlobBytesResult(byte[]? contents)
         {
             Contents = contents;
         }
@@ -22,14 +22,14 @@ namespace KodeAid.Azure.Storage
         {
         }
 
-        internal BlobBytesResult(BlobGetResult copy, byte[] contents)
+        internal BlobBytesResult(BlobGetResult copy, byte[]? contents)
             : base(copy)
         {
             Contents = contents;
         }
 
-        public byte[] Contents { get; set; }
+        public byte[]? Contents { get; set; }
 
-        byte[] IBytesResult.Data => Contents;
+        byte[]? IBytesResult.Data => Contents;
     }
 }

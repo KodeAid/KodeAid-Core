@@ -12,13 +12,13 @@ namespace KodeAid.Storage
     {
         private bool _disposed = false;
 
-        public string Key { get; set; }
-        public string Partition { get; set; }
+        public string? Key { get; set; }
+        public string? Partition { get; set; }
         public DateTimeOffset? ExpiresAt { get; set; }
-        public object ConcurrencyToken { get; set; }
-        public Stream Content { get; set; }
-        public string ContentType { get; set; }
-        public string ContentEncoding { get; set; }
+        public object? ConcurrencyToken { get; set; }
+        public Stream? Content { get; set; }
+        public string? ContentType { get; set; }
+        public string? ContentEncoding { get; set; }
         public IDictionary<string, string> Metadata { get; } = new Dictionary<string, string>();
 
         void IDisposable.Dispose()

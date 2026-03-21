@@ -7,6 +7,6 @@ namespace KodeAid.Storage
 {
     public interface IBytesResult : IStoreResult
     {
-        byte[] Data { get; }
+        byte[]? Data { get; }
     }
 }
