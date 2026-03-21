@@ -12,6 +12,6 @@ namespace KodeAid.Serialization
     public interface IAsyncStreamSerializer
     {
         Task SerializeToStreamAsync(Stream stream, object graph, CancellationToken cancellationToken = default);
-        Task<object> DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
+        Task<object?> DeserializeFromStreamAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
     }
 }
