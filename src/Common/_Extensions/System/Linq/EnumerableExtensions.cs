@@ -11,7 +11,7 @@ namespace System.Linq
     {
         public static IEnumerable<TSource> EmptyIfNull<TSource>(this IEnumerable<TSource>? source)
         {
-            return source ?? Enumerable.Empty<TSource>();
+            return source ?? [];
         }
 
         public static IEnumerable<TSource>? NullIfEmpty<TSource>(this IEnumerable<TSource>? source)
@@ -24,10 +24,13 @@ namespace System.Linq
             return source;
         }
 
-        public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource> source)
-        {
-            return source.Where(f => f != null);
-        }
+        public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource?> source)
+            where TSource : class
+            => source.OfType<TSource>();
+
+        public static IEnumerable<TSource> WhereNotNull<TSource>(this IEnumerable<TSource?> source)
+            where TSource : struct
+            => source.OfType<TSource>();
 
         public static IEnumerable<TSource> SelectValueOrDefault<TSource>(this IEnumerable<TSource?> source, TSource defaultValue = default)
             where TSource : struct
@@ -45,7 +48,7 @@ namespace System.Linq
                 if (partition.Count == size)
                 {
                     yield return partition;
-                    partition = new List<T>(size);
+                    partition = new(size);
                 }
             }
             if (partition.Count > 0)
@@ -61,7 +64,7 @@ namespace System.Linq
             // https://math.stackexchange.com/a/130862
             //Remark: For any fixed k, the number of k-element subsets of a set of n items is n!/k!(n−k)!
             // https://stackoverflow.com/questions/127704/algorithm-to-return-all-combinations-of-k-elements-from-n
-            return size == 0 ? new[] { new T[0] } :
+            return size == 0 ? [[]] :
               source.SelectMany((e, i) =>
                 source.Skip(i + 1).Combinations(size - 1).Select(c => (new[] { e }).Concat(c)));
         }
