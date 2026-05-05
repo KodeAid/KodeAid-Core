@@ -111,7 +111,7 @@ namespace KodeAid
         /// that this value need not be a member of the TEnum enumeration. This parameter
         /// is passed uninitialized.</param>
         /// <returns>true if the value parameter was converted successfully; otherwise, false.</returns>
-        public static bool TryParse<TEnum>(string value, out TEnum result, bool ignoreCase = false)
+        public static bool TryParse<TEnum>(string? value, out TEnum result, bool ignoreCase = false)
             where TEnum : struct, Enum
         {
             if (Enum.TryParse(value, ignoreCase, out result))
