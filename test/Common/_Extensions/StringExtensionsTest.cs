@@ -14,56 +14,56 @@ namespace KodeAid
         }
 
         [Fact]
-        public void EnsureTerminatingPuncuation_AddsDefaultPuncuation()
+        public void EnsureTerminatingPunctuation_AddsDefaultPuncuation()
         {
             // Arrange
             var expected = ".";
             var str = "The brown fox jumped over the gate";
 
             // Act
-            str = str.EnsureTerminatingPuncuation();
+            str = str.EnsureTerminatingPunctuation();
 
             // Assert
             Assert.EndsWith(expected, str);
         }
 
         [Fact]
-        public void EnsureTerminatingPuncuation_AddsSpecifiedPuncuation()
+        public void EnsureTerminatingPunctuation_AddsSpecifiedPuncuation()
         {
             // Arrange
             var expected = "!";
             var str = "The brown fox jumped over the gate";
 
             // Act
-            str = str.EnsureTerminatingPuncuation(expected);
+            str = str.EnsureTerminatingPunctuation(expected);
 
             // Assert
             Assert.EndsWith(expected, str);
         }
 
         [Fact]
-        public void EnsureTerminatingPuncuation_AddsSpecifiedPuncuationPriorToEndingWhiteSpace()
+        public void EnsureTerminatingPunctuation_AddsSpecifiedPuncuationPriorToEndingWhiteSpace()
         {
             // Arrange
             var expected = "!";
             var str = "The brown fox jumped over the gate  \t\n";
 
             // Act
-            str = str.EnsureTerminatingPuncuation(expected);
+            str = str.EnsureTerminatingPunctuation(expected);
 
             // Assert
             Assert.EndsWith($"{expected}  \t\n", str);
         }
 
         [Fact]
-        public void EnsureTerminatingPuncuation_LeavesExistingPuncuationAndEndingWhiteSpaceAsIs()
+        public void EnsureTerminatingPunctuation_LeavesExistingPuncuationAndEndingWhiteSpaceAsIs()
         {
             // Arrange
             var expected = "!";
             var str = "The brown fox jumped over the gate.  \t\n";
 
             // Act
-            str = str.EnsureTerminatingPuncuation(expected);
+            str = str.EnsureTerminatingPunctuation(expected);
 
             // Assert
             Assert.EndsWith($".  \t\n", str);

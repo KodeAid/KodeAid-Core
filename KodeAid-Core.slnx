@@ -1,0 +1,46 @@
+<Solution>
+  <Folder Name="/Cache/">
+    <Project Path="src/AzureStorageCache/AzureStorageCache.csproj" />
+    <Project Path="src/Caching/Caching.csproj" />
+    <Project Path="src/MemoryCache/MemoryCache.csproj" />
+    <Project Path="src/Redis/Redis.csproj" />
+    <Project Path="src/SqlCache/SqlCache.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="test/AutoMapper/AutoMapper.Tests.csproj" />
+    <Project Path="test/Common/Common.Tests.csproj" />
+    <Project Path="test/Json/Json.Tests.csproj" />
+  </Folder>
+  <Folder Name="/_Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/dotnet.yml" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="src/Directory.Build.props" />
+  </Folder>
+  <Project Path="src/AspNetCore/AspNetCore.csproj" />
+  <Project Path="src/AutoMapper/AutoMapper.csproj" />
+  <Project Path="src/Azure/Azure.csproj" />
+  <Project Path="src/Common/Common.csproj" />
+  <Project Path="src/Configuration/Configuration.csproj" />
+  <Project Path="src/Cosmos/Cosmos.csproj" />
+  <Project Path="src/CosmosDB/CosmosDB.csproj" />
+  <Project Path="src/Data.SqlClient/Data.SqlClient.csproj" />
+  <Project Path="src/DependencyInjection/DependencyInjection.csproj" />
+  <Project Path="src/Diagnostics/Diagnostics.csproj" />
+  <Project Path="src/EntityFrameworkCore/EntityFrameworkCore.csproj" />
+  <Project Path="src/Extensions/Extensions.csproj" />
+  <Project Path="src/Html/Html.csproj" />
+  <Project Path="src/Http/Http.csproj" />
+  <Project Path="src/IO.Compression/IO.Compression.csproj" />
+  <Project Path="src/Json/Json.csproj" />
+  <Project Path="src/Logging/Logging.csproj" />
+  <Project Path="src/Nullability/Nullability.csproj" />
+  <Project Path="src/ProtocolBuffers/ProtocolBuffers.csproj" />
+  <Project Path="src/Reactive/Reactive.csproj" />
+  <Project Path="src/Security.Cryptography/Security.Cryptography.csproj" />
+  <Project Path="src/Swagger/Swagger.csproj" />
+  <Project Path="src/Testing/Testing.csproj" />
+  <Project Path="src/Xunit/Xunit.csproj" />
+</Solution>

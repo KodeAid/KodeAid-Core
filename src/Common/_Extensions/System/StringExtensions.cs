@@ -413,7 +413,7 @@ namespace System
                 .Normalize(NormalizationForm.FormC);
         }
 
-        public static string EnsureTerminatingPuncuation(this string str, string defaultPuncuation = ".")
+        public static string EnsureTerminatingPunctuation(this string str, string defaultPuncuation = ".")
         {
             if (string.IsNullOrWhiteSpace(str))
             {
