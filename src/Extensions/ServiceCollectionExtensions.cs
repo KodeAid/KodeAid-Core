@@ -22,6 +22,9 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        /// <summary>
+        /// Adds an <see cref="IDateTimeProvider"/> backed by the system clock.
+        /// </summary>
         public static IServiceCollection AddDefaultDateTimeProvider(this IServiceCollection services)
         {
             services.TryAddSingleton(DefaultDateTimeProvider.Instance);

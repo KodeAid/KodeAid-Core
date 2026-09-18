@@ -61,20 +61,20 @@ namespace KodeAid.Testing
 
         private TestDateTimeProvider(DateTimeOffset? dateTime, TimeSpan? utcOffset, TimeZoneInfo? timeZone)
         {
-            // a fake time provider must be given a UTC time, otherwise the offset is applied twice
-            TimeProvider = new FakeTimeProvider(dateTime?.ToUniversalTime() ?? DateTimeOffset.UtcNow);
+            // A fake time provider must be given a UTC time, otherwise its offset is applied twice.
+            TimeProvider = new FakeTimeProvider((dateTime ?? DateTimeOffset.Now).ToUniversalTime());
             _defaultTimeZone = dateTime != null ? CreateFixedTimeZone(dateTime.Value.Offset) : TimeZoneInfo.Local;
             _timeZone = timeZone;
             _utcOffset = utcOffset;
             ApplyTimeZone();
         }
 
-        /// <summary>
-        /// The underlying fake time provider.
-        /// </summary>
-        public FakeTimeProvider TimeProvider { get; private set; }
-
         public DateTimeOffset Now => TimeProvider.GetLocalNow();
+
+        /// <summary>
+        /// The underlying fake time provider, which can be passed to a <c>PeriodicTimer</c> or driven directly.
+        /// </summary>
+        public FakeTimeProvider TimeProvider { get; }
 
         /// <summary>
         /// The effective time zone, which may be overridden by <see cref="UtcOffset"/>.
@@ -105,6 +105,8 @@ namespace KodeAid.Testing
             }
         }
 
+        TimeProvider IDateTimeProvider.TimeProvider => TimeProvider;
+
         public void AddTime(TimeSpan time)
         {
             if (time < TimeSpan.Zero)
@@ -119,20 +121,16 @@ namespace KodeAid.Testing
 
         public void SetDateTime(DateTimeOffset dateTime)
         {
-            if (dateTime < TimeProvider.GetUtcNow())
-            {
-                // a fake time provider cannot move backwards in time, so replace it
-                var timeProvider = new FakeTimeProvider(dateTime.ToUniversalTime())
-                {
-                    AutoAdvanceAmount = TimeProvider.AutoAdvanceAmount,
-                };
+            var utcDateTime = dateTime.ToUniversalTime();
 
-                TimeProvider = timeProvider;
-                ApplyTimeZone();
+            if (utcDateTime < TimeProvider.GetUtcNow())
+            {
+                // Advance() and SetUtcNow() refuse to move backwards in time, AdjustTime() is how a clock is wound back.
+                TimeProvider.AdjustTime(utcDateTime);
             }
             else
             {
-                TimeProvider.SetUtcNow(dateTime.ToUniversalTime());
+                TimeProvider.SetUtcNow(utcDateTime);
             }
         }
 

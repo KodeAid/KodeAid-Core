@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using KodeAid.Testing;
 using Xunit;
@@ -195,7 +196,7 @@ namespace KodeAid
                     {
                         Assert.Same(provider, DateTimeProvider.Current);
 
-                        // moving one flow's clock must not be visible to any other flow
+                        // Moving one flow's clock must not be visible to any other flow.
                         provider.AddTime(TimeSpan.FromHours(1));
 
                         Assert.Equal(new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero).AddDays(i).AddHours(j + 1), DateTimeProvider.Current.UtcNow);
@@ -208,6 +209,50 @@ namespace KodeAid
             await Task.WhenAll(tasks);
 
             Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
+        }
+
+        [Fact]
+        public void TheTimeProviderFollowsTheAmbientProvider()
+        {
+            var provider = new TestDateTimeProvider(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero));
+
+            Assert.Same(DefaultDateTimeProvider.Instance.TimeProvider, DateTimeProvider.Current.TimeProvider);
+
+            using (DateTimeProvider.UseProvider(provider))
+            {
+                // Read at the point of use, it resolves against whichever provider is current.
+                Assert.Same(provider.TimeProvider, DateTimeProvider.Current.TimeProvider);
+                Assert.Equal(provider.UtcNow, DateTimeProvider.Current.TimeProvider.GetUtcNow());
+            }
+
+            Assert.Same(DefaultDateTimeProvider.Instance.TimeProvider, DateTimeProvider.Current.TimeProvider);
+        }
+
+        [Fact]
+        public async Task TheTimeProviderDrivesTimersOnTheAmbientClock()
+        {
+            var provider = new TestDateTimeProvider(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero));
+
+            using (DateTimeProvider.UseProvider(provider))
+            {
+                using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30), DateTimeProvider.Current.TimeProvider);
+
+                var tick = timer.WaitForNextTickAsync();
+
+                Assert.False(tick.IsCompleted);
+
+                provider.AddTime(TimeSpan.FromSeconds(30));
+
+                Assert.True(await tick);
+            }
+        }
+
+        [Fact]
+        public void TheAmbientProviderCannotBeSetToTheForwardingProvider()
+        {
+            // It forwards to Current, so installing it would recurse forever.
+            Assert.Throws<ArgumentException>(() => DateTimeProvider.SetCurrentProvider(CurrentDateTimeProvider.Instance));
+            Assert.Throws<ArgumentException>(() => DateTimeProvider.UseProvider(CurrentDateTimeProvider.Instance));
         }
 
         [Fact]

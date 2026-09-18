@@ -4,7 +4,7 @@
         <TargetFrameworks>net10.0;net8.0;netstandard2.0</TargetFrameworks>
         <AssemblyName>KodeAid.Testing</AssemblyName>
         <RootNamespace>KodeAid.Testing</RootNamespace>
-        <Version>1.7.0</Version>
+        <Version>1.7.1</Version>
         <Description>Kode-Aid shared testing helpers library.</Description>
     </PropertyGroup>
 
@@ -13,8 +13,13 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.*" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.*" />
     </ItemGroup>
+
+    <!-- 10.x has no netstandard2.0 asset, and in 8.x FakeTimeProvider.AdjustTime() is still marked experimental -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <NoWarn>$(NoWarn);EXTEXP0004</NoWarn>
+    </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.*" />

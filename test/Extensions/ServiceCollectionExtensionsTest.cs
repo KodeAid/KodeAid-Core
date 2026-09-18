@@ -27,7 +27,7 @@ namespace KodeAid
         {
             using var serviceProvider = new ServiceCollection().AddCurrentDateTimeProvider().BuildServiceProvider();
 
-            // resolved before the scope is opened, as a singleton consumer would be
+            // Resolved before the scope is opened, as a singleton consumer would be.
             var dateTimeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
 
             var provider = new TestDateTimeProvider(_dateTime);
@@ -54,7 +54,7 @@ namespace KodeAid
 
             Assert.Same(DefaultDateTimeProvider.Instance, dateTimeProvider);
 
-            // unlike the current provider, this one ignores the ambient provider
+            // Unlike the current provider, this one ignores the ambient provider.
             using (DateTimeProvider.UseProvider(new TestDateTimeProvider(_dateTime)))
             {
                 Assert.Equal(TimeZoneInfo.Local, dateTimeProvider.TimeZone);

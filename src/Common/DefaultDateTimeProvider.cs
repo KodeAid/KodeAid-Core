@@ -27,12 +27,9 @@ namespace KodeAid
             TimeProvider = timeProvider ?? TimeProvider.System;
         }
 
-        /// <summary>
-        /// The underlying time provider.
-        /// </summary>
-        public TimeProvider TimeProvider { get; }
-
         public DateTimeOffset Now => TimeProvider.GetLocalNow();
+
+        public TimeProvider TimeProvider { get; }
 
         public TimeZoneInfo TimeZone => TimeProvider.LocalTimeZone;
 

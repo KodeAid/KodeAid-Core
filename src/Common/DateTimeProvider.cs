@@ -29,7 +29,7 @@ namespace KodeAid
         /// </summary>
         public static void SetCurrentProvider(IDateTimeProvider provider)
         {
-            ArgCheck.NotNull(nameof(provider), provider);
+            CheckProvider(nameof(provider), provider);
             _defaultProvider = provider;
         }
 
@@ -51,12 +51,23 @@ namespace KodeAid
         /// <returns>A scope which restores the previously scoped provider when disposed.</returns>
         public static IDisposable UseProvider(IDateTimeProvider provider)
         {
-            ArgCheck.NotNull(nameof(provider), provider);
+            CheckProvider(nameof(provider), provider);
 
             var scope = new ProviderScope(_scopedProvider.Value);
             _scopedProvider.Value = provider;
 
             return scope;
+        }
+
+        private static void CheckProvider(string paramName, IDateTimeProvider provider)
+        {
+            ArgCheck.NotNull(paramName, provider);
+
+            if (ReferenceEquals(provider, CurrentDateTimeProvider.Instance))
+            {
+                // It forwards back to Current, which would recurse until the stack ran out.
+                throw new ArgumentException($"Parameter {paramName} cannot be the current date time provider itself.", paramName);
+            }
         }
 
         private sealed class ProviderScope : IDisposable

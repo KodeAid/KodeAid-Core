@@ -31,7 +31,7 @@ namespace KodeAid
         [Fact]
         public void FollowsTheAmbientProviderOnEveryCallRatherThanCapturingIt()
         {
-            // held before any scope is opened, exactly as an injected consumer would hold it
+            // Held before any scope is opened, exactly as an injected consumer would hold it.
             var injected = CurrentDateTimeProvider.Instance;
 
             Assert.Equal(TimeZoneInfo.Local, injected.TimeZone);
@@ -42,13 +42,13 @@ namespace KodeAid
             {
                 Assert.Equal(_dateTime, injected.Now);
 
-                // and it keeps following that provider as its clock moves
+                // And it keeps following that provider as its clock moves.
                 provider.AddTime(TimeSpan.FromHours(3));
 
                 Assert.Equal(_dateTime.AddHours(3), injected.Now);
             }
 
-            // back to the real clock once the scope is gone
+            // Back to the real clock once the scope is gone.
             Assert.Equal(TimeZoneInfo.Local, injected.TimeZone);
         }
     }

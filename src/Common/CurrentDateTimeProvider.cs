@@ -19,6 +19,8 @@ namespace KodeAid
 
         public DateTimeOffset Now => DateTimeProvider.Current.Now;
 
+        public TimeProvider TimeProvider => DateTimeProvider.Current.TimeProvider;
+
         public TimeZoneInfo TimeZone => DateTimeProvider.Current.TimeZone;
 
         public DateTimeOffset UtcNow => DateTimeProvider.Current.UtcNow;

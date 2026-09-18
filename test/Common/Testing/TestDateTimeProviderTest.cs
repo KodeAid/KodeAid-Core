@@ -1,11 +1,13 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace KodeAid.Testing
 {
     /// <summary>
-    /// <see cref="TestDateTimeProvider"/> now wraps a <see cref="FakeTimeProvider"/>,
+    /// <see cref="TestDateTimeProvider"/> is now a <see cref="FakeTimeProvider"/>,
     /// these confirm the values it reports are the same as the previous hand-rolled implementation, which was:
     /// <code>
     /// Now     => (_dateTime ?? DateTimeOffset.Now) converted by UtcOffset, else by TimeZone, else left as-is
@@ -76,8 +78,8 @@ namespace KodeAid.Testing
         }
 
         [Theory]
-        [InlineData(7)]  // daylight saving time
-        [InlineData(1)]  // standard time
+        [InlineData(7)]  // Daylight saving time.
+        [InlineData(1)]  // Standard time.
         public void DateTimeIsConvertedToTheTimeZoneHonoringDaylightSavingTime(int month)
         {
             var dateTime = new DateTimeOffset(2019, month, 4, 16, 30, 0, TimeSpan.Zero);
@@ -101,7 +103,7 @@ namespace KodeAid.Testing
 
             AssertEqual(_dateTime.ToOffset(utcOffset), provider.Now);
 
-            // clearing the offset falls back to the time zone
+            // Clearing the offset falls back to the time zone.
             provider.UtcOffset = null;
 
             AssertEqual(TimeZoneInfo.ConvertTime(_dateTime, timeZone), provider.Now);
@@ -119,7 +121,7 @@ namespace KodeAid.Testing
 
             AssertEqual(TimeZoneInfo.ConvertTime(_dateTime, timeZone), provider.Now);
 
-            // clearing the time zone falls back to the offset the provider was constructed with
+            // Clearing the time zone falls back to the offset the provider was constructed with.
             provider.TimeZone = null;
 
             AssertEqual(_dateTime, provider.Now);
@@ -202,7 +204,7 @@ namespace KodeAid.Testing
         {
             var provider = new TestDateTimeProvider(_dateTime);
 
-            // scoped rather than set process-wide, so this cannot disturb tests running in parallel
+            // Scoped rather than set process-wide, so this cannot disturb tests running in parallel.
             using (DateTimeProvider.UseProvider(provider))
             {
                 AssertEqual(_dateTime, DateTimeProvider.Current.Now);
@@ -247,58 +249,43 @@ namespace KodeAid.Testing
 
         #endregion
 
-        #region wrapped fake time provider
+        #region fake time provider
 
         [Fact]
-        public void WrapsAnExistingFakeTimeProvider()
+        public void ExposesItsFakeTimeProviderThroughTheInterface()
         {
-            var timeProvider = new FakeTimeProvider(_dateTime.ToUniversalTime());
-            timeProvider.SetLocalTimeZone(CreateFixedTimeZone(_dateTime.Offset));
+            IDateTimeProvider provider = new TestDateTimeProvider(_dateTime);
 
-            var provider = new TestDateTimeProvider(timeProvider);
+            Assert.IsType<FakeTimeProvider>(provider.TimeProvider);
+            Assert.Same(((TestDateTimeProvider)provider).TimeProvider, provider.TimeProvider);
+        }
 
-            Assert.Same(timeProvider, provider.TimeProvider);
-            AssertEqual(_dateTime, provider.Now);
+        [Fact]
+        public void TheWrappedClockAgreesWithTheProvider()
+        {
+            var provider = new TestDateTimeProvider(_dateTime);
 
-            // the wrapped provider can be driven directly
-            timeProvider.Advance(TimeSpan.FromHours(4));
+            AssertEqual(provider.TimeProvider.GetUtcNow(), provider.UtcNow);
+            AssertEqual(provider.TimeProvider.GetLocalNow(), provider.Now);
+            Assert.Equal(provider.TimeProvider.LocalTimeZone, provider.TimeZone);
+
+            provider.TimeProvider.Advance(TimeSpan.FromHours(4));
 
             AssertEqual(_dateTime.AddHours(4), provider.Now);
         }
 
         [Fact]
-        public void TheWrappedFakeTimeProviderIsMovedByAddTimeAndSetDateTime()
+        public void AddTimeAndSetDateTimeMoveTheWrappedClock()
         {
             var provider = new TestDateTimeProvider(_dateTime);
-            var timeProvider = provider.TimeProvider;
 
             provider.AddTime(TimeSpan.FromHours(4));
 
-            Assert.Same(timeProvider, provider.TimeProvider);
-            Assert.Equal(_dateTime.AddHours(4), timeProvider.GetUtcNow());
+            Assert.Equal(_dateTime.AddHours(4), provider.TimeProvider.GetUtcNow());
 
             provider.SetDateTime(_dateTime.AddHours(6));
 
-            Assert.Same(timeProvider, provider.TimeProvider);
-            Assert.Equal(_dateTime.AddHours(6), timeProvider.GetUtcNow());
-        }
-
-        /// <summary>
-        /// A <see cref="FakeTimeProvider"/> cannot be moved backwards, so it is replaced when the clock is rewound.
-        /// </summary>
-        [Fact]
-        public void TheWrappedFakeTimeProviderIsReplacedWhenTheClockIsRewound()
-        {
-            var provider = new TestDateTimeProvider(_dateTime);
-            provider.TimeProvider.AutoAdvanceAmount = TimeSpan.FromSeconds(1);
-
-            var timeProvider = provider.TimeProvider;
-
-            provider.SetDateTime(_dateTime.AddDays(-30));
-
-            Assert.NotSame(timeProvider, provider.TimeProvider);
-            Assert.Equal(TimeSpan.FromSeconds(1), provider.TimeProvider.AutoAdvanceAmount);
-            Assert.Equal(timeProvider.LocalTimeZone, provider.TimeProvider.LocalTimeZone);
+            Assert.Equal(_dateTime.AddHours(6), provider.TimeProvider.GetUtcNow());
         }
 
         [Fact]
@@ -312,11 +299,71 @@ namespace KodeAid.Testing
             AssertEqual(_dateTime.AddSeconds(2), provider.Now);
         }
 
+        [Fact]
+        public async Task DrivesAPeriodicTimer()
+        {
+            var provider = new TestDateTimeProvider(_dateTime);
+
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30), provider.TimeProvider);
+
+            var tick = timer.WaitForNextTickAsync();
+
+            provider.AddTime(TimeSpan.FromSeconds(29));
+
+            Assert.False(tick.IsCompleted);
+
+            provider.AddTime(TimeSpan.FromSeconds(1));
+
+            Assert.True(await tick);
+            AssertEqual(_dateTime.AddSeconds(30), provider.Now);
+        }
+
+        [Fact]
+        public async Task DrivesDelaysAndTimeouts()
+        {
+            var provider = new TestDateTimeProvider(_dateTime);
+
+            var delay = Task.Delay(TimeSpan.FromMinutes(5), provider.TimeProvider);
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10), provider.TimeProvider);
+
+            provider.AddTime(TimeSpan.FromMinutes(5));
+
+            await delay;
+
+            Assert.False(cts.IsCancellationRequested);
+
+            provider.AddTime(TimeSpan.FromMinutes(5));
+
+            Assert.True(cts.IsCancellationRequested);
+        }
+
+        /// <summary>
+        /// Rewinding used to replace the wrapped fake, which orphaned any timer already created from it.
+        /// </summary>
+        [Fact]
+        public async Task RewindingTheClockKeepsExistingTimersRunning()
+        {
+            var provider = new TestDateTimeProvider(_dateTime);
+
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30), provider.TimeProvider);
+
+            var tick = timer.WaitForNextTickAsync();
+
+            provider.SetDateTime(_dateTime.AddDays(-30));
+
+            AssertEqual(_dateTime.AddDays(-30), provider.Now);
+            Assert.False(tick.IsCompleted);
+
+            provider.AddTime(TimeSpan.FromSeconds(30));
+
+            Assert.True(await tick);
+        }
+
         #endregion
 
         private static void AssertEqual(DateTimeOffset expected, DateTimeOffset actual)
         {
-            // equality on DateTimeOffset only compares the instant in time, so the offset is checked separately
+            // Equality on DateTimeOffset only compares the instant in time, so the offset is checked separately.
             Assert.Equal(expected, actual);
             Assert.Equal(expected.Offset, actual.Offset);
         }
