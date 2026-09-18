@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/Cache/">
     <Project Path="src/AzureStorageCache/AzureStorageCache.csproj" />
     <Project Path="src/Caching/Caching.csproj" />
@@ -9,6 +9,7 @@
   <Folder Name="/Tests/">
     <Project Path="test/AutoMapper/AutoMapper.Tests.csproj" />
     <Project Path="test/Common/Common.Tests.csproj" />
+    <Project Path="test/Extensions/Extensions.Tests.csproj" />
     <Project Path="test/Json/Json.Tests.csproj" />
   </Folder>
   <Folder Name="/_Solution Items/">

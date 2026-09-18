@@ -12,9 +12,13 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds an <see cref="IDateTimeProvider"/> which follows <see cref="DateTimeProvider.Current"/>,
+        /// including any provider scoped by <see cref="DateTimeProvider.UseProvider"/>.
+        /// </summary>
         public static IServiceCollection AddCurrentDateTimeProvider(this IServiceCollection services)
         {
-            services.TryAddSingleton(DateTimeProvider.Current);
+            services.TryAddSingleton(CurrentDateTimeProvider.Instance);
             return services;
         }
 

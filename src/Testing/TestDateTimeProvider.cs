@@ -3,12 +3,21 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Time.Testing;
 
 namespace KodeAid.Testing
 {
+    /// <summary>
+    /// An <see cref="IDateTimeProvider"/> backed by a <see cref="FakeTimeProvider"/>.
+    /// The clock is frozen at the date and time it was constructed with,
+    /// unless <see cref="FakeTimeProvider.AutoAdvanceAmount"/> is set on <see cref="TimeProvider"/>.
+    /// </summary>
     public class TestDateTimeProvider : IDateTimeProvider
     {
-        private DateTimeOffset? _dateTime;
+        private readonly TimeZoneInfo _defaultTimeZone;
+        private TimeZoneInfo? _timeZone;
+        private TimeSpan? _utcOffset;
 
         public TestDateTimeProvider()
             : this(null, null, null)
@@ -40,49 +49,112 @@ namespace KodeAid.Testing
         {
         }
 
-        private TestDateTimeProvider(DateTimeOffset? dateTime, TimeSpan? utcOffset, TimeZoneInfo? timeZone)
+        /// <summary>
+        /// Wraps an existing <see cref="FakeTimeProvider"/>.
+        /// </summary>
+        public TestDateTimeProvider(FakeTimeProvider timeProvider)
         {
-            _dateTime = dateTime;
-            UtcOffset = utcOffset;
-            TimeZone = timeZone;
+            ArgCheck.NotNull(nameof(timeProvider), timeProvider);
+            TimeProvider = timeProvider;
+            _defaultTimeZone = timeProvider.LocalTimeZone;
         }
 
-        public DateTimeOffset Now
+        private TestDateTimeProvider(DateTimeOffset? dateTime, TimeSpan? utcOffset, TimeZoneInfo? timeZone)
         {
-            get
+            // a fake time provider must be given a UTC time, otherwise the offset is applied twice
+            TimeProvider = new FakeTimeProvider(dateTime?.ToUniversalTime() ?? DateTimeOffset.UtcNow);
+            _defaultTimeZone = dateTime != null ? CreateFixedTimeZone(dateTime.Value.Offset) : TimeZoneInfo.Local;
+            _timeZone = timeZone;
+            _utcOffset = utcOffset;
+            ApplyTimeZone();
+        }
+
+        /// <summary>
+        /// The underlying fake time provider.
+        /// </summary>
+        public FakeTimeProvider TimeProvider { get; private set; }
+
+        public DateTimeOffset Now => TimeProvider.GetLocalNow();
+
+        /// <summary>
+        /// The effective time zone, which may be overridden by <see cref="UtcOffset"/>.
+        /// </summary>
+        [AllowNull]
+        public TimeZoneInfo TimeZone
+        {
+            get => TimeProvider.LocalTimeZone;
+            set
             {
-                var dateTime = _dateTime ?? DateTimeOffset.Now;
-
-                if (UtcOffset != null)
-                {
-                    dateTime = dateTime.ToOffset(UtcOffset.Value);
-                }
-                else if (TimeZone != null)
-                {
-                    dateTime = TimeZoneInfo.ConvertTime(dateTime, TimeZone);
-                }
-
-                return dateTime;
+                _timeZone = value;
+                ApplyTimeZone();
             }
         }
 
-        public TimeZoneInfo? TimeZone { get; set; }
-
-        public DateTimeOffset UtcNow => Now.ToUniversalTime();
+        public DateTimeOffset UtcNow => TimeProvider.GetUtcNow();
 
         /// <summary>
         /// Overrides <see cref="TimeZone"/> with a set offset from UTC.
         /// </summary>
-        public TimeSpan? UtcOffset { get; set; }
+        public TimeSpan? UtcOffset
+        {
+            get => _utcOffset;
+            set
+            {
+                _utcOffset = value;
+                ApplyTimeZone();
+            }
+        }
 
         public void AddTime(TimeSpan time)
         {
-            SetDateTime(Now.Add(time));
+            if (time < TimeSpan.Zero)
+            {
+                SetDateTime(UtcNow.Add(time));
+            }
+            else
+            {
+                TimeProvider.Advance(time);
+            }
         }
 
         public void SetDateTime(DateTimeOffset dateTime)
         {
-            _dateTime = dateTime;
+            if (dateTime < TimeProvider.GetUtcNow())
+            {
+                // a fake time provider cannot move backwards in time, so replace it
+                var timeProvider = new FakeTimeProvider(dateTime.ToUniversalTime())
+                {
+                    AutoAdvanceAmount = TimeProvider.AutoAdvanceAmount,
+                };
+
+                TimeProvider = timeProvider;
+                ApplyTimeZone();
+            }
+            else
+            {
+                TimeProvider.SetUtcNow(dateTime.ToUniversalTime());
+            }
+        }
+
+        private void ApplyTimeZone()
+        {
+            TimeProvider.SetLocalTimeZone(
+                _utcOffset != null ? CreateFixedTimeZone(_utcOffset.Value) :
+                _timeZone ??
+                _defaultTimeZone);
+        }
+
+        private static TimeZoneInfo CreateFixedTimeZone(TimeSpan utcOffset)
+        {
+            if (utcOffset == TimeSpan.Zero)
+            {
+                return TimeZoneInfo.Utc;
+            }
+
+            var duration = utcOffset.Duration();
+            var id = $"UTC{(utcOffset < TimeSpan.Zero ? "-" : "+")}{duration.Hours:00}:{duration.Minutes:00}";
+
+            return TimeZoneInfo.CreateCustomTimeZone(id, utcOffset, id, id);
         }
     }
 }
