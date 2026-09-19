@@ -13,21 +13,15 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds an <see cref="IDateTimeProvider"/> which follows <see cref="DateTimeProvider.Current"/>,
-        /// including any provider scoped by <see cref="DateTimeProvider.UseProvider"/>.
+        /// Adds an <see cref="IDateTimeProvider"/> backed by the registered <see cref="TimeProvider"/>,
+        /// falling back to <see cref="TimeProvider.System"/> when no time provider is registered.
+        /// Both are resolved lazily, so the time provider may be registered before or after this.
         /// </summary>
-        public static IServiceCollection AddCurrentDateTimeProvider(this IServiceCollection services)
+        public static IServiceCollection AddDateTimeProvider(this IServiceCollection services)
         {
-            services.TryAddSingleton(CurrentDateTimeProvider.Instance);
-            return services;
-        }
+            ArgCheck.NotNull(nameof(services), services);
 
-        /// <summary>
-        /// Adds an <see cref="IDateTimeProvider"/> backed by the system clock.
-        /// </summary>
-        public static IServiceCollection AddDefaultDateTimeProvider(this IServiceCollection services)
-        {
-            services.TryAddSingleton(DefaultDateTimeProvider.Instance);
+            services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
             return services;
         }
 

@@ -13,6 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.*" />
     </ItemGroup>
 
     <ItemGroup>

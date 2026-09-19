@@ -1,266 +1,118 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using KodeAid.Testing;
+using Microsoft.Extensions.Time.Testing;
 using Xunit;
 
 namespace KodeAid
 {
     /// <summary>
-    /// This is the only test class which touches the process-wide provider, tests within a class are
-    /// never run in parallel with each other, so keeping it here is what stops it racing other tests.
-    /// Everything else overrides the provider with <see cref="DateTimeProvider.UseProvider"/>,
-    /// which is scoped to the running test.
+    /// <see cref="DateTimeProvider"/> is now a <see cref="TimeProvider"/>,
+    /// these confirm it still reports the same values as the previous
+    /// <see cref="DateTimeOffset.Now"/>/<see cref="DateTimeOffset.UtcNow"/>/<see cref="TimeZoneInfo.Local"/> implementation.
     /// </summary>
     public class DateTimeProviderTest
     {
+        private static readonly TimeSpan _tolerance = TimeSpan.FromSeconds(10);
+
         [Fact]
-        public void CurrentDefaultsToTheDefaultProvider()
+        public void NowMatchesSystemLocalTime()
         {
-            Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
+            var expected = DateTimeOffset.Now;
+
+            var actual = DateTimeProvider.System.Now;
+
+            Assert.Equal(expected.Offset, actual.Offset);
+            Assert.True((actual - expected).Duration() < _tolerance, $"Expected {actual:o} to be within {_tolerance} of {expected:o}.");
         }
 
         [Fact]
-        public void SetCurrentProviderReplacesTheProcessWideProvider()
+        public void UtcNowMatchesSystemUtcTime()
         {
-            var provider = new TestDateTimeProvider();
+            var expected = DateTimeOffset.UtcNow;
 
-            try
-            {
-                DateTimeProvider.SetCurrentProvider(provider);
+            var actual = DateTimeProvider.System.UtcNow;
 
-                Assert.Same(provider, DateTimeProvider.Current);
-            }
-            finally
-            {
-                DateTimeProvider.ResetCurrentProviderToDefault();
-            }
-
-            Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
+            Assert.Equal(TimeSpan.Zero, actual.Offset);
+            Assert.True((actual - expected).Duration() < _tolerance, $"Expected {actual:o} to be within {_tolerance} of {expected:o}.");
         }
 
         [Fact]
-        public void SetCurrentProviderThrowsWhenTheProviderIsNull()
+        public void TimeZoneMatchesSystemLocalTimeZone()
         {
-            Assert.Throws<ArgumentNullException>(() => DateTimeProvider.SetCurrentProvider(null!));
+            Assert.Equal(TimeZoneInfo.Local, DateTimeProvider.System.TimeZone);
         }
 
         [Fact]
-        public void UseProviderThrowsWhenTheProviderIsNull()
+        public void InstanceIsASingleton()
         {
-            Assert.Throws<ArgumentNullException>(() => DateTimeProvider.UseProvider(null!));
+            // The ambient provider is covered by DateTimeProviderTest, which owns the process-wide state.
+            Assert.Same(DateTimeProvider.System, DateTimeProvider.System);
         }
 
         [Fact]
-        public void UseProviderOverridesCurrentUntilTheScopeIsDisposed()
+        public void ExposesTheSystemTimeProvider()
         {
-            var provider = new TestDateTimeProvider();
-
-            using (DateTimeProvider.UseProvider(provider))
-            {
-                Assert.Same(provider, DateTimeProvider.Current);
-            }
-
-            Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
+            Assert.Same(TimeProvider.System, DateTimeProvider.System.TimeProvider);
+            Assert.Same(TimeProvider.System, new DateTimeProvider().TimeProvider);
+            Assert.Same(TimeProvider.System, new DateTimeProvider(null).TimeProvider);
         }
 
         [Fact]
-        public void UseProviderTakesPrecedenceOverTheProcessWideProvider()
+        public void ParameterlessConstructorUsesTheSystemClock()
         {
-            var processWide = new TestDateTimeProvider();
-            var scoped = new TestDateTimeProvider();
+            var provider = new DateTimeProvider();
 
-            try
-            {
-                DateTimeProvider.SetCurrentProvider(processWide);
-
-                using (DateTimeProvider.UseProvider(scoped))
-                {
-                    Assert.Same(scoped, DateTimeProvider.Current);
-                }
-
-                Assert.Same(processWide, DateTimeProvider.Current);
-            }
-            finally
-            {
-                DateTimeProvider.ResetCurrentProviderToDefault();
-            }
+            AssertWithinTolerance(DateTimeOffset.UtcNow, provider.UtcNow);
+            Assert.Equal(TimeZoneInfo.Local, provider.TimeZone);
         }
 
         [Fact]
-        public void ResetCurrentProviderToDefaultLeavesAScopedProviderInEffect()
+        public void NullTimeProviderFallsBackToTheSystemClock()
         {
-            var scoped = new TestDateTimeProvider();
+            var provider = new DateTimeProvider(null);
 
-            try
-            {
-                DateTimeProvider.SetCurrentProvider(new TestDateTimeProvider());
-
-                using (DateTimeProvider.UseProvider(scoped))
-                {
-                    DateTimeProvider.ResetCurrentProviderToDefault();
-
-                    Assert.Same(scoped, DateTimeProvider.Current);
-                }
-
-                Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
-            }
-            finally
-            {
-                DateTimeProvider.ResetCurrentProviderToDefault();
-            }
+            AssertWithinTolerance(DateTimeOffset.UtcNow, provider.UtcNow);
+            Assert.Equal(TimeZoneInfo.Local, provider.TimeZone);
         }
 
         [Fact]
-        public void ScopesNest()
+        public void SuppliedTimeProviderDrivesTheClock()
         {
-            var outer = new TestDateTimeProvider();
-            var inner = new TestDateTimeProvider();
+            var timeProvider = new FakeTimeProvider(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero));
+            timeProvider.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("UTC-06:00", TimeSpan.FromHours(-6), "UTC-06:00", "UTC-06:00"));
 
-            using (DateTimeProvider.UseProvider(outer))
-            {
-                Assert.Same(outer, DateTimeProvider.Current);
+            var provider = new DateTimeProvider(timeProvider);
 
-                using (DateTimeProvider.UseProvider(inner))
-                {
-                    Assert.Same(inner, DateTimeProvider.Current);
-                }
-
-                Assert.Same(outer, DateTimeProvider.Current);
-            }
-
-            Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
+            Assert.Equal(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero), provider.UtcNow);
+            Assert.Equal(new DateTimeOffset(2019, 7, 4, 10, 30, 0, TimeSpan.FromHours(-6)), provider.Now);
+            Assert.Equal(TimeSpan.FromHours(-6), provider.Now.Offset);
+            Assert.Equal(timeProvider.LocalTimeZone, provider.TimeZone);
+            Assert.Same(timeProvider, provider.TimeProvider);
         }
 
         [Fact]
-        public void DisposingAScopeMoreThanOnceDoesNothing()
+        public async Task SuppliedTimeProviderAlsoDrivesTimers()
         {
-            var outer = new TestDateTimeProvider();
-            var inner = new TestDateTimeProvider();
+            var timeProvider = new FakeTimeProvider(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero));
 
-            using (DateTimeProvider.UseProvider(outer))
-            {
-                var scope = DateTimeProvider.UseProvider(inner);
+            var provider = new DateTimeProvider(timeProvider);
 
-                scope.Dispose();
-                scope.Dispose();
+            // The timer must run on the supplied clock, not the real one.
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30), provider.TimeProvider);
 
-                Assert.Same(outer, DateTimeProvider.Current);
-            }
+            var tick = timer.WaitForNextTickAsync();
+
+            Assert.False(tick.IsCompleted);
+
+            timeProvider.Advance(TimeSpan.FromSeconds(30));
+
+            Assert.True(await tick);
         }
 
-        [Fact]
-        public async Task ScopeFlowsAcrossAwaits()
+        private static void AssertWithinTolerance(DateTimeOffset expected, DateTimeOffset actual)
         {
-            var provider = new TestDateTimeProvider();
-
-            using (DateTimeProvider.UseProvider(provider))
-            {
-                await Task.Delay(10);
-
-                Assert.Same(provider, DateTimeProvider.Current);
-
-                await Task.Run(() => Assert.Same(provider, DateTimeProvider.Current));
-
-                Assert.Same(provider, DateTimeProvider.Current);
-            }
-        }
-
-        [Fact]
-        public async Task ScopeDoesNotLeakOutOfTheFlowThatOpenedIt()
-        {
-            var provider = new TestDateTimeProvider();
-
-            await Task.Run(() =>
-            {
-                using (DateTimeProvider.UseProvider(provider))
-                {
-                    Assert.Same(provider, DateTimeProvider.Current);
-                }
-            });
-
-            Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
-        }
-
-        [Fact]
-        public async Task ConcurrentFlowsEachSeeTheirOwnProvider()
-        {
-            var tasks = Enumerable.Range(0, 16).Select(i => Task.Run(async () =>
-            {
-                var provider = new TestDateTimeProvider(new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero).AddDays(i));
-
-                using (DateTimeProvider.UseProvider(provider))
-                {
-                    for (var j = 0; j < 10; j++)
-                    {
-                        Assert.Same(provider, DateTimeProvider.Current);
-
-                        // Moving one flow's clock must not be visible to any other flow.
-                        provider.AddTime(TimeSpan.FromHours(1));
-
-                        Assert.Equal(new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero).AddDays(i).AddHours(j + 1), DateTimeProvider.Current.UtcNow);
-
-                        await Task.Yield();
-                    }
-                }
-            }));
-
-            await Task.WhenAll(tasks);
-
-            Assert.Same(DefaultDateTimeProvider.Instance, DateTimeProvider.Current);
-        }
-
-        [Fact]
-        public void TheTimeProviderFollowsTheAmbientProvider()
-        {
-            var provider = new TestDateTimeProvider(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero));
-
-            Assert.Same(DefaultDateTimeProvider.Instance.TimeProvider, DateTimeProvider.Current.TimeProvider);
-
-            using (DateTimeProvider.UseProvider(provider))
-            {
-                // Read at the point of use, it resolves against whichever provider is current.
-                Assert.Same(provider.TimeProvider, DateTimeProvider.Current.TimeProvider);
-                Assert.Equal(provider.UtcNow, DateTimeProvider.Current.TimeProvider.GetUtcNow());
-            }
-
-            Assert.Same(DefaultDateTimeProvider.Instance.TimeProvider, DateTimeProvider.Current.TimeProvider);
-        }
-
-        [Fact]
-        public async Task TheTimeProviderDrivesTimersOnTheAmbientClock()
-        {
-            var provider = new TestDateTimeProvider(new DateTimeOffset(2019, 7, 4, 16, 30, 0, TimeSpan.Zero));
-
-            using (DateTimeProvider.UseProvider(provider))
-            {
-                using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30), DateTimeProvider.Current.TimeProvider);
-
-                var tick = timer.WaitForNextTickAsync();
-
-                Assert.False(tick.IsCompleted);
-
-                provider.AddTime(TimeSpan.FromSeconds(30));
-
-                Assert.True(await tick);
-            }
-        }
-
-        [Fact]
-        public void TheAmbientProviderCannotBeSetToTheForwardingProvider()
-        {
-            // It forwards to Current, so installing it would recurse forever.
-            Assert.Throws<ArgumentException>(() => DateTimeProvider.SetCurrentProvider(CurrentDateTimeProvider.Instance));
-            Assert.Throws<ArgumentException>(() => DateTimeProvider.UseProvider(CurrentDateTimeProvider.Instance));
-        }
-
-        [Fact]
-        public void IsAStaticClass()
-        {
-            var type = typeof(DateTimeProvider);
-
-            Assert.True(type.IsAbstract && type.IsSealed, "DateTimeProvider should be a static class.");
+            Assert.True((actual - expected).Duration() < _tolerance, $"Expected {actual:o} to be within {_tolerance} of {expected:o}.");
         }
     }
 }

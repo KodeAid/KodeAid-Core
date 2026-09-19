@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using KodeAid;
 using KodeAid.Testing;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -12,64 +13,58 @@ namespace KodeAid
         private static readonly DateTimeOffset _dateTime = new DateTimeOffset(2019, 7, 4, 10, 30, 0, TimeSpan.FromHours(-6));
 
         [Fact]
-        public void AddCurrentDateTimeProviderRegistersTheInterface()
+        public void AddDateTimeProviderFollowsTheRegisteredTimeProvider()
         {
-            var services = new ServiceCollection().AddCurrentDateTimeProvider();
+            var timeProvider = new FakeTimeProvider(_dateTime.ToUniversalTime());
 
-            var descriptor = Assert.Single(services);
+            using var serviceProvider = new ServiceCollection()
+                .AddSingleton<TimeProvider>(timeProvider)
+                .AddDateTimeProvider()
+                .BuildServiceProvider();
 
-            Assert.Equal(typeof(IDateTimeProvider), descriptor.ServiceType);
-            Assert.Equal(ServiceLifetime.Singleton, descriptor.Lifetime);
+            var dateTimeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
+
+            Assert.Same(timeProvider, dateTimeProvider.TimeProvider);
+            Assert.Equal(_dateTime, dateTimeProvider.UtcNow);
+
+            timeProvider.Advance(TimeSpan.FromHours(3));
+
+            Assert.Equal(_dateTime.AddHours(3), dateTimeProvider.UtcNow);
         }
 
         [Fact]
-        public void AddCurrentDateTimeProviderResolvesAProviderWhichFollowsTheAmbientProvider()
+        public void AddDateTimeProviderPicksUpATimeProviderRegisteredAfterIt()
         {
-            using var serviceProvider = new ServiceCollection().AddCurrentDateTimeProvider().BuildServiceProvider();
+            var timeProvider = new FakeTimeProvider(_dateTime.ToUniversalTime());
 
-            // Resolved before the scope is opened, as a singleton consumer would be.
+            using var serviceProvider = new ServiceCollection()
+                .AddDateTimeProvider()
+                .AddSingleton<TimeProvider>(timeProvider)
+                .BuildServiceProvider();
+
+            // Both are resolved lazily, so the order they were registered in does not matter.
+            Assert.Same(timeProvider, serviceProvider.GetRequiredService<IDateTimeProvider>().TimeProvider);
+        }
+
+        [Fact]
+        public void AddDateTimeProviderFallsBackToTheSystemClock()
+        {
+            using var serviceProvider = new ServiceCollection().AddDateTimeProvider().BuildServiceProvider();
+
             var dateTimeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
 
-            var provider = new TestDateTimeProvider(_dateTime);
-
-            using (DateTimeProvider.UseProvider(provider))
-            {
-                Assert.Equal(_dateTime, dateTimeProvider.Now);
-                Assert.Equal(_dateTime.Offset, dateTimeProvider.Now.Offset);
-
-                provider.AddTime(TimeSpan.FromHours(3));
-
-                Assert.Equal(_dateTime.AddHours(3), dateTimeProvider.Now);
-            }
-
+            Assert.Same(TimeProvider.System, dateTimeProvider.TimeProvider);
             Assert.Equal(TimeZoneInfo.Local, dateTimeProvider.TimeZone);
         }
 
         [Fact]
-        public void AddDefaultDateTimeProviderResolvesTheSystemClock()
+        public void AddDateTimeProviderDoesNotReplaceAnExistingRegistration()
         {
-            using var serviceProvider = new ServiceCollection().AddDefaultDateTimeProvider().BuildServiceProvider();
-
-            var dateTimeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
-
-            Assert.Same(DefaultDateTimeProvider.Instance, dateTimeProvider);
-
-            // Unlike the current provider, this one ignores the ambient provider.
-            using (DateTimeProvider.UseProvider(new TestDateTimeProvider(_dateTime)))
-            {
-                Assert.Equal(TimeZoneInfo.Local, dateTimeProvider.TimeZone);
-            }
-        }
-
-        [Fact]
-        public void TheDateTimeProviderRegistrationsDoNotReplaceAnExistingOne()
-        {
-            var provider = new TestDateTimeProvider(_dateTime);
+            var provider = new DateTimeProvider(new FakeTimeProvider().SetDateTime(_dateTime));
 
             using var serviceProvider = new ServiceCollection()
                 .AddSingleton<IDateTimeProvider>(provider)
-                .AddCurrentDateTimeProvider()
-                .AddDefaultDateTimeProvider()
+                .AddDateTimeProvider()
                 .BuildServiceProvider();
 
             Assert.Same(provider, serviceProvider.GetRequiredService<IDateTimeProvider>());
