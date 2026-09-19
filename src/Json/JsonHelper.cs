@@ -23,7 +23,8 @@ namespace KodeAid.Json
         /// <param name="configure">An optional callback to further configure the settings.</param>
         public static void SetDefaultSettings(Action<JsonSerializerSettings>? configure = null)
         {
-            JsonConvert.DefaultSettings = () => CreateDefaultSettings(configure);
+            var settings = CreateDefaultSettings(configure);
+            JsonConvert.DefaultSettings = () => settings;
         }
 
         /// <summary>
