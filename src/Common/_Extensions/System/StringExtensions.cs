@@ -3,6 +3,7 @@
 
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,12 @@ namespace System
         public static byte[] FromBase64Url(this string base64Url)
         {
             return Base64UrlEncoder.DecodeBytes(base64Url);
+        }
+
+        [return: NotNullIfNotNull(nameof(hexString))]
+        public static byte[]? FromHexString(this string? hexString)
+        {
+            return HexEncoder.DecodeBytes(hexString);
         }
 
         public static int GetBase64DecodedByteCount(this string base64String)

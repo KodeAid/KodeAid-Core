@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using KodeAid;
@@ -39,6 +40,12 @@ namespace System
         public static string ToBase64Url(this byte[] bytes)
         {
             return Base64UrlEncoder.EncodeBytes(bytes);
+        }
+
+        [return: NotNullIfNotNull(nameof(bytes))]
+        public static string? ToHexString(this byte[]? bytes)
+        {
+            return HexEncoder.EncodeBytes(bytes);
         }
 
         public static string ToUtf8String(this byte[] bytes)
